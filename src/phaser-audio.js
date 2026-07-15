@@ -41,6 +41,11 @@ export function queuePhaserAudio(scene, manifest) {
       queued.push(key);
     });
   }
+  for (const [trackId, entry] of Object.entries(manifest.music || {})) {
+    const key = keyFor('music', trackId);
+    scene.load.audio(key, entry.file);
+    queued.push(key);
+  }
   for (const [trackId, entry] of Object.entries(manifest.ambience || {})) {
     const key = keyFor('ambience', trackId);
     scene.load.audio(key, entry.file);
@@ -58,6 +63,8 @@ export function createPhaserAudio(scene, manifest, {
 } = {}) {
   if (!scene?.sound) throw new TypeError('A Phaser Scene with the Sound plugin is required');
   let muted = readMuted(storage, storageKey);
+  let activeMusic;
+  let activeMusicTrackId;
   let activeAmbience;
   let activeAmbienceTrackId;
   let destroyed = false;
@@ -80,11 +87,22 @@ export function createPhaserAudio(scene, manifest, {
     return true;
   }
 
+  function stopMusic() {
+    if (!activeMusic) return false;
+    activeMusic.stop?.();
+    activeMusic.destroy?.();
+    activeMusic = undefined;
+    activeMusicTrackId = undefined;
+    return true;
+  }
+
   function onShutdown() {
+    stopMusic();
     if (stopAmbienceOnSceneShutdown) stopAmbience();
   }
 
   function onSceneDestroy() {
+    stopMusic();
     stopAmbience();
   }
 
@@ -157,10 +175,42 @@ export function createPhaserAudio(scene, manifest, {
       return true;
     },
 
+    async playMusic(trackId, { volume = 1 } = {}) {
+      if (!trackId || destroyed || muted || scene.sound.locked) return false;
+      if (activeMusicTrackId === trackId) return true;
+      const entry = manifest.music?.[trackId];
+      const key = keyFor('music', trackId);
+      if (!entry || !cached(key)) return false;
+
+      stopMusic();
+      const instance = scene.sound.add(key, {
+        loop: entry.loop === true,
+        volume: Math.max(0, Math.min(1,
+          Number(entry.volume ?? manifest.defaults?.musicVolume ?? 0.28) * Number(volume)
+        ))
+      });
+      activeMusic = instance;
+      activeMusicTrackId = trackId;
+      instance.once?.('complete', () => {
+        if (activeMusic !== instance) return;
+        instance.destroy?.();
+        activeMusic = undefined;
+        activeMusicTrackId = undefined;
+      });
+      const played = instance.play();
+      if (played === false) {
+        stopMusic();
+        return false;
+      }
+      return true;
+    },
+
     stopAmbience,
+    stopMusic,
 
     setMuted(nextMuted) {
       muted = Boolean(nextMuted);
+      if (muted) stopMusic();
       if (muted) stopAmbience();
       scene.sound.setMute?.(muted);
       storeMuted(storage, storageKey, muted);
@@ -183,6 +233,7 @@ export function createPhaserAudio(scene, manifest, {
 
     async destroy() {
       destroyed = true;
+      stopMusic();
       stopAmbience();
       scene.events?.off?.('shutdown', onShutdown);
       scene.events?.off?.('destroy', onSceneDestroy);

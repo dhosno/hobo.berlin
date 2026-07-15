@@ -2,7 +2,8 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 const SAMPLE_RATE = 22050;
-const OUTPUT_DIR = new URL('../public/assets/audio/sfx/', import.meta.url);
+const BASE_OUTPUT_DIR = new URL('../public/assets/audio/sfx/base/', import.meta.url);
+const ALT_OUTPUT_DIR = new URL('../public/assets/audio/sfx/alt/', import.meta.url);
 const TAU = Math.PI * 2;
 
 function secondsToSamples(seconds) {
@@ -278,9 +279,15 @@ Object.assign(sounds, {
   ])
 });
 
-await mkdir(OUTPUT_DIR, { recursive: true });
+await Promise.all([
+  mkdir(BASE_OUTPUT_DIR, { recursive: true }),
+  mkdir(ALT_OUTPUT_DIR, { recursive: true })
+]);
 await Promise.all(
-  Object.entries(sounds).map(([filename, samples]) => writeFile(join(OUTPUT_DIR.pathname, filename), wav8Mono(samples)))
+  Object.entries(sounds).map(([filename, samples]) => {
+    const directory = filename.endsWith('-alt.wav') ? ALT_OUTPUT_DIR : BASE_OUTPUT_DIR;
+    return writeFile(join(directory.pathname, filename), wav8Mono(samples));
+  })
 );
 
-console.log(`Generated ${Object.keys(sounds).length} sounds in ${OUTPUT_DIR.pathname}`);
+console.log(`Generated ${Object.keys(sounds).length} base/alt sounds under public/assets/audio/sfx/`);
