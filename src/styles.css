@@ -379,8 +379,18 @@ body {
 }
 
 #queue-bar {
-  margin-top: 0.35rem;
-  max-width: 14rem;
+  position: absolute;
+  top: 0.45rem;
+  left: 50%;
+  z-index: 7;
+  transform: translateX(-50%);
+  width: min(86%, 14rem);
+  padding: 0.35rem 0.55rem;
+  border-radius: 10px;
+  background: rgba(18, 22, 15, 0.92);
+  border: 1px solid rgba(243, 240, 230, 0.12);
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.28);
 }
 
 #queue-bar.hidden {

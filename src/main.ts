@@ -49,12 +49,12 @@ app.innerHTML = `
         <span id="hud-need"></span>
       </div>
       <div id="hud-toast"></div>
+    </header>
+    <div id="playfield">
       <div id="queue-bar" class="hidden" aria-hidden="true">
         <div id="queue-track"><div id="queue-fill"></div></div>
         <span id="queue-label"></span>
       </div>
-    </header>
-    <div id="playfield">
       <div id="dev-badge" class="hidden">DEV · timer frozen</div>
       <div id="game" aria-label="hobo.berlin grid"></div>
       <div id="stage" class="hidden" aria-live="polite">
