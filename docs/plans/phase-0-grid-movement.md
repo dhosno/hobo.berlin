@@ -576,11 +576,11 @@ Expected RED: the presentation marker and new obstacle flow fail before scene ch
 
 Preload all six manifest textures. Render 384 terrain images at exact 32×32 design cells, then the Gate at native 128×96, tree/bin props, a subtle grid, and the character at the authoritative player cell. Preserve texture aspect ratios and pixel-snap coordinates. Set the presentation marker only after successful rendering. Thread a Phaser loader-failure callback through `createGame` into the existing idempotent bootstrap cleanup. Add `image-rendering: pixelated` to the canvas; keep `Phaser.Scale.FIT` and the complete-map 3:2 layout.
 
-- [ ] **Step 7: Verify focused GREEN**
+- [ ] **Step 7: Verify focused unit/build GREEN and prepare manual browser review**
 
-Run: `pnpm exec playwright test tests/e2e/phase-0.spec.ts && pnpm test && pnpm build`
+Run: `pnpm test && pnpm build`
 
-Expected: Stage B browser flow, all unit tests, and build pass.
+Expected: all unit tests and the production build pass. Keep the Stage B Playwright coverage checked in but do not run it unless the user explicitly asks. Start Vite for the manual browser checkpoint.
 
 - [ ] **Step 8: Commit and review**
 
@@ -594,9 +594,9 @@ Commit message: `feat: add berlin park grid`
 
 - [ ] **Step 1: Run the complete clean verification suite**
 
-Run: `pnpm install --frozen-lockfile && pnpm test && pnpm build && pnpm exec playwright test`
+Run: `pnpm install --frozen-lockfile && pnpm test && pnpm build`
 
-Expected: frozen install, unit tests, build, and browser tests all exit 0.
+Expected: frozen install, unit tests, and build all exit 0. Do not run Playwright unless the user explicitly asks.
 
 - [ ] **Step 2: Verify the final app in a real browser**
 

@@ -19,7 +19,7 @@ Before editing, use this source-of-truth order:
 - Treat grid state as the movement and collision source of truth; rendering must not own gameplay state.
 - Keep the complete 24×16 map visible responsively at a 768×512 design resolution.
 - Follow test-driven development: observe each behavior test fail before adding its production code.
-- Add dedicated browser-level coverage for the complete movement flow, then verify non-trivial behavior in a real browser.
+- Keep dedicated browser-level coverage for the complete movement flow, but do not run Playwright unless the user explicitly asks; verify non-trivial behavior manually in the real browser instead.
 - Stage B placeholder art must not begin until the user manually approves the Stage A debug proof of concept.
 
 ## Scope Guard

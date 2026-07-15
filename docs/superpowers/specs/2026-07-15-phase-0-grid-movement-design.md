@@ -174,6 +174,8 @@ A second Playwright test intercepts the real map request and returns a contract-
 
 Use the status readout for position assertions and screenshots/canvas bounds for presentation assertions. Do not expose test-only production APIs or assert on mocked Phaser behavior.
 
+Keep this browser coverage checked in, but do not run Playwright unless the user explicitly requests it. Stage B verification uses the running Vite application and a manual browser checkpoint instead.
+
 ## Acceptance Criteria
 
 Stage A is ready for the manual checkpoint only when all of the following are true:
