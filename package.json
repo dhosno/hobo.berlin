@@ -1,0 +1,26 @@
+{
+  "name": "hobo-berlin",
+  "description": "An in-browser game for hobos moving around Berlin, collecting bottles in exchange for money to buy food and weed.",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24 <26"
+  },
+  "packageManager": "pnpm@11.13.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "phaser": "4.2.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.61.1",
+    "typescript": "7.0.2",
+    "vite": "8.1.4",
+    "vitest": "4.1.10"
+  }
+}

@@ -18,6 +18,8 @@ This workstream owns **structure and presentation chrome**, not bottle math or d
 
 ## WP-0 — Foundation (land first, then share)
 
+> **Current Phase 0 contract:** [`../superpowers/specs/2026-07-15-phase-0-grid-movement-design.md`](../superpowers/specs/2026-07-15-phase-0-grid-movement-design.md) is authoritative for the first implementation slice. It uses Phaser and Tiled, a responsive 24×16 whole-map landscape canvas, arrow-key input, and no touch controls, interactions, HUD, or shell UI. The broader WP-0 material below remains future work after Phase 0.
+
 ### Deliverables
 
 | Area | Requirement |

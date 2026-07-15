@@ -1,0 +1,51 @@
+:root {
+  color: #f3ead7;
+  background: #151922;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+html,
+body,
+#app {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+#app {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+#game {
+  width: min(100vw, 150vh);
+  max-width: 100vw;
+  height: min(100vh, calc(100vw / 1.5));
+  max-height: 100vh;
+  aspect-ratio: 3 / 2;
+}
+
+#player-position {
+  position: absolute;
+  inset: 0.5rem auto auto 0.5rem;
+  padding: 0.3rem 0.45rem;
+  color: #f3ead7;
+  background: rgb(21 25 34 / 85%);
+  border: 1px solid #f3ead7;
+  pointer-events: none;
+}
+
+#game [role="alert"] {
+  box-sizing: border-box;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 2rem;
+  place-items: center;
+  color: #ffd6d6;
+  background: #391c24;
+  text-align: center;
+}
