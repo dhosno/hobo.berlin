@@ -44,7 +44,7 @@ export const REWE_WAIT_MAX_MS = 12_000;
 export const DONER_WAIT_MIN_MS = 2_000;
 export const DONER_WAIT_MAX_MS = 5_000;
 /** Player-facing name for the food stand. */
-export const MEAL_VENDOR_NAME = "Mustafa Kebap";
+export const MEAL_VENDOR_NAME = "kebap with Attitude";
 
 export const ACTIVE_MAP_URL = new URL("../assets/maps/phase-1.json", import.meta.url);
 

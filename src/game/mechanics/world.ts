@@ -321,7 +321,7 @@ function dropLooseBottles(items: WorldItem[], count: number): WorldItem[] {
 
 /**
  * Guarantee the day is winnable, then soft-cap surplus so early days stay
- * generous without trivializing Mustafa Kebap.
+ * generous without trivializing kebap with Attitude.
  */
 export function balanceDayEconomy(
   items: WorldItem[],

@@ -33,8 +33,8 @@ test("renders the canvas, HUD hearts, and spawn status", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator("#game canvas")).toHaveCount(1);
   await expect(page.locator("#hud-hearts")).toContainText("♥");
-  await expect(page.locator("#player-position")).toHaveText("Player: 2,25");
-  await expect.poll(() => readPosition(page)).toEqual({ column: 2, row: 25 });
+  await expect(page.locator("#player-position")).toHaveText("Player: 4,13");
+  await expect.poll(() => readPosition(page)).toEqual({ column: 4, row: 13 });
 });
 
 for (const viewport of [

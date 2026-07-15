@@ -37,7 +37,7 @@ app.innerHTML = `
         </div>
         <div class="hud-cell hud-cell-meal">
           <span class="hud-label">Meal</span>
-          <span id="hud-meal">Mustafa Kebap €—</span>
+          <span id="hud-meal">kebap with Attitude €—</span>
         </div>
         <div class="hud-cell hud-cell-fed">
           <span class="hud-label">Status</span>

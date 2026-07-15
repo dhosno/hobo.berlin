@@ -47,6 +47,9 @@ describe("portrait board layout", () => {
       .filter((item) => item.assetKey === "tree")
       .map((item) => item.position);
 
+    expect(map.spawn).toEqual({ column: 4, row: 13 });
+    expect(terrainAt(map.spawn.column, map.spawn.row)).toBe("asphalt");
+
     expect(gate).toMatchObject({
       position: { column: 7, row: 12 },
       size: { columns: 4, rows: 3 },

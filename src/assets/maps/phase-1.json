@@ -12,8 +12,8 @@
           "name": "player",
           "point": true,
           "visible": true,
-          "x": 56,
-          "y": 700
+          "x": 112,
+          "y": 364
         }
       ],
       "type": "objectgroup",
