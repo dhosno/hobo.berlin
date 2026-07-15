@@ -128,12 +128,21 @@ export function spawnDailyCollectibles(
   mark(world.spawn);
   for (const key of world.blockedCells) reserved.add(key);
 
-  const fixed = world.items.filter(
-    (item) =>
-      item.type === "scenery" ||
-      item.type === "bottle-return" ||
-      item.type === "food",
-  );
+  // Each day, bottle-return randomly presents as REWE or Netto (seeded).
+  const fixed = world.items
+    .filter(
+      (item) =>
+        item.type === "scenery" ||
+        item.type === "bottle-return" ||
+        item.type === "food",
+    )
+    .map((item) => {
+      if (item.type !== "bottle-return") return item;
+      return {
+        ...item,
+        assetKey: rng.chance(0.5) ? "rewe" : "netto",
+      };
+    });
   for (const item of fixed) {
     for (const cell of cellsOf(item)) mark(cell);
   }
@@ -147,43 +156,116 @@ export function spawnDailyCollectibles(
     }
   }
 
-  const shuffled = rng.shuffle(free);
+  const binCount = clamp(
+    balance.binCount + rng.int(-2, 2),
+    Math.max(5, balance.binCount - 3),
+    Math.min(free.length, balance.binCount + 3),
+  );
+  const looseCount = clamp(
+    balance.looseBottleCount + rng.int(-2, 3),
+    Math.max(3, balance.looseBottleCount - 3),
+    Math.max(0, free.length - binCount),
+  );
+
+  const plan: Array<"bin" | "loose"> = [
+    ...Array.from({ length: binCount }, () => "bin" as const),
+    ...Array.from({ length: looseCount }, () => "loose" as const),
+  ];
+  rng.shuffle(plan);
+
+  const remaining = [...free];
+  const placed: GridPosition[] = [];
   const collectibles: WorldItem[] = [];
-  let i = 0;
+  let binIndex = 0;
+  let looseIndex = 0;
 
-  for (let n = 0; n < balance.binCount && i < shuffled.length; n += 1, i += 1) {
-    const pos = shuffled[i]!;
-    const hazardChance =
-      balance.hazardChanceMin +
-      rng.next() * (balance.hazardChanceMax - balance.hazardChanceMin);
-    collectibles.push({
-      id: `bin-${n}`,
-      type: "bin",
-      position: pos,
-      size: { columns: 1, rows: 1 },
-      blocking: true,
-      state: "available",
-      yieldBottles: rng.int(balance.binYieldMin, balance.binYieldMax),
-      hazardChance,
-    });
-  }
+  for (const kind of plan) {
+    const pos = takeChaoticCell(remaining, placed, rng);
+    if (!pos) break;
+    removeFreeCell(remaining, pos);
+    placed.push(pos);
 
-  for (
-    let n = 0;
-    n < balance.looseBottleCount && i < shuffled.length;
-    n += 1, i += 1
-  ) {
-    collectibles.push({
-      id: `loose-${n}`,
-      type: "loose-bottle",
-      position: shuffled[i]!,
-      size: { columns: 1, rows: 1 },
-      blocking: false,
-      state: "available",
-    });
+    if (kind === "bin") {
+      const hazardChance =
+        balance.hazardChanceMin +
+        rng.next() * (balance.hazardChanceMax - balance.hazardChanceMin);
+      collectibles.push({
+        id: `bin-${binIndex}`,
+        type: "bin",
+        position: pos,
+        size: { columns: 1, rows: 1 },
+        blocking: true,
+        state: "available",
+        yieldBottles: rng.int(balance.binYieldMin, balance.binYieldMax),
+        hazardChance,
+      });
+      binIndex += 1;
+    } else {
+      collectibles.push({
+        id: `loose-${looseIndex}`,
+        type: "loose-bottle",
+        position: pos,
+        size: { columns: 1, rows: 1 },
+        blocking: false,
+        state: "available",
+      });
+      looseIndex += 1;
+    }
   }
 
   return [...fixed, ...collectibles];
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, value));
+}
+
+function manhattan(a: GridPosition, b: GridPosition): number {
+  return Math.abs(a.column - b.column) + Math.abs(a.row - b.row);
+}
+
+function removeFreeCell(free: GridPosition[], pos: GridPosition): void {
+  const index = free.findIndex(
+    (cell) => cell.column === pos.column && cell.row === pos.row,
+  );
+  if (index >= 0) free.splice(index, 1);
+}
+
+/**
+ * Mix of clustered and scattered placements so the board feels messier each day.
+ */
+function takeChaoticCell(
+  free: GridPosition[],
+  placed: GridPosition[],
+  rng: Rng,
+): GridPosition | undefined {
+  if (free.length === 0) return undefined;
+
+  if (placed.length > 0 && rng.chance(0.3)) {
+    const neighbors = free.filter((cell) =>
+      placed.some((anchor) => manhattan(cell, anchor) === 1),
+    );
+    if (neighbors.length > 0) return rng.pick(neighbors);
+  }
+
+  if (placed.length > 0 && rng.chance(0.55)) {
+    let best = free[0]!;
+    let bestScore = -1;
+    const samples = Math.min(10, free.length);
+    for (let i = 0; i < samples; i += 1) {
+      const candidate = free[rng.int(0, free.length - 1)]!;
+      const score = Math.min(
+        ...placed.map((anchor) => manhattan(candidate, anchor)),
+      );
+      if (score > bestScore) {
+        best = candidate;
+        bestScore = score;
+      }
+    }
+    return best;
+  }
+
+  return free[rng.int(0, free.length - 1)]!;
 }
 
 function boostSafeBinYields(items: WorldItem[], amount: number): WorldItem[] {

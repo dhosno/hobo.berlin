@@ -10,6 +10,7 @@ import { dayBalance } from "../../src/game/mechanics/day-balance";
 import {
   bottlesNeededForMeal,
   createInitialState,
+  declareLost,
   endDayEarly,
   formatCash,
   resolveDay,
@@ -241,12 +242,33 @@ describe("mechanics run", () => {
     );
     const bins = items.filter((item) => item.type === "bin");
 
-    expect(bins.length).toBe(balance.binCount);
+    expect(bins.length).toBeGreaterThanOrEqual(Math.max(5, balance.binCount - 3));
+    expect(bins.length).toBeLessThanOrEqual(balance.binCount + 3);
     for (const bin of bins) {
       expect(bin.hazardChance).toBeGreaterThanOrEqual(BIN_HAZARD_CHANCE_MIN - 1e-9);
       expect(bin.hazardChance).toBeLessThanOrEqual(BIN_HAZARD_CHANCE_MAX + 1e-9);
       expect(bin.yieldBottles).toBeGreaterThan(0);
     }
+  });
+
+  it("randomizes bottle-return as REWE or Netto per day", () => {
+    const map = parseTiledMap(miniMap);
+    const world = worldFromParsedMap(map);
+    const brands = new Set<string>();
+    for (let i = 0; i < 24; i += 1) {
+      const items = spawnDailyCollectibles(
+        world,
+        createRng(`pfand-brand-${i}`),
+        dayBalance(1),
+      );
+      const venue = items.find((item) => item.type === "bottle-return");
+      expect(venue?.assetKey === "rewe" || venue?.assetKey === "netto").toBe(
+        true,
+      );
+      brands.add(venue!.assetKey!);
+    }
+    expect(brands.has("rewe")).toBe(true);
+    expect(brands.has("netto")).toBe(true);
   });
 
   it("burns half a heart and awards no bottles", () => {
@@ -286,5 +308,46 @@ describe("mechanics run", () => {
     expect(next.player.bottles).toBe(0);
     expect(next.lastEvents).toContain("bin-burn");
     expect(next.toast).toContain("Burn");
+  });
+
+  it("keeps a lethal burn in playing so feedback can show before lost", () => {
+    const map = parseTiledMap(miniMap);
+    let state = createInitialState(map, "lethal-burn");
+    const burner = {
+      id: "bin-lethal",
+      type: "bin" as const,
+      position: { column: 3, row: 3 },
+      size: { columns: 1, rows: 1 },
+      blocking: true,
+      state: "available" as const,
+      yieldBottles: 1,
+      hazardChance: 1,
+    };
+    state = {
+      ...state,
+      phase: "playing",
+      player: {
+        ...state.player,
+        position: { column: 4, row: 3 },
+        healthUnits: 1,
+        bottles: 0,
+      },
+      focusedItemId: burner.id,
+      world: {
+        ...state.world,
+        items: [...state.world.items.filter((i) => i.type !== "bin"), burner],
+      },
+    };
+
+    const burned = tryAction(state);
+    expect(burned.player.healthUnits).toBe(0);
+    expect(burned.phase).toBe("playing");
+    expect(burned.toast).toContain("Burn");
+    expect(burned.lastEvents.at(-1)).toBe("bin-burn");
+    expect(tickPlaying(burned, 5_000).phase).toBe("playing");
+
+    const lost = declareLost(burned);
+    expect(lost.phase).toBe("lost");
+    expect(lost.lastEvents.at(-1)).toBe("lost");
   });
 });

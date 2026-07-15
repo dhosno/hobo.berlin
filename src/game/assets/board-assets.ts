@@ -23,10 +23,20 @@ export const BOARD_ASSETS = {
 
 export type BoardAssetKey = keyof typeof BOARD_ASSETS;
 
+export type BottleReturnBrand = "rewe" | "netto";
+
 function knownAssetKey(value: string | undefined): BoardAssetKey | undefined {
   return value && Object.hasOwn(BOARD_ASSETS, value)
     ? (value as BoardAssetKey)
     : undefined;
+}
+
+export function bottleReturnBrand(item: WorldItem): BottleReturnBrand {
+  return item.assetKey === "netto" ? "netto" : "rewe";
+}
+
+export function bottleReturnLabel(item: WorldItem): string {
+  return bottleReturnBrand(item) === "netto" ? "Netto" : "REWE";
 }
 
 export function itemAssetKey(
@@ -38,8 +48,11 @@ export function itemAssetKey(
       return "trash-can";
     case "loose-bottle":
       return "bottle";
-    case "bottle-return":
+    case "bottle-return": {
+      const locked = knownAssetKey(item.assetKey);
+      if (locked === "rewe" || locked === "netto") return locked;
       return random() < 0.5 ? "rewe" : "netto";
+    }
     case "scenery":
       return knownAssetKey(item.assetKey);
     case "food":

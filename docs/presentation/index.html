@@ -1,914 +1,973 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>hobo.berlin — Pitch</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;1,9..40,400&display=swap"
-      rel="stylesheet"
-    />
-    <style>
-      :root {
-        --bg: #1a1f18;
-        --bg-2: #243022;
-        --ink: #f3f0e6;
-        --muted: #b8c0a8;
-        --accent: #f0d33c;
-        --bottle: #6ecf7a;
-        --danger: #ff6b4a;
-        --card: #2c3428;
-        --line: rgba(243, 240, 230, 0.12);
-      }
 
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>hobo.berlin — Pitch</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;1,9..40,400&display=swap"
+    rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #1a1f18;
+      --bg-2: #243022;
+      --ink: #f3f0e6;
+      --muted: #b8c0a8;
+      --accent: #f0d33c;
+      --bottle: #6ecf7a;
+      --danger: #ff6b4a;
+      --card: #2c3428;
+      --line: rgba(243, 240, 230, 0.12);
+    }
 
-      html,
-      body {
-        height: 100%;
-        background: var(--bg);
-        color: var(--ink);
-        font-family: "DM Sans", system-ui, sans-serif;
-        overflow: hidden;
-      }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-      body {
-        background:
-          radial-gradient(ellipse 80% 50% at 10% 0%, rgba(240, 211, 60, 0.12), transparent 50%),
-          radial-gradient(ellipse 60% 40% at 90% 100%, rgba(110, 207, 122, 0.1), transparent 45%),
-          linear-gradient(160deg, var(--bg) 0%, var(--bg-2) 55%, #1a221c 100%);
-      }
+    html,
+    body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "DM Sans", system-ui, sans-serif;
+      overflow: hidden;
+    }
 
-      .deck {
-        height: 100%;
-        width: 100%;
-        position: relative;
-      }
+    body {
+      background:
+        radial-gradient(ellipse 80% 50% at 10% 0%, rgba(240, 211, 60, 0.12), transparent 50%),
+        radial-gradient(ellipse 60% 40% at 90% 100%, rgba(110, 207, 122, 0.1), transparent 45%),
+        linear-gradient(160deg, var(--bg) 0%, var(--bg-2) 55%, #1a221c 100%);
+    }
 
-      .slide {
-        position: absolute;
-        inset: 0;
-        display: none;
-        padding: clamp(1.5rem, 5vw, 4rem);
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        opacity: 0;
-        transform: translateY(12px);
-        transition: opacity 0.35s ease, transform 0.35s ease;
-      }
+    .deck {
+      height: 100%;
+      width: 100%;
+      position: relative;
+    }
 
-      .slide.active {
-        display: flex;
-        opacity: 1;
-        transform: translateY(0);
-      }
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: none;
+      padding: clamp(1.5rem, 5vw, 4rem);
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
 
-      .eyebrow {
-        font-size: 0.85rem;
-        letter-spacing: 0.18em;
-        text-transform: uppercase;
-        color: var(--accent);
-        font-weight: 600;
-        margin-bottom: 1rem;
-      }
+    .slide.active {
+      display: flex;
+      opacity: 1;
+      transform: translateY(0);
+    }
 
-      h1.brand {
-        font-family: "Bricolage Grotesque", sans-serif;
-        font-weight: 800;
-        font-size: clamp(3.25rem, 13vw, 7.5rem);
-        line-height: 1;
-        letter-spacing: -0.05em;
-        text-transform: lowercase;
-        color: var(--ink);
-        white-space: nowrap;
-      }
+    .eyebrow {
+      font-size: 0.85rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
 
-      h1.brand .dot {
-        color: var(--bottle);
-        padding: 0 0.02em;
-      }
+    h1.brand {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-weight: 800;
+      font-size: clamp(3.25rem, 13vw, 7.5rem);
+      line-height: 1;
+      letter-spacing: -0.05em;
+      text-transform: lowercase;
+      color: var(--ink);
+      white-space: nowrap;
+    }
 
-      h1.brand .berlin {
-        color: var(--accent);
-      }
+    h1.brand .dot {
+      color: var(--bottle);
+      padding: 0 0.02em;
+    }
 
-      .tagline {
-        margin-top: 1.25rem;
-        font-size: clamp(1.25rem, 3.5vw, 2rem);
-        font-weight: 500;
-        color: var(--bottle);
-        font-family: "Bricolage Grotesque", sans-serif;
-      }
+    h1.brand .berlin {
+      color: var(--accent);
+    }
 
-      .tagline em {
-        font-style: italic;
-        color: var(--ink);
-      }
+    .tagline {
+      margin-top: 1.25rem;
+      font-size: clamp(1.25rem, 3.5vw, 2rem);
+      font-weight: 500;
+      color: var(--bottle);
+      font-family: "Bricolage Grotesque", sans-serif;
+    }
 
-      h2 {
-        font-family: "Bricolage Grotesque", sans-serif;
-        font-weight: 800;
-        font-size: clamp(1.75rem, 5vw, 3rem);
-        letter-spacing: -0.02em;
-        margin-bottom: 1.5rem;
-        max-width: 18ch;
-      }
+    .tagline em {
+      font-style: italic;
+      color: var(--ink);
+    }
 
-      .intro-lead {
-        font-family: "Bricolage Grotesque", sans-serif;
-        font-weight: 800;
-        font-size: clamp(1.5rem, 4.5vw, 2.5rem);
-        max-width: 22ch;
-        line-height: 1.15;
-        margin-bottom: 2rem;
-      }
+    h2 {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-weight: 800;
+      font-size: clamp(1.75rem, 5vw, 3rem);
+      letter-spacing: -0.02em;
+      margin-bottom: 1.5rem;
+      max-width: 18ch;
+    }
 
-      .layoff-list {
-        list-style: none;
-        display: flex;
-        flex-direction: column;
-        gap: 0.85rem;
-        max-width: 38rem;
-        text-align: left;
-        width: min(100%, 38rem);
-      }
+    .intro-lead {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-weight: 800;
+      font-size: clamp(1.5rem, 4.5vw, 2.5rem);
+      max-width: 22ch;
+      line-height: 1.15;
+      margin-bottom: 2rem;
+    }
 
-      .layoff-list li {
-        background: rgba(44, 52, 40, 0.75);
-        border: 1px solid var(--line);
-        border-radius: 14px;
-        padding: 0.9rem 1.15rem;
-        font-size: clamp(0.95rem, 2.2vw, 1.15rem);
-        line-height: 1.35;
-        color: var(--muted);
-        backdrop-filter: blur(6px);
-      }
+    .layoff-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      max-width: 38rem;
+      text-align: left;
+      width: min(100%, 38rem);
+    }
 
-      .layoff-list strong {
-        color: var(--ink);
-        font-weight: 600;
-      }
+    .layoff-list li {
+      background: rgba(44, 52, 40, 0.75);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 0.9rem 1.15rem;
+      font-size: clamp(0.95rem, 2.2vw, 1.15rem);
+      line-height: 1.35;
+      color: var(--muted);
+      backdrop-filter: blur(6px);
+    }
 
-      .punch {
-        margin-top: 1.75rem;
-        font-size: clamp(1.1rem, 2.8vw, 1.45rem);
-        color: var(--accent);
-        font-family: "Bricolage Grotesque", sans-serif;
-        font-weight: 800;
-      }
+    .layoff-list strong {
+      color: var(--ink);
+      font-weight: 600;
+    }
 
-      .demo-box {
-        width: min(100%, 28rem);
-        aspect-ratio: 9 / 14;
-        max-height: min(70vh, 520px);
-        border-radius: 28px;
-        border: 2px dashed rgba(240, 211, 60, 0.45);
-        background:
-          repeating-linear-gradient(
-            -45deg,
-            rgba(240, 211, 60, 0.04),
-            rgba(240, 211, 60, 0.04) 12px,
-            transparent 12px,
-            transparent 24px
-          ),
-          rgba(44, 52, 40, 0.6);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 1rem;
-        padding: 2rem;
-      }
+    .punch {
+      margin-top: 1.75rem;
+      font-size: clamp(1.1rem, 2.8vw, 1.45rem);
+      color: var(--accent);
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-weight: 800;
+    }
 
-      .demo-box .big {
-        font-family: "Bricolage Grotesque", sans-serif;
-        font-weight: 800;
-        font-size: clamp(3.5rem, 14vw, 6rem);
-        letter-spacing: -0.04em;
-        color: var(--accent);
-        line-height: 1;
-      }
+    .demo-box {
+      width: min(100%, 28rem);
+      aspect-ratio: 9 / 14;
+      max-height: min(70vh, 520px);
+      border-radius: 28px;
+      border: 2px dashed rgba(240, 211, 60, 0.45);
+      background:
+        repeating-linear-gradient(-45deg,
+          rgba(240, 211, 60, 0.04),
+          rgba(240, 211, 60, 0.04) 12px,
+          transparent 12px,
+          transparent 24px),
+        rgba(44, 52, 40, 0.6);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      padding: 2rem;
+    }
 
-      .demo-box p {
-        color: var(--muted);
-        font-size: 1rem;
-        max-width: 16ch;
-      }
+    .demo-box .big {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-weight: 800;
+      font-size: clamp(3.5rem, 14vw, 6rem);
+      letter-spacing: -0.04em;
+      color: var(--accent);
+      line-height: 1;
+    }
 
-      .demo-link {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-        margin-top: 0.25rem;
-        padding: 0.65rem 1.1rem;
-        border-radius: 999px;
-        background: var(--accent);
-        color: #1a1f18;
-        font-weight: 600;
-        text-decoration: none;
-        font-size: 0.95rem;
-      }
+    .demo-box p {
+      color: var(--muted);
+      font-size: 1rem;
+      max-width: 16ch;
+    }
 
-      .demo-link:hover {
-        filter: brightness(1.05);
-      }
+    .demo-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 0.25rem;
+      padding: 0.65rem 1.1rem;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #1a1f18;
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 0.95rem;
+    }
 
+    .demo-link:hover {
+      filter: brightness(1.05);
+    }
+
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: clamp(0.75rem, 2vw, 1.5rem);
+      width: min(100%, 56rem);
+      margin-top: 0.5rem;
+    }
+
+    @media (max-width: 800px) {
       .team-grid {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: clamp(0.75rem, 2vw, 1.5rem);
-        width: min(100%, 56rem);
-        margin-top: 0.5rem;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
+    }
 
-      @media (max-width: 800px) {
-        .team-grid {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
+    .member {
+      text-align: left;
+    }
+
+    .avatar {
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 22px;
+      background:
+        linear-gradient(145deg, #3a4534 0%, #252c22 100%);
+      border: 1px solid var(--line);
+      margin-bottom: 0.85rem;
+      display: grid;
+      place-items: center;
+      color: rgba(243, 240, 230, 0.28);
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      overflow: hidden;
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .member .name {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-weight: 800;
+      font-size: clamp(1rem, 2.2vw, 1.25rem);
+      margin-bottom: 0.25rem;
+    }
+
+    .member .meta {
+      font-size: clamp(0.75rem, 1.6vw, 0.88rem);
+      font-weight: 400;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .nav {
+      position: fixed;
+      bottom: 1.25rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      z-index: 10;
+      background: rgba(26, 31, 24, 0.75);
+      border: 1px solid var(--line);
+      backdrop-filter: blur(8px);
+      padding: 0.45rem 0.75rem;
+      border-radius: 999px;
+    }
+
+    .nav button {
+      appearance: none;
+      border: none;
+      background: transparent;
+      color: var(--ink);
+      font: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+      padding: 0.35rem 0.65rem;
+      border-radius: 999px;
+    }
+
+    .nav button:hover {
+      background: rgba(240, 211, 60, 0.15);
+    }
+
+    .dots {
+      display: flex;
+      gap: 0.4rem;
+    }
+
+    .dots span {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: rgba(243, 240, 230, 0.25);
+    }
+
+    .dots span.on {
+      background: var(--accent);
+    }
+
+    .hint {
+      position: fixed;
+      top: 1rem;
+      right: 1.25rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      z-index: 10;
+    }
+
+    .bottle-deco {
+      position: absolute;
+      font-size: 3rem;
+      opacity: 0.08;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .slide-wide {
+      justify-content: flex-start;
+      padding-top: clamp(2.5rem, 6vh, 4rem);
+      padding-bottom: 4.5rem;
+      overflow-y: auto;
+    }
+
+    .slide-wide h2 {
+      max-width: none;
+      margin-bottom: 0.35rem;
+    }
+
+    .slide-sub {
+      color: var(--muted);
+      font-size: clamp(0.95rem, 2vw, 1.1rem);
+      margin-bottom: 1.5rem;
+      max-width: 36rem;
+    }
+
+    .process {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      width: min(100%, 40rem);
+      text-align: left;
+      margin-bottom: 1.5rem;
+    }
+
+    .process li {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0.85rem;
+      align-items: start;
+      background: rgba(44, 52, 40, 0.7);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 0.75rem 1rem;
+    }
+
+    .process .n {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-weight: 800;
+      color: var(--accent);
+      font-size: 1.1rem;
+      line-height: 1.2;
+      min-width: 1.4rem;
+    }
+
+    .process strong {
+      display: block;
+      color: var(--ink);
+      font-weight: 600;
+      margin-bottom: 0.15rem;
+      font-size: 0.98rem;
+    }
+
+    .process span {
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.35;
+      font-weight: 400;
+    }
+
+    .stack {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.45rem;
+      width: min(100%, 40rem);
+    }
+
+    .stack .chip {
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.4rem 0.75rem;
+      border-radius: 999px;
+      background: rgba(110, 207, 122, 0.12);
+      border: 1px solid rgba(110, 207, 122, 0.35);
+      color: var(--bottle);
+    }
+
+    .stack .chip.skill {
+      background: rgba(240, 211, 60, 0.1);
+      border-color: rgba(240, 211, 60, 0.4);
+      color: var(--accent);
+    }
+
+    .skills-block {
+      width: min(100%, 40rem);
+      margin-top: 1.25rem;
+      text-align: left;
+    }
+
+    .skills-block .label {
+      font-size: 0.75rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 0.55rem;
+    }
+
+    .skills-note {
+      margin-top: 0.65rem;
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.4;
+      font-weight: 400;
+    }
+
+    .codex-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.65rem;
+      width: min(100%, 44rem);
+      text-align: left;
+    }
+
+    .codex-card {
+      background: rgba(44, 52, 40, 0.75);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 0.85rem 1rem;
+    }
+
+    .codex-card h3 {
+      color: var(--accent);
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: 1rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .codex-card p {
+      color: var(--muted);
+      font-size: 0.86rem;
+      line-height: 1.4;
+    }
+
+    .codex-tools {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.55rem;
+      width: min(100%, 44rem);
+      margin-top: 1rem;
+    }
+
+    .codex-tools a {
+      color: var(--bottle);
+      background: rgba(110, 207, 122, 0.1);
+      border: 1px solid rgba(110, 207, 122, 0.35);
+      border-radius: 999px;
+      padding: 0.45rem 0.8rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .codex-tools a:hover {
+      background: rgba(110, 207, 122, 0.18);
+    }
+
+    @media (max-width: 640px) {
+      .codex-grid {
+        grid-template-columns: 1fr;
       }
+    }
 
-      .member {
-        text-align: left;
-      }
+    .loop {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 0.4rem;
+      width: min(100%, 42rem);
+      margin-bottom: 1.35rem;
+    }
 
-      .avatar {
-        width: 100%;
-        aspect-ratio: 1;
-        border-radius: 22px;
-        background:
-          linear-gradient(145deg, #3a4534 0%, #252c22 100%);
-        border: 1px solid var(--line);
-        margin-bottom: 0.85rem;
-        display: grid;
-        place-items: center;
-        color: rgba(243, 240, 230, 0.28);
-        font-size: 0.75rem;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        overflow: hidden;
-      }
+    .loop .step {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-weight: 800;
+      font-size: clamp(0.85rem, 2vw, 1.05rem);
+      padding: 0.55rem 0.85rem;
+      border-radius: 12px;
+      background: rgba(44, 52, 40, 0.85);
+      border: 1px solid var(--line);
+      color: var(--ink);
+    }
 
-      .avatar img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-      }
+    .loop .arrow {
+      color: var(--accent);
+      font-weight: 800;
+      font-size: 1.1rem;
+    }
 
-      .member .name {
-        font-family: "Bricolage Grotesque", sans-serif;
-        font-weight: 800;
-        font-size: clamp(1rem, 2.2vw, 1.25rem);
-        margin-bottom: 0.25rem;
-      }
+    .mech-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.65rem;
+      width: min(100%, 40rem);
+      text-align: left;
+    }
 
-      .member .meta {
-        font-size: clamp(0.75rem, 1.6vw, 0.88rem);
-        font-weight: 400;
-        color: var(--muted);
-        line-height: 1.4;
-      }
-
-      .nav {
-        position: fixed;
-        bottom: 1.25rem;
-        left: 50%;
-        transform: translateX(-50%);
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        z-index: 10;
-        background: rgba(26, 31, 24, 0.75);
-        border: 1px solid var(--line);
-        backdrop-filter: blur(8px);
-        padding: 0.45rem 0.75rem;
-        border-radius: 999px;
-      }
-
-      .nav button {
-        appearance: none;
-        border: none;
-        background: transparent;
-        color: var(--ink);
-        font: inherit;
-        font-size: 0.85rem;
-        cursor: pointer;
-        padding: 0.35rem 0.65rem;
-        border-radius: 999px;
-      }
-
-      .nav button:hover {
-        background: rgba(240, 211, 60, 0.15);
-      }
-
-      .dots {
-        display: flex;
-        gap: 0.4rem;
-      }
-
-      .dots span {
-        width: 7px;
-        height: 7px;
-        border-radius: 50%;
-        background: rgba(243, 240, 230, 0.25);
-      }
-
-      .dots span.on {
-        background: var(--accent);
-      }
-
-      .hint {
-        position: fixed;
-        top: 1rem;
-        right: 1.25rem;
-        font-size: 0.75rem;
-        color: var(--muted);
-        letter-spacing: 0.04em;
-        z-index: 10;
-      }
-
-      .bottle-deco {
-        position: absolute;
-        font-size: 3rem;
-        opacity: 0.08;
-        pointer-events: none;
-        user-select: none;
-      }
-
-      .slide-wide {
-        justify-content: flex-start;
-        padding-top: clamp(2.5rem, 6vh, 4rem);
-        padding-bottom: 4.5rem;
-        overflow-y: auto;
-      }
-
-      .slide-wide h2 {
-        max-width: none;
-        margin-bottom: 0.35rem;
-      }
-
-      .slide-sub {
-        color: var(--muted);
-        font-size: clamp(0.95rem, 2vw, 1.1rem);
-        margin-bottom: 1.5rem;
-        max-width: 36rem;
-      }
-
-      .process {
-        list-style: none;
-        display: flex;
-        flex-direction: column;
-        gap: 0.55rem;
-        width: min(100%, 40rem);
-        text-align: left;
-        margin-bottom: 1.5rem;
-      }
-
-      .process li {
-        display: grid;
-        grid-template-columns: auto 1fr;
-        gap: 0.85rem;
-        align-items: start;
-        background: rgba(44, 52, 40, 0.7);
-        border: 1px solid var(--line);
-        border-radius: 14px;
-        padding: 0.75rem 1rem;
-      }
-
-      .process .n {
-        font-family: "Bricolage Grotesque", sans-serif;
-        font-weight: 800;
-        color: var(--accent);
-        font-size: 1.1rem;
-        line-height: 1.2;
-        min-width: 1.4rem;
-      }
-
-      .process strong {
-        display: block;
-        color: var(--ink);
-        font-weight: 600;
-        margin-bottom: 0.15rem;
-        font-size: 0.98rem;
-      }
-
-      .process span {
-        color: var(--muted);
-        font-size: 0.88rem;
-        line-height: 1.35;
-        font-weight: 400;
-      }
-
-      .stack {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 0.45rem;
-        width: min(100%, 40rem);
-      }
-
-      .stack .chip {
-        font-size: 0.8rem;
-        font-weight: 600;
-        padding: 0.4rem 0.75rem;
-        border-radius: 999px;
-        background: rgba(110, 207, 122, 0.12);
-        border: 1px solid rgba(110, 207, 122, 0.35);
-        color: var(--bottle);
-      }
-
-      .stack .chip.skill {
-        background: rgba(240, 211, 60, 0.1);
-        border-color: rgba(240, 211, 60, 0.4);
-        color: var(--accent);
-      }
-
-      .skills-block {
-        width: min(100%, 40rem);
-        margin-top: 1.25rem;
-        text-align: left;
-      }
-
-      .skills-block .label {
-        font-size: 0.75rem;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        color: var(--muted);
-        font-weight: 600;
-        margin-bottom: 0.55rem;
-      }
-
-      .skills-note {
-        margin-top: 0.65rem;
-        font-size: 0.82rem;
-        color: var(--muted);
-        line-height: 1.4;
-        font-weight: 400;
-      }
-
-      .loop {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        align-items: center;
-        gap: 0.4rem;
-        width: min(100%, 42rem);
-        margin-bottom: 1.35rem;
-      }
-
-      .loop .step {
-        font-family: "Bricolage Grotesque", sans-serif;
-        font-weight: 800;
-        font-size: clamp(0.85rem, 2vw, 1.05rem);
-        padding: 0.55rem 0.85rem;
-        border-radius: 12px;
-        background: rgba(44, 52, 40, 0.85);
-        border: 1px solid var(--line);
-        color: var(--ink);
+    @media (max-width: 640px) {
+      .mech-grid {
+        grid-template-columns: 1fr;
       }
 
       .loop .arrow {
-        color: var(--accent);
-        font-weight: 800;
-        font-size: 1.1rem;
+        display: none;
       }
+    }
 
-      .mech-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 0.65rem;
-        width: min(100%, 40rem);
-        text-align: left;
-      }
+    .mech-card {
+      background: rgba(44, 52, 40, 0.75);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 0.85rem 1rem;
+    }
 
-      @media (max-width: 640px) {
-        .mech-grid {
-          grid-template-columns: 1fr;
-        }
+    .mech-card h3 {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-weight: 800;
+      font-size: 1rem;
+      margin-bottom: 0.3rem;
+      color: var(--accent);
+    }
 
-        .loop .arrow {
-          display: none;
-        }
-      }
+    .mech-card p {
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.35;
+      font-weight: 400;
+    }
 
-      .mech-card {
-        background: rgba(44, 52, 40, 0.75);
-        border: 1px solid var(--line);
-        border-radius: 14px;
-        padding: 0.85rem 1rem;
-      }
+    .sound-stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.55rem;
+      width: min(100%, 44rem);
+      margin-bottom: 1rem;
+    }
 
-      .mech-card h3 {
-        font-family: "Bricolage Grotesque", sans-serif;
-        font-weight: 800;
-        font-size: 1rem;
-        margin-bottom: 0.3rem;
-        color: var(--accent);
-      }
+    .sound-stat {
+      padding: 0.65rem 0.5rem;
+      border-radius: 14px;
+      background: rgba(110, 207, 122, 0.1);
+      border: 1px solid rgba(110, 207, 122, 0.3);
+    }
 
-      .mech-card p {
-        color: var(--muted);
-        font-size: 0.88rem;
-        line-height: 1.35;
-        font-weight: 400;
-      }
+    .sound-stat strong {
+      display: block;
+      font-family: "Bricolage Grotesque", sans-serif;
+      color: var(--bottle);
+      font-size: clamp(1.2rem, 3vw, 1.8rem);
+      line-height: 1;
+      margin-bottom: 0.25rem;
+    }
 
+    .sound-stat span {
+      color: var(--muted);
+      font-size: clamp(0.68rem, 1.5vw, 0.8rem);
+    }
+
+    .codex-audio-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.65rem;
+      width: min(100%, 44rem);
+      text-align: left;
+    }
+
+    .codex-audio-card {
+      position: relative;
+      overflow: hidden;
+      background: rgba(44, 52, 40, 0.75);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 0.85rem 1rem 0.85rem 3rem;
+    }
+
+    .codex-audio-card .n {
+      position: absolute;
+      left: 1rem;
+      top: 0.82rem;
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-weight: 800;
+      color: var(--accent);
+      font-size: 1rem;
+    }
+
+    .codex-audio-card h3 {
+      font-family: "Bricolage Grotesque", sans-serif;
+      color: var(--ink);
+      font-size: 1rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .codex-audio-card p {
+      color: var(--muted);
+      font-size: 0.84rem;
+      line-height: 1.35;
+    }
+
+    .sound-punch {
+      margin-top: 0.9rem;
+      color: var(--accent);
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-weight: 800;
+      font-size: clamp(0.9rem, 2vw, 1.05rem);
+    }
+
+    @media (max-width: 640px) {
       .sound-stats {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 0.55rem;
-        width: min(100%, 44rem);
-        margin-bottom: 1rem;
-      }
-
-      .sound-stat {
-        padding: 0.65rem 0.5rem;
-        border-radius: 14px;
-        background: rgba(110, 207, 122, 0.1);
-        border: 1px solid rgba(110, 207, 122, 0.3);
-      }
-
-      .sound-stat strong {
-        display: block;
-        font-family: "Bricolage Grotesque", sans-serif;
-        color: var(--bottle);
-        font-size: clamp(1.2rem, 3vw, 1.8rem);
-        line-height: 1;
-        margin-bottom: 0.25rem;
-      }
-
-      .sound-stat span {
-        color: var(--muted);
-        font-size: clamp(0.68rem, 1.5vw, 0.8rem);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
       .codex-audio-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 0.65rem;
-        width: min(100%, 44rem);
-        text-align: left;
+        grid-template-columns: 1fr;
       }
+    }
+  </style>
+</head>
 
-      .codex-audio-card {
-        position: relative;
-        overflow: hidden;
-        background: rgba(44, 52, 40, 0.75);
-        border: 1px solid var(--line);
-        border-radius: 14px;
-        padding: 0.85rem 1rem 0.85rem 3rem;
-      }
+<body>
+  <p class="hint">← → or click · Space</p>
 
-      .codex-audio-card .n {
-        position: absolute;
-        left: 1rem;
-        top: 0.82rem;
-        font-family: "Bricolage Grotesque", sans-serif;
-        font-weight: 800;
-        color: var(--accent);
-        font-size: 1rem;
-      }
+  <div class="deck" id="deck">
+    <!-- 1. Title -->
+    <section class="slide active" data-slide="0">
+      <p class="eyebrow">A Berlin survival comedy</p>
+      <h1 class="brand">hobo<span class="dot">.</span><span class="berlin">berlin</span></h1>
+      <p class="tagline">Collect bottles to survive.</p>
+    </section>
 
-      .codex-audio-card h3 {
-        font-family: "Bricolage Grotesque", sans-serif;
-        color: var(--ink);
-        font-size: 1rem;
-        margin-bottom: 0.3rem;
-      }
+    <!-- 2. Intro -->
+    <section class="slide" data-slide="1">
+      <p class="intro-lead">Whoever you are — they’re gonna take your job.</p>
+      <ul class="layoff-list">
+        <li>
+          <strong>Prompt engineers</strong> are being automated by loop engineers.
+        </li>
+        <li>
+          <strong>Marketing managers</strong> are losing their jobs to end-to-end workflows.
+        </li>
+        <li>
+          <strong>QA engineers</strong> — replaced by Playwright scripts in three seconds.
+        </li>
+      </ul>
+      <p class="punch">This transformation: everyone can lose their job.</p>
+    </section>
 
-      .codex-audio-card p {
-        color: var(--muted);
-        font-size: 0.84rem;
-        line-height: 1.35;
-      }
-
-      .sound-punch {
-        margin-top: 0.9rem;
-        color: var(--accent);
-        font-family: "Bricolage Grotesque", sans-serif;
-        font-weight: 800;
-        font-size: clamp(0.9rem, 2vw, 1.05rem);
-      }
-
-      @media (max-width: 640px) {
-        .sound-stats {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-
-        .codex-audio-grid {
-          grid-template-columns: 1fr;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <p class="hint">← → or click · Space</p>
-
-    <div class="deck" id="deck">
-      <!-- 1. Title -->
-      <section class="slide active" data-slide="0">
-        <p class="eyebrow">A Berlin survival comedy</p>
-        <h1 class="brand">hobo<span class="dot">.</span><span class="berlin">berlin</span></h1>
-        <p class="tagline">Collect bottles to survive.</p>
-      </section>
-
-      <!-- 2. Intro -->
-      <section class="slide" data-slide="1">
-        <p class="intro-lead">Whoever you are — they’re gonna take your job.</p>
-        <ul class="layoff-list">
-          <li>
-            <strong>Prompt engineers</strong> are being automated by loop engineers.
-          </li>
-          <li>
-            <strong>Marketing managers</strong> are losing their jobs to end-to-end workflows.
-          </li>
-          <li>
-            <strong>QA engineers</strong> — replaced by Playwright scripts in three seconds.
-          </li>
-        </ul>
-        <p class="punch">This transformation: everyone can lose their job.</p>
-      </section>
-
-      <!-- 3. Game mechanics -->
-      <section class="slide slide-wide" data-slide="2">
-        <p class="eyebrow">How you play</p>
-        <h2>Game mechanics</h2>
-        <p class="slide-sub">
-          One clear loop. Win and lose for real — jokes are free, hearts are not.
-        </p>
-        <div class="loop" aria-label="Core loop">
-          <span class="step">Explore</span>
-          <span class="arrow" aria-hidden="true">→</span>
-          <span class="step">Collect</span>
-          <span class="arrow" aria-hidden="true">→</span>
-          <span class="step">Redeem</span>
-          <span class="arrow" aria-hidden="true">→</span>
-          <span class="step">Eat</span>
-          <span class="arrow" aria-hidden="true">→</span>
-          <span class="step">Survive × 7</span>
-        </div>
-        <div class="mech-grid">
-          <article class="mech-card">
-            <h3>Seven fast days</h3>
-            <p>
-              About 60 seconds each. Eat before the timer ends or lose a heart.
-              Last until day 7 — Agentur für Arbeit finally pays.
-            </p>
-          </article>
-          <article class="mech-card">
-            <h3>Mystery bins</h3>
-            <p>
-              Dig for Pfand bottles… or burn your hand. Outcome stays hidden
-              until you commit. Slot-machine energy, Berlin edition.
-            </p>
-          </article>
-          <article class="mech-card">
-            <h3>Bottles → cash → Döner</h3>
-            <p>
-              Queue at REWE for Pfand cash, then buy food at the Döner stand.
-              Waits cost precious seconds while the day clock keeps ticking.
-            </p>
-          </article>
-          <article class="mech-card">
-            <h3>Three hearts</h3>
-            <p>
-              Miss a meal: −1 heart. Bin burn: −½ heart. Hit zero and the run
-              is over. Survive with health left — you win.
-            </p>
-          </article>
-        </div>
-      </section>
-
-      <!-- 4. Demo -->
-      <section class="slide" data-slide="3">
-        <p class="eyebrow">Gameplay</p>
-        <h2>The demo</h2>
-        <div class="demo-box">
-          <div class="big">DEMO</div>
-          <p>Placeholder — drop the live build here when it’s ready.</p>
-          <!-- Replace href when you have a deployed URL -->
-          <a class="demo-link" href="#" id="demo-link">Play placeholder →</a>
-        </div>
-      </section>
-
-      <!-- 5. Technology & process -->
-      <section class="slide slide-wide" data-slide="4">
-        <p class="eyebrow">How we built it</p>
-        <h2>Technology</h2>
-        <p class="slide-sub">
-          Spec first, code second — so four people (and a few agents) could
-          actually run in parallel.
-        </p>
-        <ol class="process">
-          <li>
-            <span class="n">1</span>
-            <div>
-              <strong>Record the chaos</strong>
-              <span
-                >Whiteboard brainstorm on camera — premise, loop, maps, what to
-                cut. Captured as a transcript so nothing funny got lost.</span
-              >
-            </div>
-          </li>
-          <li>
-            <span class="n">2</span>
-            <div>
-              <strong>Hackathon planning docs</strong>
-              <span
-                >Filled the organizers’ ideation / architecture templates so the
-                problem, constraints, and stack were written down before the
-                sprint.</span
-              >
-            </div>
-          </li>
-          <li>
-            <span class="n">3</span>
-            <div>
-              <strong>Transcript → specs</strong>
-              <span
-                >Turned the recording into a PDD + technical SPEC, then split
-                workstreams: app infra, game mechanics, assets, sound &amp;
-                dialogue.</span
-              >
-            </div>
-          </li>
-          <li>
-            <span class="n">4</span>
-            <div>
-              <strong>Foundation, then fork</strong>
-              <span
-                >Land a shared WP-0 (grid, movement, items, HUD shell), tag it,
-                and parallelize collectibles, economy, run loop, and polish.</span
-              >
-            </div>
-          </li>
-        </ol>
-        <div class="stack" aria-label="Stack">
-          <span class="chip">Phaser</span>
-          <span class="chip">TypeScript</span>
-          <span class="chip">Vite</span>
-          <span class="chip">Tiled maps</span>
-          <span class="chip">Pixel / flat art</span>
-          <span class="chip">Kenney + Berlin overlays</span>
-          <span class="chip">Static deploy · Vercel</span>
-          <span class="chip">No backend</span>
-        </div>
-        <div class="skills-block">
-          <p class="label">Used skills</p>
-          <div class="stack" aria-label="Skills" style="justify-content: flex-start">
-            <span class="chip skill">grill-with-docs</span>
-            <span class="chip skill">brainstorming</span>
-            <span class="chip skill">subagent-driven-development</span>
-            <span class="chip skill">verification-before-completion</span>
-          </div>
-          <p class="skills-note">
-            Superpowers plugin — plus the usual agent chaos, now with a paper trail.
+    <!-- 3. Game mechanics -->
+    <section class="slide slide-wide" data-slide="2">
+      <p class="eyebrow">How you play</p>
+      <h2>Game mechanics</h2>
+      <p class="slide-sub">
+        One clear loop. Win and lose for real — jokes are free, hearts are not.
+      </p>
+      <div class="loop" aria-label="Core loop">
+        <span class="step">Explore</span>
+        <span class="arrow" aria-hidden="true">→</span>
+        <span class="step">Collect</span>
+        <span class="arrow" aria-hidden="true">→</span>
+        <span class="step">Redeem</span>
+        <span class="arrow" aria-hidden="true">→</span>
+        <span class="step">Eat</span>
+        <span class="arrow" aria-hidden="true">→</span>
+        <span class="step">Survive × 7</span>
+      </div>
+      <div class="mech-grid">
+        <article class="mech-card">
+          <h3>Seven fast days</h3>
+          <p>
+            About 60 seconds each. Eat before the timer ends or lose a heart.
+            Last until day 7 — Agentur für Arbeit finally pays.
           </p>
-        </div>
-      </section>
+        </article>
+        <article class="mech-card">
+          <h3>Mystery bins</h3>
+          <p>
+            Dig for Pfand bottles… or burn your hand. Outcome stays hidden
+            until you commit. Slot-machine energy, Berlin edition.
+          </p>
+        </article>
+        <article class="mech-card">
+          <h3>Bottles → cash → Döner</h3>
+          <p>
+            Queue at REWE for Pfand cash, then buy food at the Döner stand.
+            Waits cost precious seconds while the day clock keeps ticking.
+          </p>
+        </article>
+        <article class="mech-card">
+          <h3>Three hearts</h3>
+          <p>
+            Miss a meal: −1 heart. Bin burn: −½ heart. Hit zero and the run
+            is over. Survive with health left — you win.
+          </p>
+        </article>
+      </div>
+    </section>
 
-      <!-- 6. Codex sound workflow -->
-      <section class="slide slide-wide" data-slide="5">
-        <p class="eyebrow">Codex in the studio</p>
-        <h2>From game events to a Phaser soundboard</h2>
-        <p class="slide-sub">
-          One creative brief became a playable, licensed sound set in hours —
-          without adding a heavyweight audio dependency.
+    <!-- 4. Demo -->
+    <section class="slide" data-slide="3">
+      <p class="eyebrow">Gameplay</p>
+      <h2>The demo</h2>
+      <div class="demo-box">
+        <div class="big">DEMO</div>
+        <p>Placeholder — drop the live build here when it’s ready.</p>
+        <!-- Replace href when you have a deployed URL -->
+        <a class="demo-link" href="#" id="demo-link">Play placeholder →</a>
+      </div>
+    </section>
+
+    <!-- 5. Technology & process -->
+    <section class="slide slide-wide" data-slide="4">
+      <p class="eyebrow">How we built it</p>
+      <h2>Technology</h2>
+      <p class="slide-sub">
+        Spec first, code second — so four people (and a few agents) could
+        actually run in parallel.
+      </p>
+      <ol class="process">
+        <li>
+          <span class="n">1</span>
+          <div>
+            <strong>Record the chaos</strong>
+            <span>Whiteboard brainstorm on camera — premise, loop, maps, what to
+              cut. Captured as a transcript so nothing funny got lost.</span>
+          </div>
+        </li>
+        <li>
+          <span class="n">2</span>
+          <div>
+            <strong>Hackathon planning docs</strong>
+            <span>Filled the organizers’ ideation / architecture templates so the
+              problem, constraints, and stack were written down before the
+              sprint.</span>
+          </div>
+        </li>
+        <li>
+          <span class="n">3</span>
+          <div>
+            <strong>Transcript → specs</strong>
+            <span>Turned the recording into a PDD + technical SPEC, then split
+              workstreams: app infra, game mechanics, assets, sound &amp;
+              dialogue.</span>
+          </div>
+        </li>
+        <li>
+          <span class="n">4</span>
+          <div>
+            <strong>Foundation, then fork</strong>
+            <span>Land a shared WP-0 (grid, movement, items, HUD shell), tag it,
+              and parallelize collectibles, economy, run loop, and polish.</span>
+          </div>
+        </li>
+      </ol>
+      <div class="stack" aria-label="Stack">
+        <span class="chip">Phaser</span>
+        <span class="chip">TypeScript</span>
+        <span class="chip">Vite</span>
+        <span class="chip">Tiled maps</span>
+        <span class="chip">Pixel / flat art</span>
+        <span class="chip">Kenney + Berlin overlays</span>
+        <span class="chip">Static deploy · Vercel</span>
+        <span class="chip">No backend</span>
+      </div>
+      <div class="skills-block">
+        <p class="label">Used skills</p>
+        <div class="stack" aria-label="Skills" style="justify-content: flex-start">
+          <span class="chip skill">grill-with-docs</span>
+          <span class="chip skill">brainstorming</span>
+          <span class="chip skill">subagent-driven-development</span>
+          <span class="chip skill">verification-before-completion</span>
+        </div>
+        <p class="skills-note">
+          Superpowers plugin — plus the usual agent chaos, now with a paper trail.
         </p>
-        <div class="sound-stats" aria-label="Sound pack totals">
-          <div class="sound-stat"><strong>43</strong><span>original SFX</span></div>
-          <div class="sound-stat"><strong>3</strong><span>music cues</span></div>
-          <div class="sound-stat"><strong>4</strong><span>CC0 ambience loops</span></div>
-          <div class="sound-stat"><strong>0</strong><span>extra runtime libraries</span></div>
-        </div>
-        <div class="codex-audio-grid">
-          <article class="codex-audio-card">
-            <span class="n">01</span>
-            <h3>Turn mechanics into a contract</h3>
-            <p>
-              Codex mapped every bottle, bin, meal, heart, win, and loss to a
-              stable event ID — with comedy aimed at bureaucracy, never poverty.
-            </p>
-          </article>
-          <article class="codex-audio-card">
-            <span class="n">02</span>
-            <h3>Synthesize the sound set</h3>
-            <p>
-              It generated crunchy 8-bit cues, modern WAV alternates, drunk
-              boots, three heartbreak moods, and dramatic Pfand intro/outros.
-            </p>
-          </article>
-          <article class="codex-audio-card">
-            <span class="n">03</span>
-            <h3>Curate and document</h3>
-            <p>
-              CC0 ambience was source-checked, renamed for its game role, and
-              captured in a license ledger so the soundboard is safe to ship.
-            </p>
-          </article>
-          <article class="codex-audio-card">
-            <span class="n">04</span>
-            <h3>Wire it into Phaser</h3>
-            <p>
-              A manifest-driven loader handles variants, Start-gesture unlock,
-              background loops, mute-safe fallbacks, and automated asset tests.
-            </p>
-          </article>
-        </div>
-        <p class="sound-punch">
-          Codex did the paperwork. Phaser makes the noise. Berlin supplies the bass.
-        </p>
-      </section>
+      </div>
+    </section>
 
-      <!-- 7. Team -->
-      <section class="slide" data-slide="6">
-        <p class="eyebrow">The humans still employed</p>
-        <h2>Team</h2>
-        <div class="team-grid">
-          <article class="member">
-            <div class="avatar">
-              <img src="assets/team/denys.png" alt="Denys" />
-            </div>
-            <p class="name">Denys</p>
-            <p class="meta">Software Engineer</p>
-          </article>
-          <article class="member">
-            <div class="avatar">
-              <img src="assets/team/antwan.png" alt="Antwan" />
-            </div>
-            <p class="name">Antwan</p>
-            <p class="meta">Software Engineer</p>
-          </article>
-          <article class="member">
-            <div class="avatar">
-              <img src="assets/team/nishant.png" alt="Nishant" />
-            </div>
-            <p class="name">Nishant</p>
-            <p class="meta">Software Engineer</p>
-          </article>
-          <article class="member">
-            <div class="avatar">
-              <img src="assets/team/marina.png" alt="Marina" />
-            </div>
-            <p class="name">Marina</p>
-            <p class="meta">Software Engineer</p>
-          </article>
-        </div>
-      </section>
-    </div>
+    <!-- 6. Codex workflow -->
+    <section class="slide slide-wide" data-slide="5">
+      <p class="eyebrow">Our AI co-pilot</p>
+      <h2>How we used Codex</h2>
+      <p class="slide-sub">
+        From a messy idea to a playable Berlin survival loop — one shared
+        workflow for thinking, building, and checking the work.
+      </p>
+      <div class="codex-grid">
+        <article class="codex-card">
+          <h3>Planning</h3>
+          <p>
+            Turned brainstorm transcripts into product docs, technical specs,
+            milestones, and parallel workstreams before coding began.
+          </p>
+        </article>
+        <article class="codex-card">
+          <h3>Brainstorming</h3>
+          <p>
+            Challenged the premise, narrowed the core loop, explored Berlin
+            jokes, and cut ideas that would not fit the hackathon.
+          </p>
+        </article>
+        <article class="codex-card">
+          <h3>Coding</h3>
+          <p>
+            Implemented Phaser mechanics, movement, HUD, economy, and polish
+            across coordinated tasks while keeping shared invariants intact.
+          </p>
+        </article>
+        <article class="codex-card">
+          <h3>Images &amp; GIFs</h3>
+          <p>
+            Generated and iterated pixel-art portraits, game visuals, and
+            GIF-ready animation assets that match the hobo.berlin style.
+          </p>
+        </article>
+        <article class="codex-card">
+          <h3>Grill with Docs</h3>
+          <p>
+            Interrogated plans and specs for missing decisions, vague rules,
+            hidden assumptions, and risks before they became code.
+          </p>
+        </article>
+        <article class="codex-card">
+          <h3>Verification</h3>
+          <p>
+            Used tests, browser flows, and final checks to prove each feature
+            worked before calling it done.
+          </p>
+        </article>
+      </div>
+      <div class="codex-tools" aria-label="Codex skills and plugins">
+        <a href="https://github.com/mattpocock/skills/blob/main/skills/engineering/grill-with-docs/SKILL.md">grill-with-docs
+          ↗</a>
+        <a href="https://github.com/obra/superpowers">Superpowers plugin ↗</a>
+        <a href="https://github.com/obra/superpowers">brainstorming</a>
+        <a href="https://github.com/obra/superpowers">subagent-driven-development</a>
+        <a href="https://github.com/obra/superpowers">verification-before-completion</a>
+      </div>
+    </section>
 
-    <nav class="nav" aria-label="Slide navigation">
-      <button type="button" id="prev" aria-label="Previous slide">←</button>
-      <div class="dots" id="dots"></div>
-      <button type="button" id="next" aria-label="Next slide">→</button>
-    </nav>
+    <!-- 7. Team -->
+    <section class="slide" data-slide="6">
+      <p class="eyebrow">The humans still employed</p>
+      <h2>Team</h2>
+      <div class="team-grid">
+        <article class="member">
+          <div class="avatar">
+            <img src="assets/team/denys.png" alt="Denys" />
+          </div>
+          <p class="name">Denys</p>
+          <p class="meta">Software Engineer</p>
+        </article>
+        <article class="member">
+          <div class="avatar">
+            <img src="assets/team/antwan.png" alt="Antwan" />
+          </div>
+          <p class="name">Antwan</p>
+          <p class="meta">Software Engineer</p>
+        </article>
+        <article class="member">
+          <div class="avatar">
+            <img src="assets/team/nishant.png" alt="Nishant" />
+          </div>
+          <p class="name">Nishant</p>
+          <p class="meta">Software Engineer</p>
+        </article>
+        <article class="member">
+          <div class="avatar">
+            <img src="assets/team/marina.png" alt="Marina" />
+          </div>
+          <p class="name">Marina</p>
+          <p class="meta">Software Engineer</p>
+        </article>
+      </div>
+    </section>
+  </div>
 
-    <script>
-      const slides = [...document.querySelectorAll(".slide")];
-      const dotsEl = document.getElementById("dots");
-      let index = 0;
+  <nav class="nav" aria-label="Slide navigation">
+    <button type="button" id="prev" aria-label="Previous slide">←</button>
+    <div class="dots" id="dots"></div>
+    <button type="button" id="next" aria-label="Next slide">→</button>
+  </nav>
 
-      slides.forEach((_, i) => {
-        const dot = document.createElement("span");
-        if (i === 0) dot.classList.add("on");
-        dotsEl.appendChild(dot);
-      });
+  <script>
+    const slides = [...document.querySelectorAll(".slide")];
+    const dotsEl = document.getElementById("dots");
+    let index = 0;
 
-      function show(i) {
-        index = (i + slides.length) % slides.length;
-        slides.forEach((s, n) => s.classList.toggle("active", n === index));
-        [...dotsEl.children].forEach((d, n) => d.classList.toggle("on", n === index));
-      }
+    slides.forEach((_, i) => {
+      const dot = document.createElement("span");
+      if (i === 0) dot.classList.add("on");
+      dotsEl.appendChild(dot);
+    });
 
-      document.getElementById("prev").addEventListener("click", () => show(index - 1));
-      document.getElementById("next").addEventListener("click", () => show(index + 1));
+    function show(i) {
+      index = (i + slides.length) % slides.length;
+      slides.forEach((s, n) => s.classList.toggle("active", n === index));
+      [...dotsEl.children].forEach((d, n) => d.classList.toggle("on", n === index));
+    }
 
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") {
-          e.preventDefault();
-          show(index + 1);
-        }
-        if (e.key === "ArrowLeft" || e.key === "PageUp") {
-          e.preventDefault();
-          show(index - 1);
-        }
-      });
+    document.getElementById("prev").addEventListener("click", () => show(index - 1));
+    document.getElementById("next").addEventListener("click", () => show(index + 1));
 
-      document.getElementById("deck").addEventListener("click", (e) => {
-        if (e.target.closest("a, button, .nav")) return;
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") {
+        e.preventDefault();
         show(index + 1);
-      });
+      }
+      if (e.key === "ArrowLeft" || e.key === "PageUp") {
+        e.preventDefault();
+        show(index - 1);
+      }
+    });
 
-      // Optional: set your live demo URL
-      // document.getElementById("demo-link").href = "https://your-demo-url";
-    </script>
-  </body>
+    document.getElementById("deck").addEventListener("click", (e) => {
+      if (e.target.closest("a, button, .nav")) return;
+      show(index + 1);
+    });
+
+    // Optional: set your live demo URL
+    // document.getElementById("demo-link").href = "https://your-demo-url";
+  </script>
+</body>
+
 </html>
