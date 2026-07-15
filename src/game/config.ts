@@ -24,7 +24,7 @@ export const DAMAGE_BIN_HAZARD = 1;
 
 export const STARTING_CASH_CENTS = 0;
 export const BOTTLE_VALUE_CENTS = 25;
-export const MINIMUM_BOTTLES_TO_REDEEM = 20;
+export const MINIMUM_BOTTLES_TO_REDEEM = 15;
 
 export const BIN_COUNT = 12;
 export const LOOSE_BOTTLE_COUNT = 10;

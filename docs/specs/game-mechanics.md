@@ -171,7 +171,7 @@ All money is stored as integer cents. The configured bottle value defaults to â‚
 
 - The HUD may show how many more bottles are needed to afford the current meal after accounting for current cash.
 - REWE accepts a redemption only when the player has at least `minimumBottlesToRedeem` bottles.
-- The provisional minimum is 20 bottles and must be tuned with the food-price and day-duration ranges.
+- The provisional minimum is 15 bottles and must be tuned with the food-price and day-duration ranges.
 - An attempt below the minimum does not begin a queue and emits an immediate denial event.
 
 ### REWE bottle return

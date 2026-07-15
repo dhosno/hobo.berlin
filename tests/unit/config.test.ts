@@ -31,7 +31,7 @@ describe("Phase 1 layout constants", () => {
 
   it("keeps economy defaults aligned with the mechanics spec", () => {
     expect(DAYS_PER_RUN).toBe(7);
-    expect(MINIMUM_BOTTLES_TO_REDEEM).toBe(20);
+    expect(MINIMUM_BOTTLES_TO_REDEEM).toBe(15);
     expect([REWE_WAIT_MIN_MS, REWE_WAIT_MAX_MS]).toEqual([2_000, 12_000]);
     expect(MEAL_VENDOR_NAME).toBe("kebap with Attitude");
     expect([BIN_HAZARD_CHANCE_MIN, BIN_HAZARD_CHANCE_MAX]).toEqual([0.2, 0.35]);
