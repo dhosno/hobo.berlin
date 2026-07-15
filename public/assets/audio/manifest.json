@@ -1,0 +1,183 @@
+{
+  "version": 1,
+  "format": {
+    "retroSfx": "WAV, unsigned 8-bit PCM, mono, 22050 Hz",
+    "modernSfx": "WAV, signed 16-bit PCM, mono, 44100 Hz",
+    "ambience": "Ogg Vorbis"
+  },
+  "defaults": {
+    "sfxVolume": 0.72,
+    "ambienceVolume": 0.16,
+    "preload": false
+  },
+  "events": {
+    "loose-bottle-collected": {
+      "files": [
+        "/assets/audio/sfx/loose-bottle-collected.wav",
+        "/assets/audio/sfx/loose-bottle-collected-alt.wav",
+        "/assets/audio/sfx/loose-bottle-collected-modern.wav"
+      ],
+      "variantStyles": ["retro-8bit", "retro-8bit", "modern-16bit"],
+      "intent": "bright glassy pickup ding",
+      "priority": "high"
+    },
+    "bin-bottles": {
+      "files": [
+        "/assets/audio/sfx/bin-bottles.wav",
+        "/assets/audio/sfx/bin-bottles-alt.wav",
+        "/assets/audio/sfx/bin-bottles-modern.wav"
+      ],
+      "variantStyles": ["retro-8bit", "retro-8bit", "modern-16bit"],
+      "intent": "larger bottle reward arpeggio",
+      "priority": "high"
+    },
+    "bin-burn": {
+      "files": [
+        "/assets/audio/sfx/bin-burn.wav",
+        "/assets/audio/sfx/bin-burn-alt.wav",
+        "/assets/audio/sfx/bin-burn-modern.wav"
+      ],
+      "variantStyles": ["retro-8bit", "retro-8bit", "modern-16bit"],
+      "intent": "comic burn buzz and droop",
+      "priority": "high"
+    },
+    "bottles-redeemed": {
+      "files": [
+        "/assets/audio/sfx/bottles-redeemed.wav",
+        "/assets/audio/sfx/bottles-redeemed-alt.wav",
+        "/assets/audio/sfx/bottles-redeemed-modern.wav"
+      ],
+      "variantStyles": ["retro-8bit", "retro-8bit", "modern-16bit"],
+      "intent": "mechanical Pfand machine doo-ding",
+      "priority": "high"
+    },
+    "food-bought": {
+      "files": [
+        "/assets/audio/sfx/food-bought.wav",
+        "/assets/audio/sfx/food-bought-alt.wav",
+        "/assets/audio/sfx/food-bought-modern.wav"
+      ],
+      "variantStyles": ["retro-8bit", "retro-8bit", "modern-16bit"],
+      "intent": "crunch plus till confirmation",
+      "priority": "high"
+    },
+    "food-denied": {
+      "files": [
+        "/assets/audio/sfx/food-denied.wav",
+        "/assets/audio/sfx/food-denied-alt.wav",
+        "/assets/audio/sfx/food-denied-modern.wav"
+      ],
+      "variantStyles": ["retro-8bit", "retro-8bit", "modern-16bit"],
+      "intent": "soft two-note insufficient-funds fail",
+      "priority": "high"
+    },
+    "day-failed": {
+      "files": [
+        "/assets/audio/sfx/day-failed.wav",
+        "/assets/audio/sfx/day-failed-alt.wav",
+        "/assets/audio/sfx/day-failed-modern.wav"
+      ],
+      "variantStyles": ["retro-8bit", "retro-8bit", "modern-16bit"],
+      "intent": "short descending heart-loss cue",
+      "priority": "high"
+    },
+    "day-survived": {
+      "files": [
+        "/assets/audio/sfx/day-survived.wav",
+        "/assets/audio/sfx/day-survived-alt.wav",
+        "/assets/audio/sfx/day-survived-modern.wav"
+      ],
+      "variantStyles": ["retro-8bit", "retro-8bit", "modern-16bit"],
+      "intent": "gentle relief arpeggio",
+      "priority": "medium"
+    },
+    "won": {
+      "files": [
+        "/assets/audio/sfx/won.wav",
+        "/assets/audio/sfx/won-alt.wav",
+        "/assets/audio/sfx/won-modern.wav"
+      ],
+      "variantStyles": ["retro-8bit", "retro-8bit", "modern-16bit"],
+      "intent": "small benefits-approved fanfare",
+      "priority": "high"
+    },
+    "lost": {
+      "files": [
+        "/assets/audio/sfx/lost.wav",
+        "/assets/audio/sfx/lost-alt.wav",
+        "/assets/audio/sfx/lost-modern.wav"
+      ],
+      "variantStyles": ["retro-8bit", "retro-8bit", "modern-16bit"],
+      "intent": "soft game-over descent",
+      "priority": "high"
+    },
+    "ui-start": {
+      "files": [
+        "/assets/audio/sfx/ui-start.wav",
+        "/assets/audio/sfx/ui-start-alt.wav",
+        "/assets/audio/sfx/ui-start-modern.wav"
+      ],
+      "variantStyles": ["retro-8bit", "retro-8bit", "modern-16bit"],
+      "intent": "clean menu confirmation",
+      "priority": "medium"
+    },
+    "step": {
+      "files": [
+        "/assets/audio/sfx/step-1.wav",
+        "/assets/audio/sfx/step-2.wav",
+        "/assets/audio/sfx/step-modern.wav"
+      ],
+      "variantStyles": ["retro-8bit", "retro-8bit", "modern-16bit"],
+      "intent": "quiet alternating lo-fi footsteps",
+      "priority": "low",
+      "volume": 0.18,
+      "defaultEnabled": false
+    },
+    "day-night-sting": {
+      "files": [
+        "/assets/audio/sfx/day-night-sting.wav",
+        "/assets/audio/sfx/day-night-sting-alt.wav",
+        "/assets/audio/sfx/day-night-sting-modern.wav"
+      ],
+      "variantStyles": ["retro-8bit", "retro-8bit", "modern-16bit"],
+      "intent": "short transition whoosh",
+      "priority": "low"
+    }
+  },
+  "ambience": {
+    "city-night": {
+      "file": "/assets/audio/ambience/city-night-loop.ogg",
+      "loop": true,
+      "priority": "nice-to-have",
+      "license": "CC0-1.0",
+      "source": "https://opengameart.org/content/scifi-city-ambient-loop"
+    },
+    "berlin-outside": {
+      "file": "/assets/audio/ambience/berlin-outside-loop.ogg",
+      "loop": true,
+      "priority": "alternate",
+      "volume": 0.14,
+      "intent": "quiet outdoor evening bed for Berlin streets",
+      "license": "CC0-1.0",
+      "source": "https://opengameart.org/content/amb-outside-1"
+    },
+    "ubahn-wind": {
+      "file": "/assets/audio/ambience/ubahn-wind-loop.ogg",
+      "loop": true,
+      "priority": "alternate",
+      "volume": 0.1,
+      "intent": "airy tunnel motion for U-Bahn-adjacent spaces",
+      "license": "CC0-1.0",
+      "source": "https://opengameart.org/content/wind-whoosh-loop"
+    },
+    "waiting-room-ambient": {
+      "file": "/assets/audio/ambience/waiting-room-ambient-loop.ogg",
+      "loop": true,
+      "priority": "alternate",
+      "volume": 0.12,
+      "intent": "hopeful lo-fi loop for bureaucratic waiting",
+      "license": "CC0-1.0",
+      "source": "https://opengameart.org/content/two-simple-game-music-loops"
+    }
+  }
+}
