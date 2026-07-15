@@ -96,7 +96,11 @@ export function phaseLabel(state: GameState): string {
 }
 
 function canControl(state: GameState): boolean {
-  return state.phase === "playing" && state.venue.kind === "none";
+  return (
+    state.phase === "playing" &&
+    state.venue.kind === "none" &&
+    state.player.healthUnits > 0
+  );
 }
 
 function prepareDay(state: GameState, day: number): GameState {
@@ -258,7 +262,8 @@ function searchBin(state: GameState, item: WorldItem): GameState {
       0,
       state.player.healthUnits - DAMAGE_BIN_HAZARD,
     );
-    let next = emit(
+    // Lethal burns stay in `playing` briefly so burn feedback can show before game over.
+    return emit(
       {
         ...state,
         player: { ...state.player, healthUnits },
@@ -268,10 +273,6 @@ function searchBin(state: GameState, item: WorldItem): GameState {
       "bin-burn",
       "Burn! −½ ♥",
     );
-    if (healthUnits <= 0) {
-      next = emit({ ...next, phase: "lost" }, "lost", "Game over");
-    }
-    return next;
   }
 
   const gained = item.yieldBottles ?? 1;
@@ -477,6 +478,17 @@ export function endDayEarly(state: GameState): GameState {
   return resolveDay({ ...state, timeRemainingMs: 0 });
 }
 
+/** Enter the lost phase after fatal damage feedback has had time to show. */
+export function declareLost(state: GameState): GameState {
+  if (state.phase === "lost" || state.phase === "won") return state;
+  if (state.player.healthUnits > 0) return state;
+  return emit(
+    { ...state, phase: "lost", timeRemainingMs: 0 },
+    "lost",
+    "Game over",
+  );
+}
+
 export function continueToNextDay(state: GameState): GameState {
   if (state.phase !== "day-resolution") return state;
   const prepared = prepareDay(state, state.day + 1);
@@ -493,6 +505,8 @@ export function tickPlaying(
   options: { freezeDayTimer?: boolean } = {},
 ): GameState {
   if (state.phase !== "playing") return state;
+  // Lethal burn: hold the day so burn feedback can play before game over.
+  if (state.player.healthUnits <= 0) return state;
 
   let next = state;
   const remaining = options.freezeDayTimer

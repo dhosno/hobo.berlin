@@ -218,8 +218,9 @@ body {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  image-rendering: pixelated;
+  object-fit: contain;
+  object-position: center bottom;
+  image-rendering: auto;
 }
 
 .speech-copy {
@@ -266,13 +267,14 @@ body {
 
 .character-card-portrait {
   flex: 0 0 auto;
-  width: 96px;
-  height: 96px;
+  width: 112px;
+  height: 112px;
   border-radius: 12px;
-  object-fit: cover;
-  background: #1a2118;
-  border: 1px dashed rgba(243, 240, 230, 0.28);
-  image-rendering: pixelated;
+  object-fit: contain;
+  object-position: center bottom;
+  background: #0a0c09;
+  border: 1px solid rgba(243, 240, 230, 0.18);
+  image-rendering: auto;
 }
 
 .character-card-name {
