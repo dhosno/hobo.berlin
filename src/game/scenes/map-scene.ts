@@ -1,39 +1,68 @@
 import Phaser from "phaser";
 
+import { PHASE_B_ASSETS } from "../assets/phase-b-assets";
 import { CELL_SIZE, DESIGN_HEIGHT, DESIGN_WIDTH } from "../config";
+import type { GameBootFailureHandler } from "../create-game";
 import { moveGridPosition, type Direction } from "../grid/movement";
 import { ArrowRepeatController } from "../input/repeat";
+import {
+  GATE_PLACEMENT,
+  TRASH_CAN_POSITIONS,
+  TREE_POSITIONS,
+  terrainAt,
+} from "../map/phase-b-layout";
 import type { GridPosition, ParsedMapContract } from "../map/tiled-contract";
 
 const COLORS = {
-  background: 0x151922,
-  blocker: 0xa4495f,
-  grid: 0x596376,
-  player: 0xf0bf4c,
+  grid: 0x162219,
 } as const;
 
 export class MapScene extends Phaser.Scene {
   private readonly map: ParsedMapContract;
+  private readonly onBootFailure: GameBootFailureHandler;
   private readonly repeatController = new ArrowRepeatController();
+  private assetLoadFailed = false;
   private position: GridPosition;
-  private player!: Phaser.GameObjects.Rectangle;
+  private player!: Phaser.GameObjects.Image;
 
-  constructor(map: ParsedMapContract) {
+  constructor(map: ParsedMapContract, onBootFailure: GameBootFailureHandler) {
     super({ key: "MapScene" });
     this.map = map;
+    this.onBootFailure = onBootFailure;
     this.position = { ...map.spawn };
   }
 
+  preload(): void {
+    this.load.once(
+      Phaser.Loader.Events.FILE_LOAD_ERROR,
+      (file: Phaser.Loader.File) => {
+        this.assetLoadFailed = true;
+        this.onBootFailure(new Error(`Asset texture failed to load: ${file.key}`));
+      },
+    );
+
+    for (const asset of Object.values(PHASE_B_ASSETS)) {
+      this.load.image(asset.key, asset.url);
+    }
+  }
+
   create(): void {
+    if (this.assetLoadFailed) {
+      return;
+    }
+
     this.drawMap();
-    this.player = this.add.rectangle(
+    this.player = this.add.image(
       this.cellCenter(this.position.column),
       this.cellCenter(this.position.row),
-      CELL_SIZE * 0.625,
-      CELL_SIZE * 0.625,
-      COLORS.player,
-    );
+      PHASE_B_ASSETS.character.key,
+    ).setDisplaySize(CELL_SIZE, CELL_SIZE).setDepth(4);
     this.syncStatus();
+
+    const gameElement = document.querySelector<HTMLElement>("#game");
+    if (gameElement !== null) {
+      gameElement.dataset.presentation = "berlin-placeholders";
+    }
 
     const keyboard = this.input.keyboard;
     if (keyboard !== null) {
@@ -75,22 +104,45 @@ export class MapScene extends Phaser.Scene {
   };
 
   private drawMap(): void {
-    const graphics = this.add.graphics();
-    graphics.fillStyle(COLORS.background);
-    graphics.fillRect(0, 0, DESIGN_WIDTH, DESIGN_HEIGHT);
-
-    graphics.fillStyle(COLORS.blocker);
-    for (const blockedCell of this.map.blockedCells) {
-      const [column, row] = blockedCell.split(",").map(Number);
-      graphics.fillRect(
-        column * CELL_SIZE,
-        row * CELL_SIZE,
-        CELL_SIZE,
-        CELL_SIZE,
-      );
+    for (let row = 0; row < this.map.bounds.rows; row += 1) {
+      for (let column = 0; column < this.map.bounds.columns; column += 1) {
+        const terrain = PHASE_B_ASSETS[terrainAt(column, row)];
+        this.add.image(
+          this.cellCenter(column),
+          this.cellCenter(row),
+          terrain.key,
+        ).setDisplaySize(CELL_SIZE, CELL_SIZE).setDepth(0);
+      }
     }
 
-    graphics.lineStyle(1, COLORS.grid, 0.8);
+    this.add.image(
+      GATE_PLACEMENT.column * CELL_SIZE,
+      GATE_PLACEMENT.row * CELL_SIZE,
+      PHASE_B_ASSETS.gate.key,
+    ).setOrigin(0, 0).setDisplaySize(
+      GATE_PLACEMENT.width * CELL_SIZE,
+      GATE_PLACEMENT.height * CELL_SIZE,
+    ).setDepth(1);
+
+    for (const position of TREE_POSITIONS) {
+      this.add.image(
+        this.cellCenter(position.column),
+        this.cellCenter(position.row),
+        PHASE_B_ASSETS.tree.key,
+      ).setDisplaySize(CELL_SIZE, CELL_SIZE).setDepth(2);
+    }
+
+    for (const position of TRASH_CAN_POSITIONS) {
+      this.add.image(
+        this.cellCenter(position.column),
+        this.cellCenter(position.row),
+        PHASE_B_ASSETS.trashCan.key,
+      ).setDisplaySize(CELL_SIZE * 0.75, CELL_SIZE * 0.75).setDepth(2);
+    }
+
+    const graphics = this.add.graphics();
+    graphics.setDepth(3);
+    graphics.lineStyle(1, COLORS.grid, 0.22);
     for (let column = 0; column <= this.map.bounds.columns; column += 1) {
       const x = column * CELL_SIZE;
       graphics.lineBetween(x, 0, x, DESIGN_HEIGHT);

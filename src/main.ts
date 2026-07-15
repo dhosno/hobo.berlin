@@ -27,6 +27,25 @@ const gameParent = gameParentElement;
 const positionOutput = positionOutputElement;
 
 let game: ReturnType<typeof createGame> | undefined;
+let bootFailed = false;
+
+function showBootFailure(error: unknown): void {
+  if (bootFailed) {
+    return;
+  }
+  bootFailed = true;
+
+  game?.destroy(true);
+  game = undefined;
+  gameParent.replaceChildren();
+  gameParent.removeAttribute("data-presentation");
+  positionOutput.remove();
+
+  const alert = document.createElement("p");
+  alert.setAttribute("role", "alert");
+  alert.textContent = `Unable to start Phase 0: ${error instanceof Error ? error.message : String(error)}`;
+  gameParent.append(alert);
+}
 
 async function bootstrap(): Promise<void> {
   try {
@@ -37,17 +56,9 @@ async function bootstrap(): Promise<void> {
     }
 
     const map = parseTiledMap(await response.json());
-    game = createGame(gameParent, map);
+    game = createGame(gameParent, map, showBootFailure);
   } catch (error) {
-    game?.destroy(true);
-    game = undefined;
-    gameParent.replaceChildren();
-    positionOutput.remove();
-
-    const alert = document.createElement("p");
-    alert.setAttribute("role", "alert");
-    alert.textContent = `Unable to start Phase 0: ${error instanceof Error ? error.message : String(error)}`;
-    gameParent.append(alert);
+    showBootFailure(error);
   }
 }
 

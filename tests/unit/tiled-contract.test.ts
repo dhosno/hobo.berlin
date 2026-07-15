@@ -243,6 +243,16 @@ describe("parseTiledMap", () => {
     const input: unknown = JSON.parse(await readFile(mapPath, "utf8"));
     const result = parseTiledMap(input);
     expect(result.spawn).toEqual({ column: 2, row: 2 });
-    expect(result.blockedCells.has("5,2")).toBe(true);
+    expect(result.blockedCells).toEqual(new Set([
+      "1,9",
+      "8,7",
+      "8,9",
+      "11,7",
+      "13,8",
+      "21,6",
+      "7,3",
+      "17,7",
+      "15,12",
+    ]));
   });
 });

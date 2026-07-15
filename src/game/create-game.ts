@@ -4,7 +4,13 @@ import { DESIGN_HEIGHT, DESIGN_WIDTH } from "./config";
 import type { ParsedMapContract } from "./map/tiled-contract";
 import { MapScene } from "./scenes/map-scene";
 
-export function createGame(parent: HTMLElement, map: ParsedMapContract): Phaser.Game {
+export type GameBootFailureHandler = (error: Error) => void;
+
+export function createGame(
+  parent: HTMLElement,
+  map: ParsedMapContract,
+  onBootFailure: GameBootFailureHandler,
+): Phaser.Game {
   return new Phaser.Game({
     type: Phaser.AUTO,
     parent,
@@ -12,6 +18,8 @@ export function createGame(parent: HTMLElement, map: ParsedMapContract): Phaser.
     height: DESIGN_HEIGHT,
     transparent: true,
     antialias: false,
+    pixelArt: true,
+    roundPixels: true,
     scale: {
       parent,
       mode: Phaser.Scale.FIT,
@@ -19,6 +27,6 @@ export function createGame(parent: HTMLElement, map: ParsedMapContract): Phaser.
       width: DESIGN_WIDTH,
       height: DESIGN_HEIGHT,
     },
-    scene: new MapScene(map),
+    scene: new MapScene(map, onBootFailure),
   });
 }

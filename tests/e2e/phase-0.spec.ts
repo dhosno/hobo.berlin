@@ -16,6 +16,7 @@ async function readPosition(page: Page): Promise<Position> {
 async function pressMany(page: Page, key: string, count: number): Promise<void> {
   for (let index = 0; index < count; index += 1) {
     await page.keyboard.press(key);
+    await page.waitForTimeout(20);
   }
 }
 
@@ -27,10 +28,14 @@ async function openGame(page: Page): Promise<void> {
   }));
 }
 
-test("renders the Stage A canvas and spawn status", async ({ page }) => {
+test("renders the Stage B canvas and spawn status", async ({ page }) => {
   await openGame(page);
 
   await expect(page.locator("#game canvas")).toHaveCount(1);
+  await expect(page.locator("#game")).toHaveAttribute(
+    "data-presentation",
+    "berlin-placeholders",
+  );
   await expect(page.locator("#player-position")).toHaveText("Player: 2,2");
   await expect.poll(() => readPosition(page)).toEqual({ column: 2, row: 2 });
 });
@@ -53,6 +58,7 @@ for (const viewport of [
     expect(box!.y).toBeGreaterThanOrEqual(0);
     expect(box!.x + box!.width).toBeLessThanOrEqual(viewport.width + 0.01);
     expect(box!.y + box!.height).toBeLessThanOrEqual(viewport.height + 0.01);
+    await expect(canvas).toHaveCSS("image-rendering", "pixelated");
 
     const overflow = await page.evaluate(() => ({
       horizontal: document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -107,11 +113,34 @@ test("repeated ArrowLeft and ArrowUp stop at the top-left map edge", async ({ pa
   await expect.poll(() => readPosition(page)).toEqual({ column: 0, row: 0 });
 });
 
-test("three ArrowRight presses stop before the blocker", async ({ page }) => {
+test("a trash can blocks its asphalt cell", async ({ page }) => {
   await openGame(page);
-  await pressMany(page, "ArrowRight", 3);
+  await pressMany(page, "ArrowRight", 5);
+  await page.keyboard.press("ArrowDown");
 
-  await expect.poll(() => readPosition(page)).toEqual({ column: 4, row: 2 });
+  await expect.poll(() => readPosition(page)).toEqual({ column: 7, row: 2 });
+});
+
+test("a tree blocks its grass cell", async ({ page }) => {
+  await openGame(page);
+  await pressMany(page, "ArrowRight", 6);
+  await pressMany(page, "ArrowDown", 5);
+
+  await expect.poll(() => readPosition(page)).toEqual({ column: 8, row: 6 });
+});
+
+test("a failed Stage B texture shows a readable failure and removes gameplay", async ({ page }) => {
+  await page.route("**/hobo.png", async (route) => {
+    await route.abort("failed");
+  });
+
+  await page.goto("/");
+
+  await expect(page.getByRole("alert")).toContainText(/texture|asset/i);
+  await expect(page.locator("canvas")).toHaveCount(0);
+  await expect(page.locator("#player-position")).toHaveCount(0);
+  await page.keyboard.press("ArrowRight");
+  await expect(page.locator("#player-position")).toHaveCount(0);
 });
 
 test("an invalid map shows a readable failure and does not start gameplay", async ({ page }) => {

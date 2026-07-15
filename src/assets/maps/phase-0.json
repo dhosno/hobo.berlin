@@ -26,18 +26,83 @@
         {
           "height": 32,
           "id": 2,
+          "name": "tree",
           "visible": true,
           "width": 32,
-          "x": 160,
-          "y": 64
+          "x": 32,
+          "y": 288
         },
         {
-          "height": 64,
+          "height": 32,
           "id": 3,
+          "name": "tree",
           "visible": true,
-          "width": 64,
-          "x": 320,
-          "y": 320
+          "width": 32,
+          "x": 256,
+          "y": 224
+        },
+        {
+          "height": 32,
+          "id": 4,
+          "name": "tree",
+          "visible": true,
+          "width": 32,
+          "x": 256,
+          "y": 288
+        },
+        {
+          "height": 32,
+          "id": 5,
+          "name": "tree",
+          "visible": true,
+          "width": 32,
+          "x": 352,
+          "y": 224
+        },
+        {
+          "height": 32,
+          "id": 6,
+          "name": "tree",
+          "visible": true,
+          "width": 32,
+          "x": 416,
+          "y": 256
+        },
+        {
+          "height": 32,
+          "id": 7,
+          "name": "tree",
+          "visible": true,
+          "width": 32,
+          "x": 672,
+          "y": 192
+        },
+        {
+          "height": 32,
+          "id": 8,
+          "name": "trash-can",
+          "visible": true,
+          "width": 32,
+          "x": 224,
+          "y": 96
+        },
+        {
+          "height": 32,
+          "id": 9,
+          "name": "trash-can",
+          "visible": true,
+          "width": 32,
+          "x": 544,
+          "y": 224
+        },
+        {
+          "height": 32,
+          "id": 10,
+          "name": "trash-can",
+          "visible": true,
+          "width": 32,
+          "x": 480,
+          "y": 384
         }
       ],
       "type": "objectgroup",
@@ -45,7 +110,7 @@
     }
   ],
   "nextlayerid": 3,
-  "nextobjectid": 4,
+  "nextobjectid": 11,
   "orientation": "orthogonal",
   "renderorder": "right-down",
   "tileheight": 32,

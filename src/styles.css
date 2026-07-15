@@ -27,6 +27,10 @@ body,
   aspect-ratio: 3 / 2;
 }
 
+#game canvas {
+  image-rendering: pixelated;
+}
+
 #player-position {
   position: absolute;
   inset: 0.5rem auto auto 0.5rem;
