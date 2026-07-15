@@ -21,6 +21,7 @@ const ASSET_FILES = [
   "bottle.png",
   "Rewe.png",
   "Netto.png",
+  "donner.png",
 ] as const;
 
 function item(type: WorldItem["type"], assetKey?: string): WorldItem {
@@ -46,10 +47,11 @@ describe("board assets", () => {
       "bottle",
       "rewe",
       "netto",
+      "donner",
     ]);
   });
 
-  it("selects sprites for supported world items and preserves the food fallback", () => {
+  it("selects sprites for every supported world item", () => {
     expect(itemAssetKey(item("bin"))).toBe("trash-can");
     expect(itemAssetKey(item("loose-bottle"))).toBe("bottle");
     expect(itemAssetKey(item("bottle-return"), () => 0)).toBe("rewe");
@@ -62,7 +64,14 @@ describe("board assets", () => {
     expect(itemAssetKey(item("scenery", "brandenburg-gate"))).toBe(
       "brandenburg-gate",
     );
-    expect(itemAssetKey(item("food"))).toBeUndefined();
+    expect(itemAssetKey(item("food"))).toBe("donner");
+  });
+
+  it.each(["game-over.gif", "win.gif"])("uses a real GIF for %s", async (filename) => {
+    const bytes = await readFile(resolve("src/assets/sprites", filename));
+
+    expect(new TextDecoder().decode(bytes.subarray(0, 6))).toMatch(/^GIF8[79]a$/);
+    expect(bytes.byteLength).toBeGreaterThan(6);
   });
 
   it.each(ASSET_FILES)("uses a real PNG for %s", async (filename) => {

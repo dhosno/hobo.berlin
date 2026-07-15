@@ -635,6 +635,14 @@ body {
   margin-bottom: 0.3rem;
 }
 
+.end-state-art {
+  display: block;
+  width: 100%;
+  max-height: 52vh;
+  margin-bottom: 0.75rem;
+  object-fit: contain;
+}
+
 #overlay-btn {
   width: 100%;
   border: none;

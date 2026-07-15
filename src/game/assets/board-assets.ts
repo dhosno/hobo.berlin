@@ -1,6 +1,7 @@
 import asphaltUrl from "../../assets/sprites/asphalt.png";
 import gateUrl from "../../assets/sprites/Brandenburg-Gate.png";
 import bottleUrl from "../../assets/sprites/bottle.png";
+import donnerUrl from "../../assets/sprites/donner.png";
 import grassUrl from "../../assets/sprites/grass.png";
 import hoboUrl from "../../assets/sprites/hobo.png";
 import nettoUrl from "../../assets/sprites/Netto.png";
@@ -19,6 +20,7 @@ export const BOARD_ASSETS = {
   bottle: { key: "bottle", url: bottleUrl },
   rewe: { key: "rewe", url: reweUrl },
   netto: { key: "netto", url: nettoUrl },
+  donner: { key: "donner", url: donnerUrl },
 } as const;
 
 export type BoardAssetKey = keyof typeof BOARD_ASSETS;
@@ -56,6 +58,6 @@ export function itemAssetKey(
     case "scenery":
       return knownAssetKey(item.assetKey);
     case "food":
-      return undefined;
+      return "donner";
   }
 }

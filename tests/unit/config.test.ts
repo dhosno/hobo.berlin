@@ -6,6 +6,7 @@ import {
   CELL_SIZE,
   DESIGN_HEIGHT,
   DESIGN_WIDTH,
+  DAYS_PER_RUN,
   GRID_COLUMNS,
   GRID_ROWS,
   INITIAL_REPEAT_DELAY_MS,
@@ -29,6 +30,7 @@ describe("Phase 1 layout constants", () => {
   });
 
   it("keeps economy defaults aligned with the mechanics spec", () => {
+    expect(DAYS_PER_RUN).toBe(1);
     expect(MINIMUM_BOTTLES_TO_REDEEM).toBe(20);
     expect([REWE_WAIT_MIN_MS, REWE_WAIT_MAX_MS]).toEqual([2_000, 12_000]);
     expect(MEAL_VENDOR_NAME).toBe("Mustafa Kebap");
