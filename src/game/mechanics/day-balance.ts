@@ -13,7 +13,7 @@ export type DayBalance = {
   binCount: number;
   binYieldMin: number;
   binYieldMax: number;
-  /** Per-bin hidden burn probability range (spec: ~5–15%). */
+  /** Per-bin hidden burn probability range (tuned hot for short days). */
   hazardChanceMin: number;
   hazardChanceMax: number;
   mealMinCents: number;
@@ -47,9 +47,9 @@ export function dayBalance(day: number): DayBalance {
     Math.round(lerp(5, 3, progress)),
   );
 
-  // Day 1 sits near the safer end of the 5–15% band; day 7 near the hotter end.
-  const hazardChanceMin = lerp(BIN_HAZARD_CHANCE_MIN, 0.1, progress);
-  const hazardChanceMax = lerp(0.1, BIN_HAZARD_CHANCE_MAX, progress);
+  // Day 1 still risky; day 7 bins burn often.
+  const hazardChanceMin = lerp(BIN_HAZARD_CHANCE_MIN, 0.28, progress);
+  const hazardChanceMax = lerp(0.28, BIN_HAZARD_CHANCE_MAX, progress);
 
   return {
     day: clamped,

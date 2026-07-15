@@ -211,8 +211,8 @@ describe("mechanics run", () => {
 
     expect(bins.length).toBe(balance.binCount);
     for (const bin of bins) {
-      expect(bin.hazardChance).toBeGreaterThanOrEqual(BIN_HAZARD_CHANCE_MIN);
-      expect(bin.hazardChance).toBeLessThanOrEqual(BIN_HAZARD_CHANCE_MAX);
+      expect(bin.hazardChance).toBeGreaterThanOrEqual(BIN_HAZARD_CHANCE_MIN - 1e-9);
+      expect(bin.hazardChance).toBeLessThanOrEqual(BIN_HAZARD_CHANCE_MAX + 1e-9);
       expect(bin.yieldBottles).toBeGreaterThan(0);
     }
   });

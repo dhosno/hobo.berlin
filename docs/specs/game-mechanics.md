@@ -149,7 +149,7 @@ At the start of each day, before the ready state is shown:
 
 - Bin bottle yield is a random one to five bottles by default.
 - Each bin receives a hidden hazard probability when the day is generated.
-- The provisional probability range is 5% to 15%, centered around the earlier 10% baseline.
+- The provisional probability range is 20% to 35% (higher later in the week via day balance).
 - A bin interaction resolves to bottles **or** a burn, never both.
 - A burn removes one health unit, equal to half a heart, and awards no bottles.
 - A depleted bin ignores further interaction until the next daily reset.

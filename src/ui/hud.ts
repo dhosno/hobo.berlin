@@ -7,6 +7,10 @@ import {
   characterDialogueId,
   dialogueEventFor,
 } from "../game/audio";
+import {
+  characterPortraitUrl,
+  characterShortLabel,
+} from "../game/characters";
 import { DEV_FREEZE_TIMER, prefersReducedMotion } from "../game/env";
 import {
   bottlesNeededForMeal,
@@ -43,6 +47,10 @@ const els = {
   toast: () => document.getElementById("hud-toast"),
   bottomToast: () => document.getElementById("bottom-toast"),
   speechBubble: () => document.getElementById("speech-bubble"),
+  speechPortrait: () =>
+    document.getElementById("speech-portrait-img") as HTMLImageElement | null,
+  speechName: () => document.getElementById("speech-name"),
+  speechText: () => document.getElementById("speech-text"),
   queue: () => document.getElementById("queue-bar"),
   queueFill: () => document.getElementById("queue-fill"),
   queueLabel: () => document.getElementById("queue-label"),
@@ -86,19 +94,35 @@ let lastDialogueKey = "";
 let speechTimer = 0;
 const dialogue = createDialogue();
 
-function showSpeechBubble(text: string, key: string): void {
+function showSpeechBubble(
+  text: string,
+  key: string,
+  options: { characterId: string; hero?: boolean },
+): void {
   const el = els.speechBubble();
-  if (!el || !text) return;
-  el.textContent = text;
+  const portrait = els.speechPortrait();
+  const nameEl = els.speechName();
+  const textEl = els.speechText();
+  if (!el || !textEl) return;
+
+  if (portrait) {
+    portrait.src = characterPortraitUrl(options.characterId);
+    portrait.alt = characterShortLabel(options.characterId);
+  }
+  if (nameEl) nameEl.textContent = characterShortLabel(options.characterId);
+  textEl.textContent = text;
+
+  el.classList.toggle("speech-bubble--hero", Boolean(options.hero));
   el.classList.remove("hidden", "fade");
   window.clearTimeout(speechTimer);
+  const holdMs = options.hero ? 4200 : 2800;
   speechTimer = window.setTimeout(() => {
     el.classList.add("fade");
     speechTimer = window.setTimeout(() => {
       el.classList.add("hidden");
-      el.classList.remove("fade");
+      el.classList.remove("fade", "speech-bubble--hero");
     }, 280);
-  }, 2200);
+  }, holdMs);
   void key;
 }
 
@@ -107,12 +131,10 @@ function maybeShowDialogue(state: GameState): void {
   if (!last) return;
 
   let eventId = dialogueEventFor(last);
-  if (
-    !eventId &&
-    last === "night-started" &&
-    state.day === 1
-  ) {
+  let hero = false;
+  if (!eventId && last === "night-started" && state.day === 1) {
     eventId = "character-intro";
+    hero = true;
   }
   if (!eventId) return;
 
@@ -125,7 +147,12 @@ function maybeShowDialogue(state: GameState): void {
       characterId: characterDialogueId(state.player.characterId),
     })
     .then((line) => {
-      if (line?.text) showSpeechBubble(line.text, key);
+      if (line?.text) {
+        showSpeechBubble(line.text, key, {
+          characterId: state.player.characterId,
+          hero,
+        });
+      }
     });
 }
 
@@ -355,8 +382,17 @@ export function syncOverlay(
   if (state.phase === "instructions") {
     show(true);
     title.textContent = "hobo.berlin";
+    const portrait = characterPortraitUrl(state.player.characterId);
+    const name = characterName(state.player.characterId);
+    const blurb = characterBlurb(state.player.characterId);
     body.innerHTML = `
-      <p><strong>${characterName(state.player.characterId)}</strong> — ${characterBlurb(state.player.characterId)}</p>
+      <div class="character-card">
+        <img class="character-card-portrait" src="${portrait}" alt="${name}" width="96" height="96" />
+        <div class="character-card-copy">
+          <p class="character-card-name">${name}</p>
+          <p class="character-card-blurb">${blurb}</p>
+        </div>
+      </div>
       <ol>
         <li>Survive seven days until the Agentur für Arbeit approves your money.</li>
         <li>Each day gives you about one minute.</li>

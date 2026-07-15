@@ -48,7 +48,15 @@ app.innerHTML = `
       </div>
     </div>
     <div id="bottom-toast" class="hidden" aria-live="polite"></div>
-    <div id="speech-bubble" class="hidden" aria-live="polite"></div>
+    <div id="speech-bubble" class="hidden" aria-live="polite">
+      <div class="speech-portrait" aria-hidden="true">
+        <img id="speech-portrait-img" alt="" width="72" height="72" decoding="async" />
+      </div>
+      <div class="speech-copy">
+        <div id="speech-name"></div>
+        <div id="speech-text"></div>
+      </div>
+    </div>
     <output id="player-position" aria-live="polite" data-column="0" data-row="0">Player: 0,0</output>
     <div id="overlay">
       <div id="overlay-card">
