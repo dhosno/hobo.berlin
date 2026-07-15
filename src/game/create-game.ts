@@ -218,8 +218,9 @@ export function createGame(
     getState: () => state,
     beginGame: () => {
       if (state.phase !== "instructions") return;
-      void unlockAudio();
-      startDayFlow();
+      void unlockAudio().then(() => {
+        startDayFlow();
+      });
     },
     continueDay: () => {
       if (state.phase === "day-resolution") {
@@ -227,8 +228,9 @@ export function createGame(
         return;
       }
       if (state.phase === "day-ready") {
-        void unlockAudio();
-        startDayFlow();
+        void unlockAudio().then(() => {
+          startDayFlow();
+        });
       }
     },
     restart: () => {

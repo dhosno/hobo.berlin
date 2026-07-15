@@ -247,9 +247,14 @@ function renderStage(state: GameState): void {
     text.classList.remove("countdown");
     text.classList.add("day-number");
   } else if (state.phase === "countdown") {
-    text.textContent = state.toast || "3";
+    const label = state.toast || "3";
+    text.textContent = label;
     text.classList.add("countdown");
     text.classList.remove("day-number");
+    // Retrigger pop on each 3-2-1 tick.
+    text.style.animation = "none";
+    void text.offsetWidth;
+    text.style.animation = "";
   } else {
     text.classList.remove("countdown", "day-number");
   }

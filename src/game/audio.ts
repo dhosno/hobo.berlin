@@ -1,6 +1,5 @@
 import { createAudio } from "../audio.js";
-import type { GameEvent } from "./mechanics/types";
-import type { GamePhase } from "./mechanics/types";
+import type { GameEvent, GamePhase } from "./mechanics/types";
 
 type Tone = {
   freq: number;
@@ -35,15 +34,20 @@ const EVENT_TO_ASSET: Partial<Record<GameEvent, string | null>> = {
   "action-noop": null,
 };
 
-/** Extra SFX layered on top of the primary mapped cue. */
+/** Extra short SFX layered on top of the primary mapped cue. */
 const EXTRA_ASSETS: Partial<Record<GameEvent, readonly string[]>> = {
   "bin-burn": ["heart-lost"],
   "day-failed": ["heart-lost"],
 };
 
-const EVENT_MUSIC: Partial<Record<GameEvent, string>> = {
-  won: "win-benefits-approved-overture",
-  lost: "lose-wartenummer-requiem",
+/**
+ * Theme WAVs are large (~0.5–1MB). Playing them through decodeAudioData has
+ * crashed tabs; keep short SFX on the Web Audio path and stream themes via
+ * HTMLAudioElement instead.
+ */
+const EVENT_MUSIC_URL: Partial<Record<GameEvent, string>> = {
+  won: "/assets/audio/music/benefits-approved-win.wav",
+  lost: "/assets/audio/music/wartenummer-requiem-lose.wav",
 };
 
 const TONES: Partial<Record<GameEvent, Tone | Tone[]>> = {
@@ -80,6 +84,9 @@ const TONES: Partial<Record<GameEvent, Tone | Tone[]>> = {
 
 let beepCtx: AudioContext | null = null;
 let beepUnlocked = false;
+let assetAudio: ReturnType<typeof createAudio> | null = null;
+let startedOnce = false;
+let themePlayer: HTMLAudioElement | null = null;
 
 function getBeepCtx(): AudioContext | null {
   if (typeof window === "undefined") return null;
@@ -100,6 +107,7 @@ function playBeep(event: GameEvent): boolean {
   if (!tone) return false;
   const audio = getBeepCtx();
   if (!audio) return false;
+  if (audio.state === "suspended") void audio.resume();
   const start = audio.currentTime + 0.01;
   const list = Array.isArray(tone) ? tone : [tone];
   let t = start;
@@ -120,68 +128,117 @@ function playBeep(event: GameEvent): boolean {
   return true;
 }
 
-const assetAudio = createAudio({
-  fallback: (eventId: string) => {
-    if (eventId in TONES) return playBeep(eventId as GameEvent);
-    return false;
-  },
-});
+function getAssetAudio(): ReturnType<typeof createAudio> {
+  if (!assetAudio) {
+    assetAudio = createAudio({
+      fallback: (eventId: string) => {
+        if (eventId in TONES) return playBeep(eventId as GameEvent);
+        return false;
+      },
+    });
+    // Prefer the small base/alt 22kHz packs — modern WAVs are much larger.
+    assetAudio.setVariantStyle("retro-8bit");
+  }
+  return assetAudio;
+}
 
-let startedOnce = false;
+function stopTheme(): void {
+  if (!themePlayer) return;
+  themePlayer.pause();
+  themePlayer.removeAttribute("src");
+  themePlayer.load();
+  themePlayer = null;
+}
 
+function playThemeUrl(url: string): void {
+  try {
+    stopTheme();
+    const el = new Audio(url);
+    el.volume = 0.28;
+    themePlayer = el;
+    void el.play().catch(() => {
+      /* autoplay / decode failure must not break gameplay */
+    });
+  } catch {
+    /* ignore */
+  }
+}
+
+/** Must run from a user gesture (Start). Ready before the day sequence begins. */
 export async function unlockAudio(): Promise<void> {
   beepUnlocked = true;
   const beep = getBeepCtx();
-  if (beep?.state === "suspended") await beep.resume();
-  await assetAudio.unlock();
-  assetAudio.setEventEnabled("step", true);
+  if (beep?.state === "suspended") {
+    try {
+      await beep.resume();
+    } catch {
+      /* continue — beeps may still work after a later gesture */
+    }
+  }
+
+  const audio = getAssetAudio();
+  await audio.unlock();
+  audio.setEventEnabled("step", true);
+
   if (!startedOnce) {
     startedOnce = true;
-    void assetAudio.play("ui-start");
-    void assetAudio.playMusic("intro-pfand-und-circumstance");
-    void assetAudio.playAmbience("berlin-outside");
+    // Short cues only — do not decode the multi-hundred-KB intro theme here.
+    void audio.play("ui-start");
+    void audio.playAmbience("berlin-outside");
   }
 }
 
 /** Quiet footstep cue on successful grid moves. */
 export function playFootstep(): void {
-  void assetAudio.play("step");
+  if (!beepUnlocked) return;
+  void getAssetAudio().play("step");
 }
 
 /** Swap ambience beds when the day phase changes. */
 export function syncPhaseAudio(phase: GamePhase): void {
+  if (!beepUnlocked) return;
+  const audio = getAssetAudio();
   if (phase === "night") {
-    void assetAudio.playAmbience("city-night");
+    void audio.playAmbience("city-night");
     return;
   }
   if (phase === "dawn" || phase === "countdown" || phase === "playing") {
-    void assetAudio.playAmbience("berlin-outside");
+    void audio.playAmbience("berlin-outside");
   }
   if (phase === "won" || phase === "lost") {
-    assetAudio.stopAmbience();
+    audio.stopAmbience();
   }
 }
 
 export function playEvent(event: GameEvent): void {
+  // Always try a beep if assets are not ready yet (unlock race / missing file).
   const mapped = EVENT_TO_ASSET[event];
   if (mapped === null) {
     playBeep(event);
     return;
   }
+
+  if (!beepUnlocked) {
+    playBeep(event);
+    return;
+  }
+
   if (mapped) {
-    void assetAudio.play(mapped).then((ok: boolean) => {
-      if (!ok) playBeep(event);
-    });
+    void getAssetAudio()
+      .play(mapped)
+      .then((ok: boolean) => {
+        if (!ok) playBeep(event);
+      });
   } else {
     playBeep(event);
   }
 
   for (const extra of EXTRA_ASSETS[event] ?? []) {
-    void assetAudio.play(extra);
+    void getAssetAudio().play(extra);
   }
 
-  const music = EVENT_MUSIC[event];
-  if (music) void assetAudio.playMusic(music);
+  const theme = EVENT_MUSIC_URL[event];
+  if (theme) playThemeUrl(theme);
 }
 
 /** Play only events appended since the previous snapshot. */
