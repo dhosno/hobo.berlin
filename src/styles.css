@@ -497,8 +497,10 @@ body {
 #stage-moon,
 #stage-sun {
   display: block;
-  width: 96px;
-  height: 96px;
+  width: 128px;
+  height: 128px;
+  object-fit: contain;
+  image-rendering: pixelated;
 }
 
 #stage-moon.hidden,

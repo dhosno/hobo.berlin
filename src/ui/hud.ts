@@ -70,8 +70,8 @@ const els = {
     document.getElementById("overlay-btn") as HTMLButtonElement | null,
 };
 
-const MOON_SRC = new URL("../assets/ui/moon-placeholder.svg", import.meta.url).href;
-const SUN_SRC = new URL("../assets/ui/sun-placeholder.svg", import.meta.url).href;
+const MOON_SRC = new URL("../assets/ui/moon.png", import.meta.url).href;
+const SUN_SRC = new URL("../assets/ui/sun.png", import.meta.url).href;
 
 let stageAssetsReady = false;
 

@@ -60,8 +60,8 @@ app.innerHTML = `
       <div id="stage-veil"></div>
       <div id="stage-content">
         <div id="stage-asset" class="hidden" aria-hidden="true">
-          <img id="stage-moon" alt="" width="96" height="96" decoding="async" />
-          <img id="stage-sun" alt="" width="96" height="96" decoding="async" />
+          <img id="stage-moon" alt="" width="128" height="128" decoding="async" />
+          <img id="stage-sun" alt="" width="128" height="128" decoding="async" />
         </div>
         <span id="stage-text"></span>
       </div>
