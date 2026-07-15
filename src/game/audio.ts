@@ -1,6 +1,34 @@
+import { createAudio } from "../audio.js";
 import type { GameEvent } from "./mechanics/types";
 
-type Tone = { freq: number; duration: number; type?: OscillatorType; gain?: number };
+type Tone = {
+  freq: number;
+  duration: number;
+  type?: OscillatorType;
+  gain?: number;
+};
+
+/** Map mechanics event IDs onto manifest SFX ids from `public/assets/audio`. */
+const EVENT_TO_ASSET: Partial<Record<GameEvent, string | null>> = {
+  "night-started": "day-night-sting",
+  "day-started": "day-night-sting",
+  "countdown-tick": null,
+  "bottle-collected": "loose-bottle-collected",
+  "got-burned": "bin-burn",
+  "rewe-wait-started": null,
+  "bottles-depositing": null,
+  "cash-received": "bottles-redeemed",
+  "food-wait-started": null,
+  "food-bought": "food-bought",
+  "food-denied": "food-denied",
+  "rewe-denied": "food-denied",
+  "day-failed": "day-failed",
+  "day-survived": "day-survived",
+  won: "won",
+  lost: "lost",
+  "move-closer": null,
+  "action-noop": null,
+};
 
 const TONES: Partial<Record<GameEvent, Tone | Tone[]>> = {
   "night-started": { freq: 180, duration: 0.2, type: "sine", gain: 0.08 },
@@ -28,60 +56,83 @@ const TONES: Partial<Record<GameEvent, Tone | Tone[]>> = {
   lost: { freq: 110, duration: 0.35, type: "sine", gain: 0.08 },
 };
 
-let ctx: AudioContext | null = null;
-let unlocked = false;
+let beepCtx: AudioContext | null = null;
+let beepUnlocked = false;
 
-function getCtx(): AudioContext | null {
+function getBeepCtx(): AudioContext | null {
   if (typeof window === "undefined") return null;
-  if (!ctx) {
+  if (!beepCtx) {
     const AC =
       window.AudioContext ||
       (window as unknown as { webkitAudioContext: typeof AudioContext })
         .webkitAudioContext;
     if (!AC) return null;
-    ctx = new AC();
+    beepCtx = new AC();
   }
-  return ctx;
+  return beepCtx;
 }
 
-export async function unlockAudio(): Promise<void> {
-  const audio = getCtx();
-  if (!audio) return;
-  if (audio.state === "suspended") {
-    await audio.resume();
-  }
-  unlocked = true;
-}
-
-function beep(tone: Tone, when: number): void {
-  const audio = getCtx();
-  if (!audio || !unlocked) return;
-  const osc = audio.createOscillator();
-  const gain = audio.createGain();
-  osc.type = tone.type ?? "square";
-  osc.frequency.value = tone.freq;
-  const level = tone.gain ?? 0.05;
-  gain.gain.setValueAtTime(level, when);
-  gain.gain.exponentialRampToValueAtTime(0.001, when + tone.duration);
-  osc.connect(gain);
-  gain.connect(audio.destination);
-  osc.start(when);
-  osc.stop(when + tone.duration + 0.02);
-}
-
-export function playEvent(event: GameEvent): void {
-  if (!unlocked) return;
+function playBeep(event: GameEvent): boolean {
+  if (!beepUnlocked) return false;
   const tone = TONES[event];
-  if (!tone) return;
-  const audio = getCtx();
-  if (!audio) return;
+  if (!tone) return false;
+  const audio = getBeepCtx();
+  if (!audio) return false;
   const start = audio.currentTime + 0.01;
   const list = Array.isArray(tone) ? tone : [tone];
   let t = start;
   for (const step of list) {
-    beep(step, t);
+    const osc = audio.createOscillator();
+    const gain = audio.createGain();
+    osc.type = step.type ?? "square";
+    osc.frequency.value = step.freq;
+    const level = step.gain ?? 0.05;
+    gain.gain.setValueAtTime(level, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + step.duration);
+    osc.connect(gain);
+    gain.connect(audio.destination);
+    osc.start(t);
+    osc.stop(t + step.duration + 0.02);
     t += step.duration * 0.85;
   }
+  return true;
+}
+
+const assetAudio = createAudio({
+  fallback: (eventId: string) => {
+    // Manifest ids sometimes arrive here; map back is unnecessary for beeps.
+    if (eventId in TONES) return playBeep(eventId as GameEvent);
+    return false;
+  },
+});
+
+let startedOnce = false;
+
+export async function unlockAudio(): Promise<void> {
+  beepUnlocked = true;
+  const beep = getBeepCtx();
+  if (beep?.state === "suspended") await beep.resume();
+  await assetAudio.unlock();
+  if (!startedOnce) {
+    startedOnce = true;
+    void assetAudio.play("ui-start");
+    void assetAudio.playAmbience("berlin-outside");
+  }
+}
+
+export function playEvent(event: GameEvent): void {
+  const mapped = EVENT_TO_ASSET[event];
+  if (mapped === null) {
+    playBeep(event);
+    return;
+  }
+  if (mapped) {
+    void assetAudio.play(mapped).then((ok: boolean) => {
+      if (!ok) playBeep(event);
+    });
+    return;
+  }
+  playBeep(event);
 }
 
 /** Play only events appended since the previous snapshot. */
