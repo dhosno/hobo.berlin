@@ -1,0 +1,20 @@
+[
+  { "id": "character-intro-prompt-engineer-en", "event": "character-intro", "characterId": "prompt-engineer", "text": "Prompt engineer. Laid off for loop engineering.", "weight": 1 },
+  { "id": "character-intro-marketing-en", "event": "character-intro", "characterId": "head-of-marketing", "text": "Marketing lead. Replaced by an end-to-end workflow.", "weight": 1 },
+  { "id": "character-intro-qa-en", "event": "character-intro", "characterId": "qa-engineer", "text": "QA engineer. Playwright did it in three seconds.", "weight": 1 },
+  { "id": "bin-burn-en-1", "event": "bin-burn", "text": "Ow. Cigarette. Classic.", "weight": 3 },
+  { "id": "bin-burn-en-2", "event": "bin-burn", "text": "Half a heart for science.", "weight": 2 },
+  { "id": "bin-burn-en-3", "event": "bin-burn", "text": "Berlin ashtray: undefeated.", "weight": 1 },
+  { "id": "bin-bottles-en-1", "event": "bin-bottles", "text": "Pfand gods smiled.", "weight": 3 },
+  { "id": "bin-bottles-en-2", "event": "bin-bottles", "text": "Liquid gold. Kind of.", "weight": 2 },
+  { "id": "food-bought-en-1", "event": "food-bought", "text": "Calories acquired.", "weight": 3 },
+  { "id": "food-bought-en-2", "event": "food-bought", "text": "Döner diplomacy works.", "weight": 2 },
+  { "id": "food-denied-en-1", "event": "food-denied", "text": "Wallet says nein.", "weight": 3 },
+  { "id": "food-denied-en-2", "event": "food-denied", "text": "Need more Flaschen.", "weight": 2 },
+  { "id": "day-failed-en-1", "event": "day-failed", "text": "Agentur still buffering…", "weight": 3 },
+  { "id": "day-failed-en-2", "event": "day-failed", "text": "One heart closer to the ticket.", "weight": 2 },
+  { "id": "won-en-1", "event": "won", "text": "Benefits approved. Touch grass? Later.", "weight": 3 },
+  { "id": "won-en-2", "event": "won", "text": "The form had the correct form.", "weight": 1 },
+  { "id": "lost-en-1", "event": "lost", "text": "Run ended. Loop engineering wins again.", "weight": 3 },
+  { "id": "lost-en-2", "event": "lost", "text": "Please take a waiting-number and retry.", "weight": 1 }
+]

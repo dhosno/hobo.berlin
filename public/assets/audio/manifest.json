@@ -1,0 +1,222 @@
+{
+  "version": 1,
+  "format": {
+    "retroSfx": "WAV, unsigned 8-bit PCM, mono, 22050 Hz",
+    "modernSfx": "WAV, signed 16-bit PCM, mono, 44100 Hz",
+    "themeMusic": "WAV, signed 16-bit PCM, mono, 44100 Hz",
+    "ambience": "Ogg Vorbis"
+  },
+  "defaults": {
+    "sfxVolume": 0.72,
+    "musicVolume": 0.28,
+    "ambienceVolume": 0.16,
+    "preload": false
+  },
+  "events": {
+    "loose-bottle-collected": {
+      "files": [
+        "/assets/audio/sfx/base/loose-bottle-collected.wav",
+        "/assets/audio/sfx/alt/loose-bottle-collected-alt.wav",
+        "/assets/audio/sfx/modern/loose-bottle-collected-modern.wav"
+      ],
+      "variantStyles": ["retro-8bit", "retro-8bit", "modern-16bit"],
+      "intent": "bright glassy pickup ding",
+      "priority": "high"
+    },
+    "bin-bottles": {
+      "files": [
+        "/assets/audio/sfx/base/bin-bottles.wav",
+        "/assets/audio/sfx/alt/bin-bottles-alt.wav",
+        "/assets/audio/sfx/modern/bin-bottles-modern.wav"
+      ],
+      "variantStyles": ["retro-8bit", "retro-8bit", "modern-16bit"],
+      "intent": "larger bottle reward arpeggio",
+      "priority": "high"
+    },
+    "bin-burn": {
+      "files": [
+        "/assets/audio/sfx/base/bin-burn.wav",
+        "/assets/audio/sfx/alt/bin-burn-alt.wav",
+        "/assets/audio/sfx/modern/bin-burn-modern.wav"
+      ],
+      "variantStyles": ["retro-8bit", "retro-8bit", "modern-16bit"],
+      "intent": "comic burn buzz and droop",
+      "priority": "high"
+    },
+    "bottles-redeemed": {
+      "files": [
+        "/assets/audio/sfx/base/bottles-redeemed.wav",
+        "/assets/audio/sfx/alt/bottles-redeemed-alt.wav",
+        "/assets/audio/sfx/modern/bottles-redeemed-modern.wav"
+      ],
+      "variantStyles": ["retro-8bit", "retro-8bit", "modern-16bit"],
+      "intent": "mechanical Pfand machine doo-ding",
+      "priority": "high"
+    },
+    "food-bought": {
+      "files": [
+        "/assets/audio/sfx/base/food-bought.wav",
+        "/assets/audio/sfx/alt/food-bought-alt.wav",
+        "/assets/audio/sfx/modern/food-bought-modern.wav"
+      ],
+      "variantStyles": ["retro-8bit", "retro-8bit", "modern-16bit"],
+      "intent": "crunch plus till confirmation",
+      "priority": "high"
+    },
+    "food-denied": {
+      "files": [
+        "/assets/audio/sfx/base/food-denied.wav",
+        "/assets/audio/sfx/alt/food-denied-alt.wav",
+        "/assets/audio/sfx/modern/food-denied-modern.wav"
+      ],
+      "variantStyles": ["retro-8bit", "retro-8bit", "modern-16bit"],
+      "intent": "soft two-note insufficient-funds fail",
+      "priority": "high"
+    },
+    "day-failed": {
+      "files": [
+        "/assets/audio/sfx/base/day-failed.wav",
+        "/assets/audio/sfx/alt/day-failed-alt.wav",
+        "/assets/audio/sfx/modern/day-failed-modern.wav"
+      ],
+      "variantStyles": ["retro-8bit", "retro-8bit", "modern-16bit"],
+      "intent": "short descending heart-loss cue",
+      "priority": "high"
+    },
+    "day-survived": {
+      "files": [
+        "/assets/audio/sfx/base/day-survived.wav",
+        "/assets/audio/sfx/alt/day-survived-alt.wav",
+        "/assets/audio/sfx/modern/day-survived-modern.wav"
+      ],
+      "variantStyles": ["retro-8bit", "retro-8bit", "modern-16bit"],
+      "intent": "gentle relief arpeggio",
+      "priority": "medium"
+    },
+    "won": {
+      "files": [
+        "/assets/audio/sfx/base/won.wav",
+        "/assets/audio/sfx/alt/won-alt.wav",
+        "/assets/audio/sfx/modern/won-modern.wav"
+      ],
+      "variantStyles": ["retro-8bit", "retro-8bit", "modern-16bit"],
+      "intent": "small benefits-approved fanfare",
+      "priority": "high"
+    },
+    "lost": {
+      "files": [
+        "/assets/audio/sfx/base/lost.wav",
+        "/assets/audio/sfx/alt/lost-alt.wav",
+        "/assets/audio/sfx/modern/lost-modern.wav"
+      ],
+      "variantStyles": ["retro-8bit", "retro-8bit", "modern-16bit"],
+      "intent": "soft game-over descent",
+      "priority": "high"
+    },
+    "heart-lost": {
+      "files": [
+        "/assets/audio/sfx/base/heart-lost-funny.wav",
+        "/assets/audio/sfx/alt/heart-lost-drunk-alt.wav",
+        "/assets/audio/sfx/modern/heart-lost-dark-modern.wav"
+      ],
+      "variantStyles": ["funny", "drunk", "dark"],
+      "intent": "single-heart break with cartoon, wobbly, and cinematic personalities",
+      "priority": "high",
+      "volume": 0.68
+    },
+    "ui-start": {
+      "files": [
+        "/assets/audio/sfx/base/ui-start.wav",
+        "/assets/audio/sfx/alt/ui-start-alt.wav",
+        "/assets/audio/sfx/modern/ui-start-modern.wav"
+      ],
+      "variantStyles": ["retro-8bit", "retro-8bit", "modern-16bit"],
+      "intent": "clean menu confirmation",
+      "priority": "medium"
+    },
+    "step": {
+      "files": [
+        "/assets/audio/sfx/base/step-1.wav",
+        "/assets/audio/sfx/base/step-2.wav",
+        "/assets/audio/sfx/modern/step-modern.wav"
+      ],
+      "variantStyles": ["retro-8bit", "retro-8bit", "modern-16bit"],
+      "intent": "quiet alternating lo-fi footsteps",
+      "priority": "low",
+      "volume": 0.18,
+      "defaultEnabled": false
+    },
+    "day-night-sting": {
+      "files": [
+        "/assets/audio/sfx/base/day-night-sting.wav",
+        "/assets/audio/sfx/alt/day-night-sting-alt.wav",
+        "/assets/audio/sfx/modern/day-night-sting-modern.wav"
+      ],
+      "variantStyles": ["retro-8bit", "retro-8bit", "modern-16bit"],
+      "intent": "short transition whoosh",
+      "priority": "low"
+    }
+  },
+  "music": {
+    "intro-pfand-und-circumstance": {
+      "file": "/assets/audio/music/pfand-und-circumstance-intro.wav",
+      "loop": false,
+      "screen": "intro",
+      "volume": 0.28,
+      "intent": "jaunty Berlin cabaret with Pfand clinks and paperwork percussion",
+      "license": "Original project asset"
+    },
+    "win-benefits-approved-overture": {
+      "file": "/assets/audio/music/benefits-approved-win.wav",
+      "loop": false,
+      "screen": "won",
+      "volume": 0.3,
+      "intent": "lengthy triumphant benefits-approved overture with Pfand clinks and an approval-machine flourish",
+      "license": "Original project asset"
+    },
+    "lose-wartenummer-requiem": {
+      "file": "/assets/audio/music/wartenummer-requiem-lose.wav",
+      "loop": false,
+      "screen": "lost",
+      "volume": 0.27,
+      "intent": "dramatic but gentle waiting-number requiem aimed at bureaucracy, not the player",
+      "license": "Original project asset"
+    }
+  },
+  "ambience": {
+    "city-night": {
+      "file": "/assets/audio/ambience/city-night-loop.ogg",
+      "loop": true,
+      "priority": "nice-to-have",
+      "license": "CC0-1.0",
+      "source": "https://opengameart.org/content/scifi-city-ambient-loop"
+    },
+    "berlin-outside": {
+      "file": "/assets/audio/ambience/berlin-outside-loop.ogg",
+      "loop": true,
+      "priority": "alternate",
+      "volume": 0.14,
+      "intent": "quiet outdoor evening bed for Berlin streets",
+      "license": "CC0-1.0",
+      "source": "https://opengameart.org/content/amb-outside-1"
+    },
+    "ubahn-wind": {
+      "file": "/assets/audio/ambience/ubahn-wind-loop.ogg",
+      "loop": true,
+      "priority": "alternate",
+      "volume": 0.1,
+      "intent": "airy tunnel motion for U-Bahn-adjacent spaces",
+      "license": "CC0-1.0",
+      "source": "https://opengameart.org/content/wind-whoosh-loop"
+    },
+    "waiting-room-ambient": {
+      "file": "/assets/audio/ambience/waiting-room-ambient-loop.ogg",
+      "loop": true,
+      "priority": "alternate",
+      "volume": 0.12,
+      "intent": "hopeful lo-fi loop for bureaucratic waiting",
+      "license": "CC0-1.0",
+      "source": "https://opengameart.org/content/two-simple-game-music-loops"
+    }
+  }
+}
