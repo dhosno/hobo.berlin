@@ -57,12 +57,16 @@
         display: none;
         padding: clamp(1.5rem, 5vw, 4rem);
         flex-direction: column;
-        justify-content: center;
+        justify-content: flex-start;
         align-items: center;
         text-align: center;
         opacity: 0;
         transform: translateY(12px);
         transition: opacity 0.35s ease, transform 0.35s ease;
+        /* Shared title band for every non-cover slide */
+        padding-top: clamp(2.75rem, 8vh, 5rem);
+        padding-bottom: 4.5rem;
+        overflow-y: auto;
       }
 
       .slide.active {
@@ -71,13 +75,27 @@
         transform: translateY(0);
       }
 
+      .slide.slide-cover {
+        justify-content: center;
+        padding-top: clamp(1.5rem, 5vw, 4rem);
+        padding-bottom: clamp(1.5rem, 5vw, 4rem);
+        overflow: hidden;
+      }
+
       .eyebrow {
         font-size: 0.85rem;
         letter-spacing: 0.18em;
         text-transform: uppercase;
         color: var(--accent);
         font-weight: 600;
-        margin-bottom: 1rem;
+        margin-bottom: 0.75rem;
+        min-height: 1.25rem;
+        line-height: 1.25rem;
+      }
+
+      .eyebrow.eyebrow-spacer {
+        visibility: hidden;
+        pointer-events: none;
       }
 
       h1.brand {
@@ -118,17 +136,19 @@
         font-weight: 800;
         font-size: clamp(1.75rem, 5vw, 3rem);
         letter-spacing: -0.02em;
-        margin-bottom: 1.5rem;
+        margin-bottom: 1.25rem;
         max-width: 18ch;
+        line-height: 1.1;
       }
 
       .intro-lead {
         font-family: "Bricolage Grotesque", sans-serif;
         font-weight: 800;
-        font-size: clamp(1.5rem, 4.5vw, 2.5rem);
+        font-size: clamp(1.75rem, 5vw, 3rem);
         max-width: 22ch;
-        line-height: 1.15;
-        margin-bottom: 2rem;
+        line-height: 1.1;
+        margin-bottom: 1.25rem;
+        letter-spacing: -0.02em;
       }
 
       .layoff-list {
@@ -319,16 +339,8 @@
         user-select: none;
       }
 
-      .slide-wide {
-        justify-content: flex-start;
-        padding-top: clamp(2.5rem, 6vh, 4rem);
-        padding-bottom: 4.5rem;
-        overflow-y: auto;
-      }
-
       .slide-wide h2 {
         max-width: none;
-        margin-bottom: 0.35rem;
       }
 
       .slide-sub {
@@ -561,7 +573,7 @@
 
     <div class="deck" id="deck">
       <!-- 1. Title -->
-      <section class="slide active" data-slide="0">
+      <section class="slide slide-cover active" data-slide="0">
         <p class="eyebrow">A Berlin survival comedy</p>
         <h1 class="brand">hobo<span class="dot">.</span><span class="berlin">berlin</span></h1>
         <p class="tagline">Collect bottles to survive.</p>
@@ -569,6 +581,7 @@
 
       <!-- 2. Intro -->
       <section class="slide" data-slide="1">
+        <p class="eyebrow eyebrow-spacer" aria-hidden="true">&nbsp;</p>
         <p class="intro-lead">Whoever you are — they’re gonna take your job.</p>
         <ul class="layoff-list">
           <li>
