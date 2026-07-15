@@ -1,10 +1,10 @@
-/** Phase 1 layout: vertical sketch grid (from mechanics branch). */
+/** Phase 1 layout: vertical sketch grid (cropped to clear HUD + controls). */
 
 export const GRID_COLUMNS = 18;
-export const GRID_ROWS = 28;
+export const GRID_ROWS = 26;
 export const CELL_SIZE = 28;
 export const DESIGN_WIDTH = GRID_COLUMNS * CELL_SIZE; // 504
-export const DESIGN_HEIGHT = GRID_ROWS * CELL_SIZE; // 784
+export const DESIGN_HEIGHT = GRID_ROWS * CELL_SIZE; // 728
 
 export const INITIAL_REPEAT_DELAY_MS = 180;
 export const REPEAT_INTERVAL_MS = 100;
@@ -12,7 +12,7 @@ export const REPEAT_INTERVAL_MS = 100;
 export const ACTION_DEBOUNCE_MS = 280;
 
 /** Economy / run balance (from mechanics sketch + game-mechanics.md). */
-export const DAYS_PER_RUN = 1;
+export const DAYS_PER_RUN = 7;
 export const DAY_DURATION_MS = 60_000;
 export const PRE_DAY_NIGHT_MS = 1_400;
 export const PRE_DAY_DAWN_MS = 1_400;

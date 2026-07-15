@@ -407,7 +407,7 @@ export function syncOverlay(
         </div>
       </div>
       <ol>
-        <li>Survive one day until the Agentur für Arbeit approves your money.</li>
+        <li>Survive seven days until the Agentur für Arbeit approves your money.</li>
         <li>Each day gives you about one minute.</li>
         <li>Move one grid square at a time with the D-pad, arrow keys, or WASD.</li>
         <li>Search garbage bins for returnable bottles.</li>
@@ -416,8 +416,8 @@ export function syncOverlay(
         <li>Collect enough bottles and redeem them at the supermarket for cash (≥${MINIMUM_BOTTLES_TO_REDEEM}).</li>
         <li>Supermarket queues take time while the day timer keeps running.</li>
         <li>Spend the cash at ${MEAL_VENDOR_NAME} and wait for the food.</li>
-        <li>Eat before time runs out or the run ends.</li>
-        <li>Once fed, tap <strong>End day</strong> to win.</li>
+        <li>Eat before time runs out or lose one heart.</li>
+        <li>Once fed, tap <strong>End day</strong> to start the next night early.</li>
       </ol>
     `;
     btn.textContent = "Start game";
@@ -451,7 +451,7 @@ export function syncOverlay(
     title.textContent = "Benefits approved";
     body.innerHTML = `
       <img class="end-state-art" src="${WIN_SRC}" alt="You win" />
-      <p>One day on Pfand and ${MEAL_VENDOR_NAME}. Touch grass? Later.</p>
+      <p>Seven days on Pfand and ${MEAL_VENDOR_NAME}. Touch grass? Later.</p>
     `;
     btn.textContent = "Play again";
     btn.onclick = () => onAction("restart");

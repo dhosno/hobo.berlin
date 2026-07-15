@@ -50,7 +50,7 @@ for (const viewport of [
     const frame = page.locator("#frame");
     const box = await frame.boundingBox();
     expect(box).not.toBeNull();
-    expect(Math.abs(box!.width / box!.height - 18 / 28)).toBeLessThanOrEqual(0.03);
+    expect(Math.abs(box!.width / box!.height - 18 / 26)).toBeLessThanOrEqual(0.03);
     expect(box!.x).toBeGreaterThanOrEqual(0);
     expect(box!.y).toBeGreaterThanOrEqual(0);
     expect(box!.x + box!.width).toBeLessThanOrEqual(viewport.width + 1);
@@ -125,7 +125,7 @@ test("an invalid map shows a readable failure and does not start gameplay", asyn
         orientation: "orthogonal",
         infinite: false,
         width: 18,
-        height: 28,
+        height: 26,
         tilewidth: 28,
         tileheight: 28,
         layers: [

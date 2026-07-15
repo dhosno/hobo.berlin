@@ -14,7 +14,7 @@ function validMap(): unknown {
     orientation: "orthogonal",
     infinite: false,
     width: 18,
-    height: 28,
+    height: 26,
     tilewidth: 28,
     tileheight: 28,
     layers: [
@@ -51,7 +51,7 @@ describe("parseTiledMap", () => {
   it("parses a valid map", () => {
     const result = parseTiledMap(validMap());
 
-    expect(result.bounds).toEqual({ columns: 18, rows: 28 });
+    expect(result.bounds).toEqual({ columns: 18, rows: 26 });
     expect(result.spawn).toEqual({ column: 2, row: 2 });
     expect(result.blockedCells).toEqual(new Set([blockedCellKey({ column: 5, row: 2 })]));
     expect(result.interactables).toEqual([]);

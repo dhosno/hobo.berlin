@@ -30,9 +30,9 @@ body {
 
 #frame {
   position: relative;
-  width: min(100vw, calc(100vh * 18 / 28));
-  height: min(100vh, calc(100vw * 28 / 18));
-  aspect-ratio: 18 / 28;
+  width: min(100vw, calc(100vh * 18 / 26));
+  height: min(100vh, calc(100vw * 26 / 18));
+  aspect-ratio: 18 / 26;
   background: var(--frame);
   overflow: hidden;
   box-shadow: 0 0 0 1px rgba(243, 240, 230, 0.08);

@@ -34,7 +34,7 @@ const miniMap = {
   orientation: "orthogonal",
   infinite: false,
   width: 18,
-  height: 28,
+  height: 26,
   tilewidth: 28,
   tileheight: 28,
   layers: [
@@ -125,8 +125,8 @@ describe("mechanics run", () => {
 
     state = { ...state, fedToday: true };
     const ended = endDayEarly(state);
-    expect(ended.phase).toBe("won");
-    expect(ended.lastEvents.at(-1)).toBe("won");
+    expect(ended.phase).toBe("day-resolution");
+    expect(ended.lastEvents.at(-1)).toBe("day-survived");
     expect(ended.timeRemainingMs).toBe(0);
 
     state = {
@@ -199,8 +199,16 @@ describe("mechanics run", () => {
     expect(next.lastEvents.at(-1)).toBe("cash-received");
   });
 
-  it("keeps the only playable day at day-one balance", () => {
-    expect(dayBalance(7)).toEqual(dayBalance(1));
+  it("gets harder from day 1 to day 7", () => {
+    const easy = dayBalance(1);
+    const hard = dayBalance(7);
+
+    expect(easy.looseBottleCount).toBeGreaterThan(hard.looseBottleCount);
+    expect(easy.binYieldMax).toBeGreaterThan(hard.binYieldMax);
+    expect(easy.hazardChanceMax).toBeLessThanOrEqual(hard.hazardChanceMax);
+    expect(easy.mealMinCents).toBeLessThan(hard.mealMinCents);
+    expect(easy.surplusRatioMin).toBeGreaterThan(hard.surplusRatioMin);
+    expect(hard.hazardChanceMax).toBe(BIN_HAZARD_CHANCE_MAX);
   });
 
   it("keeps each day solvable but not wildly oversupplied", () => {

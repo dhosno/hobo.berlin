@@ -9,12 +9,12 @@ import { blockedCellKey, parseTiledMap } from "../../src/game/map/tiled-contract
 import { worldFromParsedMap } from "../../src/game/mechanics/world";
 
 const TREE_POSITIONS = [
-  { column: 6, row: 5 },
-  { column: 11, row: 5 },
-  { column: 9, row: 18 },
-  { column: 12, row: 17 },
-  { column: 5, row: 24 },
-  { column: 16, row: 18 },
+  { column: 6, row: 4 },
+  { column: 11, row: 4 },
+  { column: 9, row: 17 },
+  { column: 12, row: 16 },
+  { column: 5, row: 23 },
+  { column: 16, row: 17 },
 ] as const;
 
 describe("portrait board layout", () => {
@@ -24,8 +24,8 @@ describe("portrait board layout", () => {
         const expected =
           (column >= 2 && column <= 4) ||
           (column >= 13 && column <= 15) ||
-          (row >= 7 && row <= 9) ||
-          (row >= 20 && row <= 22)
+          (row >= 6 && row <= 8) ||
+          (row >= 19 && row <= 21)
             ? "asphalt"
             : "grass";
 
@@ -47,15 +47,15 @@ describe("portrait board layout", () => {
       .filter((item) => item.assetKey === "tree")
       .map((item) => item.position);
 
-    expect(map.spawn).toEqual({ column: 4, row: 13 });
+    expect(map.spawn).toEqual({ column: 4, row: 12 });
     expect(terrainAt(map.spawn.column, map.spawn.row)).toBe("asphalt");
 
     expect(gate).toMatchObject({
-      position: { column: 7, row: 12 },
+      position: { column: 7, row: 11 },
       size: { columns: 4, rows: 3 },
     });
     expect(bench).toMatchObject({
-      position: { column: 8, row: 24 },
+      position: { column: 8, row: 23 },
       size: { columns: 2, rows: 1 },
     });
     expect(trees).toEqual(TREE_POSITIONS);
