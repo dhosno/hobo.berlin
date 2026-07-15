@@ -150,6 +150,13 @@ const modernSounds = {
     { at: 0.26, samples: tone({ duration: 0.44, frequency: 220, volume: 0.22, attack: 0.018, release: 0.28, harmonics: [1, 2] }) },
     { at: 0.52, samples: tone({ duration: 0.45, frequency: 165, volume: 0.21, attack: 0.018, release: 0.31, harmonics: [1, 2] }) }
   ]),
+  'heart-lost-dark-modern.wav': mix(1.32, [
+    { at: 0, samples: tone({ duration: 0.22, frequency: 82, endFrequency: 68, volume: 0.31, attack: 0.012, release: 0.14, harmonics: [1, 2, 3] }) },
+    { at: 0.25, samples: tone({ duration: 0.25, frequency: 76, endFrequency: 54, volume: 0.34, attack: 0.012, release: 0.17, harmonics: [1, 2, 3] }) },
+    { at: 0.43, samples: filteredNoise({ duration: 0.16, volume: 0.42, seed: 314, cutoff: 0.34, release: 0.13 }) },
+    { at: 0.48, samples: tone({ duration: 0.80, frequency: 196, endFrequency: 49, volume: 0.27, attack: 0.02, release: 0.42, fm: 1.1, harmonics: [1, 2, 3] }) },
+    { at: 0.51, samples: tone({ duration: 0.72, frequency: 98, endFrequency: 41, volume: 0.20, attack: 0.03, release: 0.40, harmonics: [1, 2] }) }
+  ]),
   'ui-start-modern.wav': mix(0.32, [
     { samples: tone({ duration: 0.12, frequency: 520, endFrequency: 700, volume: 0.24, release: 0.06, fm: 0.25 }) },
     { at: 0.07, samples: bell({ duration: 0.22, frequency: 1040, volume: 0.22 }) }

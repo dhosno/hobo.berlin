@@ -74,10 +74,13 @@ function fakeScene() {
 test('Phaser preload queues all SFX, theme music, and ambience with stable cache keys', () => {
   const scene = fakeScene();
   const keys = queuePhaserAudio(scene, manifest);
-  assert.equal(keys.length, 45);
+  assert.equal(keys.length, 49);
   assert.equal(new Set(keys).size, keys.length);
   assert.ok(keys.includes('hobo:ambience:berlin-outside'));
   assert.ok(keys.includes('hobo:music:intro-pfand-und-circumstance'));
+  assert.ok(keys.includes('hobo:music:win-benefits-approved-overture'));
+  assert.ok(keys.includes('hobo:music:lose-wartenummer-requiem'));
+  assert.ok(keys.includes('hobo:sfx:heart-lost:2'));
   assert.ok(keys.includes('hobo:sfx:step:0'));
   assert.ok(keys.includes('hobo:ambience:city-night'));
 });

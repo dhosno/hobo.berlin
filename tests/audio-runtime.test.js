@@ -184,7 +184,7 @@ test('named game events trigger sound and locale-backed bubbles, then unsubscrib
   const played = [];
   const bubbles = [];
   const stop = bindGameFeedback(target, {
-    eventIds: ['character-intro', 'bin-burn', 'step'],
+    eventIds: ['character-intro', 'bin-burn', 'heart-lost', 'step'],
     audio: { play: async (eventId) => played.push(eventId) },
     dialogue: { pick: async (eventId, options) => ({ id: 'line', event: eventId, text: options.locale }) },
     locale: () => 'de',
@@ -192,15 +192,16 @@ test('named game events trigger sound and locale-backed bubbles, then unsubscrib
   });
 
   target.emit('character-intro', { characterId: 'qa-engineer' });
+  target.emit('heart-lost');
   target.emit('step');
   await Promise.resolve();
   await Promise.resolve();
-  assert.deepEqual(played, ['step'], 'text-only intro must not request an unmapped sound');
+  assert.deepEqual(played, ['heart-lost', 'step'], 'text-only intro must not request an unmapped sound');
   assert.equal(bubbles.length, 1);
   assert.equal(bubbles[0].line.text, 'de');
 
   stop();
   target.emit('bin-burn');
   await Promise.resolve();
-  assert.deepEqual(played, ['step']);
+  assert.deepEqual(played, ['heart-lost', 'step']);
 });

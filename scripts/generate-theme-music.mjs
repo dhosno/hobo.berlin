@@ -18,16 +18,25 @@ function envelope(time, duration, attack = 0.012, release = 0.12) {
 function instrument({ duration, note, volume = 0.22, character = 'accordion', release = 0.12 }) {
   const output = new Float64Array(sampleCount(duration));
   const frequency = midiToHz(note);
-  const harmonics = character === 'bass' ? [1, 0.28, 0.08] : [1, 0.42, 0.20, 0.09];
+  const harmonics = character === 'bass'
+    ? [1, 0.28, 0.08]
+    : character === 'brass'
+      ? [1, 0.58, 0.26, 0.10]
+      : [1, 0.42, 0.20, 0.09];
   for (let index = 0; index < output.length; index += 1) {
     const time = index / SAMPLE_RATE;
-    const vibrato = character === 'accordion' ? Math.sin(TAU * 5.3 * time) * 0.004 : 0;
+    const vibrato = character === 'accordion'
+      ? Math.sin(TAU * 5.3 * time) * 0.004
+      : character === 'brass'
+        ? Math.sin(TAU * 4.6 * time) * 0.002
+        : 0;
     let sample = 0;
     harmonics.forEach((amplitude, harmonicIndex) => {
       sample += Math.sin(TAU * frequency * (harmonicIndex + 1) * (1 + vibrato) * time) * amplitude;
     });
     const tremolo = character === 'accordion' ? 0.88 + Math.sin(TAU * 3.7 * time) * 0.12 : 1;
-    output[index] = sample / 1.71 * volume * tremolo * envelope(time, duration, 0.018, release);
+    const attack = character === 'brass' ? 0.045 : 0.018;
+    output[index] = sample / 1.95 * volume * tremolo * envelope(time, duration, attack, release);
   }
   return output;
 }
@@ -72,9 +81,9 @@ function mix(duration, layers) {
   return Float64Array.from(output, (sample) => sample * gain);
 }
 
-function compose({ bpm, melody, bass, ending = [] }) {
+function compose({ bpm, melody, bass, harmony = [], ending = [], dramatic = false }) {
   const step = 60 / bpm / 2;
-  const steps = Math.max(melody.length, bass.length * 2);
+  const steps = Math.max(melody.length, bass.length * 2, harmony.length * 2);
   const duration = steps * step + 0.55;
   const layers = [];
 
@@ -88,10 +97,27 @@ function compose({ bpm, melody, bass, ending = [] }) {
       samples: instrument({ duration: step * 1.75, note, volume: 0.17, character: 'bass', release: step * 0.45 })
     });
   });
+  harmony.forEach((note, index) => {
+    if (note == null) return;
+    layers.push({
+      at: index * step * 2,
+      samples: instrument({
+        duration: step * 1.82,
+        note,
+        volume: dramatic ? 0.14 : 0.10,
+        character: 'brass',
+        release: step * 0.65
+      })
+    });
+  });
   for (let index = 0; index < steps; index += 2) {
-    layers.push({ at: index * step, samples: stamp({ seed: 410 + index, volume: index % 4 === 0 ? 0.12 : 0.07 }) });
+    const downbeat = index % 4 === 0;
+    layers.push({
+      at: index * step,
+      samples: stamp({ seed: 410 + index, volume: downbeat ? (dramatic ? 0.15 : 0.12) : 0.07 })
+    });
   }
-  for (const index of [7, 15, 23].filter((value) => value < steps)) {
+  for (const index of [7, 15, 23, 31, 39].filter((value) => value < steps)) {
     layers.push({ at: index * step, samples: clink({ frequency: index === 15 ? 1320 : 1100 }) });
   }
   ending.forEach(({ at, note, volume = 0.20 }) => {
@@ -129,13 +155,37 @@ const themes = {
     bass: [38, 45, 41, 45, 40, 47, 43, 47, 38, 45, 41, 45],
     ending: [{ at: 23, note: 86, volume: 0.23 }]
   }),
-  'formular-finale-outro.wav': compose({
-    bpm: 112,
-    melody: [69, 67, 65, 64, 62, null, 65, 69, 67, 64, 62, null, 65, 64, 62, 61, 62, 66, 69, 74],
-    bass: [45, 40, 41, 45, 43, 40, 41, 45, 38, 45],
+  'benefits-approved-win.wav': compose({
+    bpm: 120,
+    melody: [
+      62, 66, 69, 74, 72, 69, 66, null,
+      64, 67, 71, 76, 74, 71, 67, null,
+      66, 69, 74, 78, 76, 74, 69, null,
+      67, 71, 74, 79, 78, 76, 74, 71,
+      69, 74, 78, 81, 79, 78, 76, 74
+    ],
+    bass: [38, 45, 42, 45, 40, 47, 43, 47, 42, 49, 45, 49, 43, 50, 47, 50, 45, 50, 47, 38],
+    harmony: [50, 54, 57, 54, 52, 55, 59, 55, 54, 57, 62, 57, 55, 59, 62, 59, 57, 62, 66, 62],
+    dramatic: true,
     ending: [
-      { at: 18, note: 74, volume: 0.17 },
-      { at: 19, note: 86, volume: 0.24 }
+      { at: 37, note: 86, volume: 0.17 },
+      { at: 39, note: 98, volume: 0.25 }
+    ]
+  }),
+  'wartenummer-requiem-lose.wav': compose({
+    bpm: 96,
+    melody: [
+      74, 72, 69, 65, 67, 65, 64, null,
+      72, 69, 67, 64, 65, 64, 62, null,
+      69, 67, 65, 62, 64, 62, 60, null,
+      67, 65, 64, 60, 62, 61, 62, 57
+    ],
+    bass: [38, 45, 41, 45, 36, 43, 40, 45, 38, 45, 41, 45, 36, 43, 40, 38],
+    harmony: [53, 50, 52, 48, 50, 48, 45, null, 50, 48, 45, 50, 48, 45, 50, 45],
+    dramatic: true,
+    ending: [
+      { at: 29, note: 74, volume: 0.12 },
+      { at: 31, note: 81, volume: 0.18 }
     ]
   })
 };

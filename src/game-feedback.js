@@ -9,6 +9,7 @@ export const GAME_EVENT_IDS = Object.freeze([
   'day-survived',
   'won',
   'lost',
+  'heart-lost',
   'ui-start',
   'step',
   'day-night-sting'
