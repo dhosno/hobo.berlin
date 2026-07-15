@@ -1,69 +1,108 @@
 import Phaser from "phaser";
 
 import { CELL_SIZE, DESIGN_HEIGHT, DESIGN_WIDTH } from "../config";
-import { moveGridPosition, type Direction } from "../grid/movement";
+import type { Direction } from "../grid/movement";
 import { ArrowRepeatController } from "../input/repeat";
-import type { GridPosition, ParsedMapContract } from "../map/tiled-contract";
+import type { GameState } from "../mechanics/types";
+import type { WorldItem } from "../mechanics/types";
 
 const COLORS = {
-  background: 0x151922,
+  background: 0x1a2118,
   blocker: 0xa4495f,
-  grid: 0x596376,
-  player: 0xf0bf4c,
+  grid: 0x3a4534,
+  player: 0xf0d33c,
+  bin: 0x6b7280,
+  binDepleted: 0x3f4450,
+  loose: 0x6ecf7a,
+  rewe: 0xcc3333,
+  food: 0xd4a017,
+  scenery: 0x5a6b52,
+  focus: 0xffffff,
 } as const;
 
-export class MapScene extends Phaser.Scene {
-  private readonly map: ParsedMapContract;
-  private readonly repeatController = new ArrowRepeatController();
-  private position: GridPosition;
-  private player!: Phaser.GameObjects.Rectangle;
+type Handlers = {
+  onMove: (direction: Direction) => void;
+  onAction: () => void;
+  onItemTap: (itemId: string) => void;
+};
 
-  constructor(map: ParsedMapContract) {
+export class MapScene extends Phaser.Scene {
+  private state!: GameState;
+  private handlers!: Handlers;
+  private readonly repeatController = new ArrowRepeatController();
+  private player!: Phaser.GameObjects.Rectangle;
+  private itemGfx = new Map<
+    string,
+    { rect: Phaser.GameObjects.Rectangle; text: Phaser.GameObjects.Text }
+  >();
+  private mapGfx?: Phaser.GameObjects.Graphics;
+
+  constructor() {
     super({ key: "MapScene" });
-    this.map = map;
-    this.position = { ...map.spawn };
+  }
+
+  init(data: { state: GameState; handlers: Handlers }): void {
+    this.state = data.state;
+    this.handlers = data.handlers;
   }
 
   create(): void {
-    this.drawMap();
-    this.player = this.add.rectangle(
-      this.cellCenter(this.position.column),
-      this.cellCenter(this.position.row),
-      CELL_SIZE * 0.625,
-      CELL_SIZE * 0.625,
-      COLORS.player,
-    );
-    this.syncStatus();
+    this.drawStaticMap();
+    this.rebuildItems();
+    this.player = this.add
+      .rectangle(0, 0, CELL_SIZE * 0.7, CELL_SIZE * 0.7, COLORS.player)
+      .setDepth(20);
+    this.syncPlayer();
 
     const keyboard = this.input.keyboard;
     if (keyboard !== null) {
-      keyboard.addCapture("UP,DOWN,LEFT,RIGHT");
+      keyboard.addCapture("UP,DOWN,LEFT,RIGHT,W,A,S,D,SPACE,ENTER");
       keyboard.on("keydown", this.handleKeyDown);
       keyboard.on("keyup", this.handleKeyUp);
     }
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.removeKeyboardListeners);
+    this.events.once(
+      Phaser.Scenes.Events.SHUTDOWN,
+      this.removeKeyboardListeners,
+    );
+  }
+
+  syncState(state: GameState): void {
+    this.state = state;
+    this.rebuildItems();
+    this.syncPlayer();
+  }
+
+  syncLight(state: GameState): void {
+    this.state = state;
+    this.syncPlayer();
   }
 
   update(time: number): void {
     const direction = this.repeatController.update(time);
     if (direction !== undefined) {
-      this.move(direction);
+      this.handlers.onMove(direction);
     }
   }
 
   private readonly handleKeyDown = (event: KeyboardEvent): void => {
+    if (event.code === "Space" || event.code === "Enter") {
+      if (!event.repeat) this.handlers.onAction();
+      return;
+    }
+    const code = wasdToArrow(event.code) ?? event.code;
     const direction = this.repeatController.keyDown(
-      event.code,
+      code,
       this.time.now,
       event.repeat,
     );
     if (direction !== undefined) {
-      this.move(direction);
+      this.handlers.onMove(direction);
     }
   };
 
   private readonly handleKeyUp = (event: KeyboardEvent): void => {
-    this.repeatController.keyUp(event.code, this.time.now);
+    const code = wasdToArrow(event.code) ?? event.code;
+    this.repeatController.keyUp(code, this.time.now);
   };
 
   private readonly removeKeyboardListeners = (): void => {
@@ -74,13 +113,14 @@ export class MapScene extends Phaser.Scene {
     }
   };
 
-  private drawMap(): void {
-    const graphics = this.add.graphics();
+  private drawStaticMap(): void {
+    this.mapGfx?.destroy();
+    const graphics = this.add.graphics().setDepth(0);
     graphics.fillStyle(COLORS.background);
     graphics.fillRect(0, 0, DESIGN_WIDTH, DESIGN_HEIGHT);
 
     graphics.fillStyle(COLORS.blocker);
-    for (const blockedCell of this.map.blockedCells) {
+    for (const blockedCell of this.state.world.blockedCells) {
       const [column, row] = blockedCell.split(",").map(Number);
       graphics.fillRect(
         column * CELL_SIZE,
@@ -90,48 +130,122 @@ export class MapScene extends Phaser.Scene {
       );
     }
 
-    graphics.lineStyle(1, COLORS.grid, 0.8);
-    for (let column = 0; column <= this.map.bounds.columns; column += 1) {
+    graphics.lineStyle(1, COLORS.grid, 0.45);
+    for (let column = 0; column <= this.state.world.columns; column += 1) {
       const x = column * CELL_SIZE;
       graphics.lineBetween(x, 0, x, DESIGN_HEIGHT);
     }
-    for (let row = 0; row <= this.map.bounds.rows; row += 1) {
+    for (let row = 0; row <= this.state.world.rows; row += 1) {
       const y = row * CELL_SIZE;
       graphics.lineBetween(0, y, DESIGN_WIDTH, y);
     }
+    this.mapGfx = graphics;
   }
 
-  private move(direction: Direction): void {
-    const nextPosition = moveGridPosition(
-      this.position,
-      direction,
-      this.map.bounds,
-      this.map.blockedCells,
-    );
-    if (nextPosition === this.position) {
-      return;
-    }
-
-    this.position = nextPosition;
+  private syncPlayer(): void {
+    const { column, row } = this.state.player.position;
     this.player.setPosition(
-      this.cellCenter(this.position.column),
-      this.cellCenter(this.position.row),
+      column * CELL_SIZE + CELL_SIZE / 2,
+      row * CELL_SIZE + CELL_SIZE / 2,
     );
-    this.syncStatus();
   }
 
-  private syncStatus(): void {
-    const output = document.querySelector<HTMLOutputElement>("#player-position");
-    if (output === null) {
-      return;
+  private rebuildItems(): void {
+    for (const gfx of this.itemGfx.values()) {
+      gfx.rect.destroy();
+      gfx.text.destroy();
+    }
+    this.itemGfx.clear();
+
+    for (const item of this.state.world.items) {
+      this.itemGfx.set(item.id, this.makeItem(item));
+    }
+  }
+
+  private makeItem(item: WorldItem): {
+    rect: Phaser.GameObjects.Rectangle;
+    text: Phaser.GameObjects.Text;
+  } {
+    const w = item.size.columns * CELL_SIZE;
+    const h = item.size.rows * CELL_SIZE;
+    const px = item.position.column * CELL_SIZE;
+    const py = item.position.row * CELL_SIZE;
+
+    const rect = this.add
+      .rectangle(px + w / 2, py + h / 2, w * 0.88, h * 0.88, colorFor(item))
+      .setDepth(5)
+      .setInteractive({ useHandCursor: true });
+
+    if (this.state.focusedItemId === item.id) {
+      rect.setStrokeStyle(2, COLORS.focus, 1);
     }
 
-    output.dataset.column = String(this.position.column);
-    output.dataset.row = String(this.position.row);
-    output.textContent = `Player: ${this.position.column},${this.position.row}`;
-  }
+    rect.on("pointerdown", () => {
+      if (
+        item.type === "bin" ||
+        item.type === "bottle-return" ||
+        item.type === "food"
+      ) {
+        this.handlers.onItemTap(item.id);
+      }
+    });
 
-  private cellCenter(index: number): number {
-    return index * CELL_SIZE + CELL_SIZE / 2;
+    const text = this.add
+      .text(px + w / 2, py + h / 2, shortLabel(item), {
+        fontSize: `${Math.max(8, Math.floor(CELL_SIZE * 0.55))}px`,
+        color: "#111111",
+        fontFamily: "sans-serif",
+      })
+      .setOrigin(0.5)
+      .setDepth(6);
+
+    return { rect, text };
+  }
+}
+
+function wasdToArrow(code: string): string | undefined {
+  switch (code) {
+    case "KeyW":
+      return "ArrowUp";
+    case "KeyS":
+      return "ArrowDown";
+    case "KeyA":
+      return "ArrowLeft";
+    case "KeyD":
+      return "ArrowRight";
+    default:
+      return undefined;
+  }
+}
+
+function colorFor(item: WorldItem): number {
+  switch (item.type) {
+    case "bin":
+      return item.state === "depleted" ? COLORS.binDepleted : COLORS.bin;
+    case "loose-bottle":
+      return COLORS.loose;
+    case "bottle-return":
+      return COLORS.rewe;
+    case "food":
+      return COLORS.food;
+    default:
+      return COLORS.scenery;
+  }
+}
+
+function shortLabel(item: WorldItem): string {
+  switch (item.type) {
+    case "bin":
+      return item.state === "depleted" ? "…" : "BIN";
+    case "loose-bottle":
+      return "B";
+    case "bottle-return":
+      return "REWE";
+    case "food":
+      return "FOOD";
+    case "scenery":
+      return item.id.startsWith("gate") ? "GATE" : "";
+    default:
+      return "";
   }
 }

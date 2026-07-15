@@ -9,10 +9,11 @@ import {
   REPEAT_INTERVAL_MS,
 } from "../../src/game/config";
 
-describe("Phase 0 constants", () => {
-  it("derives the 768 by 512 design from a 24 by 16 grid", () => {
-    expect([GRID_COLUMNS, GRID_ROWS, CELL_SIZE]).toEqual([24, 16, 32]);
-    expect([DESIGN_WIDTH, DESIGN_HEIGHT]).toEqual([768, 512]);
+describe("Phase 1 layout constants", () => {
+  it("uses the vertical sketch grid (18×28 @ 28px)", () => {
+    expect([GRID_COLUMNS, GRID_ROWS, CELL_SIZE]).toEqual([18, 28, 28]);
+    expect([DESIGN_WIDTH, DESIGN_HEIGHT]).toEqual([504, 784]);
+    expect(DESIGN_HEIGHT).toBeGreaterThan(DESIGN_WIDTH);
   });
 
   it("pins deterministic repeat timing", () => {
