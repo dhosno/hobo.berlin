@@ -16,6 +16,7 @@ export type ParsedInteractable = {
   type: Exclude<ItemType, "bin" | "loose-bottle"> | "scenery";
   position: GridPosition;
   size: { columns: number; rows: number };
+  assetKey?: string;
 };
 
 export interface ParsedMapContract {
@@ -73,6 +74,19 @@ function parseType(name: string): ParsedInteractable["type"] | null {
     return "scenery";
   }
   return null;
+}
+
+function stringProperty(
+  object: Record<string, unknown>,
+  name: string,
+): string | undefined {
+  if (!Array.isArray(object.properties)) return undefined;
+  const property = object.properties.find(
+    (value) => isRecord(value) && value.name === name,
+  );
+  return isRecord(property) && typeof property.value === "string"
+    ? property.value
+    : undefined;
 }
 
 export function parseTiledMap(_input: unknown): ParsedMapContract {
@@ -238,6 +252,9 @@ export function parseTiledMap(_input: unknown): ParsedMapContract {
           columns: width / CELL_SIZE,
           rows: height / CELL_SIZE,
         },
+        ...(stringProperty(value, "assetKey")
+          ? { assetKey: stringProperty(value, "assetKey") }
+          : {}),
       });
     }
   }
