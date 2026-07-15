@@ -14,8 +14,8 @@ export const ACTION_DEBOUNCE_MS = 280;
 /** Economy / run balance (from mechanics sketch + game-mechanics.md). */
 export const DAYS_PER_RUN = 7;
 export const DAY_DURATION_MS = 60_000;
-export const PRE_DAY_NIGHT_MS = 750;
-export const PRE_DAY_DAWN_MS = 750;
+export const PRE_DAY_NIGHT_MS = 1_100;
+export const PRE_DAY_DAWN_MS = 1_100;
 export const COUNTDOWN_SECONDS = 3;
 
 export const MAX_HEALTH_UNITS = 6;

@@ -38,8 +38,14 @@ app.innerHTML = `
     <div id="dev-badge" class="hidden">DEV · timer frozen</div>
     <div id="game" aria-label="hobo.berlin grid"></div>
     <div id="stage" class="hidden" aria-live="polite">
-      <span id="stage-icon"></span>
-      <span id="stage-text"></span>
+      <div id="stage-veil"></div>
+      <div id="stage-content">
+        <div id="stage-asset" class="hidden" aria-hidden="true">
+          <img id="stage-moon" alt="" width="96" height="96" decoding="async" />
+          <img id="stage-sun" alt="" width="96" height="96" decoding="async" />
+        </div>
+        <span id="stage-text"></span>
+      </div>
     </div>
     <div id="bottom-toast" class="hidden" aria-live="polite"></div>
     <output id="player-position" aria-live="polite" data-column="0" data-row="0">Player: 0,0</output>

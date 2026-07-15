@@ -39,7 +39,9 @@ const els = {
   queueFill: () => document.getElementById("queue-fill"),
   queueLabel: () => document.getElementById("queue-label"),
   stage: () => document.getElementById("stage"),
-  stageIcon: () => document.getElementById("stage-icon"),
+  stageAsset: () => document.getElementById("stage-asset"),
+  stageMoon: () => document.getElementById("stage-moon") as HTMLImageElement | null,
+  stageSun: () => document.getElementById("stage-sun") as HTMLImageElement | null,
   stageText: () => document.getElementById("stage-text"),
   devBadge: () => document.getElementById("dev-badge"),
   pos: () => document.querySelector<HTMLOutputElement>("#player-position"),
@@ -49,6 +51,20 @@ const els = {
   overlayBtn: () =>
     document.getElementById("overlay-btn") as HTMLButtonElement | null,
 };
+
+const MOON_SRC = new URL("../assets/ui/moon-placeholder.svg", import.meta.url).href;
+const SUN_SRC = new URL("../assets/ui/sun-placeholder.svg", import.meta.url).href;
+
+let stageAssetsReady = false;
+
+function ensureStageAssets(): void {
+  if (stageAssetsReady) return;
+  const moon = els.stageMoon();
+  const sun = els.stageSun();
+  if (moon) moon.src = MOON_SRC;
+  if (sun) sun.src = SUN_SRC;
+  stageAssetsReady = true;
+}
 
 /** Last state totals we started animating toward (not mid-tween display). */
 let syncedBottles = -1;
@@ -134,10 +150,13 @@ function latestPickupToast(state: GameState): string | null {
 }
 
 function renderStage(state: GameState): void {
+  ensureStageAssets();
   const stage = els.stage();
-  const icon = els.stageIcon();
+  const asset = els.stageAsset();
+  const moon = els.stageMoon();
+  const sun = els.stageSun();
   const text = els.stageText();
-  if (!stage || !icon || !text) return;
+  if (!stage || !text) return;
 
   const reduced = prefersReducedMotion();
   const show =
@@ -145,20 +164,34 @@ function renderStage(state: GameState): void {
     state.phase === "dawn" ||
     state.phase === "countdown";
 
+  const prevPhase = stage.dataset.phase;
   stage.classList.toggle("hidden", !show);
   stage.classList.toggle("reduced", reduced);
   stage.dataset.phase = state.phase;
 
+  if (show && prevPhase !== state.phase) {
+    stage.classList.remove("stage-enter");
+    // Force reflow so the enter animation restarts per phase.
+    void stage.offsetWidth;
+    stage.classList.add("stage-enter");
+  }
+  if (!show) stage.classList.remove("stage-enter");
+
+  if (asset && moon && sun) {
+    const showCelestial =
+      state.phase === "night" || state.phase === "dawn";
+    asset.classList.toggle("hidden", !showCelestial);
+    moon.classList.toggle("hidden", state.phase !== "night");
+    sun.classList.toggle("hidden", state.phase !== "dawn");
+  }
+
   if (state.phase === "night") {
-    icon.textContent = "🌙";
     text.textContent = reduced ? "Night" : "Night falls…";
     text.classList.remove("countdown");
   } else if (state.phase === "dawn") {
-    icon.textContent = "☀️";
     text.textContent = reduced ? "Dawn" : "Dawn over Berlin";
     text.classList.remove("countdown");
   } else if (state.phase === "countdown") {
-    icon.textContent = "";
     text.textContent = state.toast || "3";
     text.classList.add("countdown");
   } else {
