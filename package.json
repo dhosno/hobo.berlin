@@ -8,9 +8,11 @@
   },
   "packageManager": "pnpm@11.13.0",
   "scripts": {
+    "audio:generate": "node scripts/generate-sfx.mjs && node scripts/generate-modern-sfx.mjs && node scripts/generate-theme-music.mjs",
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "test": "vitest run",
+    "test:audio": "node --test tests/audio-assets.test.js tests/audio-runtime.test.js && vitest run tests/unit/phaser-audio.test.ts",
     "test:watch": "vitest",
     "test:e2e": "playwright test"
   },

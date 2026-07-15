@@ -1,0 +1,20 @@
+[
+  { "id": "character-intro-prompt-engineer-de", "event": "character-intro", "characterId": "prompt-engineer", "text": "Prompt Engineer. Wegen Loop Engineering entlassen.", "weight": 1 },
+  { "id": "character-intro-marketing-de", "event": "character-intro", "characterId": "head-of-marketing", "text": "Marketing-Leitung. Ein Workflow macht jetzt alles.", "weight": 1 },
+  { "id": "character-intro-qa-de", "event": "character-intro", "characterId": "qa-engineer", "text": "QA Engineer. Playwright brauchte drei Sekunden.", "weight": 1 },
+  { "id": "bin-burn-de-1", "event": "bin-burn", "text": "Aua. Kippe. Klassiker.", "weight": 3 },
+  { "id": "bin-burn-de-2", "event": "bin-burn", "text": "Ein halbes Herz für die Wissenschaft.", "weight": 2 },
+  { "id": "bin-burn-de-3", "event": "bin-burn", "text": "Berliner Aschenbecher: unbesiegt.", "weight": 1 },
+  { "id": "bin-bottles-de-1", "event": "bin-bottles", "text": "Die Pfandgötter lächeln.", "weight": 3 },
+  { "id": "bin-bottles-de-2", "event": "bin-bottles", "text": "Flüssiges Gold. Na ja.", "weight": 2 },
+  { "id": "food-bought-de-1", "event": "food-bought", "text": "Kalorien gesichert.", "weight": 3 },
+  { "id": "food-bought-de-2", "event": "food-bought", "text": "Döner-Diplomatie wirkt.", "weight": 2 },
+  { "id": "food-denied-de-1", "event": "food-denied", "text": "Portemonnaie sagt nein.", "weight": 3 },
+  { "id": "food-denied-de-2", "event": "food-denied", "text": "Mehr Flaschen. Mehr Chancen.", "weight": 2 },
+  { "id": "day-failed-de-1", "event": "day-failed", "text": "Die Agentur lädt noch…", "weight": 3 },
+  { "id": "day-failed-de-2", "event": "day-failed", "text": "Ein Herz näher am Termin.", "weight": 2 },
+  { "id": "won-de-1", "event": "won", "text": "Leistung bewilligt. Gras anfassen? Später.", "weight": 3 },
+  { "id": "won-de-2", "event": "won", "text": "Das Formular war formgerecht.", "weight": 1 },
+  { "id": "lost-de-1", "event": "lost", "text": "Lauf beendet. Die Schleife gewinnt.", "weight": 3 },
+  { "id": "lost-de-2", "event": "lost", "text": "Bitte Wartenummer ziehen und neu versuchen.", "weight": 1 }
+]
