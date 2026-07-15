@@ -10,6 +10,7 @@ import { dayBalance } from "../../src/game/mechanics/day-balance";
 import {
   bottlesNeededForMeal,
   createInitialState,
+  declareLost,
   endDayEarly,
   formatCash,
   resolveDay,
@@ -286,5 +287,46 @@ describe("mechanics run", () => {
     expect(next.player.bottles).toBe(0);
     expect(next.lastEvents).toContain("bin-burn");
     expect(next.toast).toContain("Burn");
+  });
+
+  it("keeps a lethal burn in playing so feedback can show before lost", () => {
+    const map = parseTiledMap(miniMap);
+    let state = createInitialState(map, "lethal-burn");
+    const burner = {
+      id: "bin-lethal",
+      type: "bin" as const,
+      position: { column: 3, row: 3 },
+      size: { columns: 1, rows: 1 },
+      blocking: true,
+      state: "available" as const,
+      yieldBottles: 1,
+      hazardChance: 1,
+    };
+    state = {
+      ...state,
+      phase: "playing",
+      player: {
+        ...state.player,
+        position: { column: 4, row: 3 },
+        healthUnits: 1,
+        bottles: 0,
+      },
+      focusedItemId: burner.id,
+      world: {
+        ...state.world,
+        items: [...state.world.items.filter((i) => i.type !== "bin"), burner],
+      },
+    };
+
+    const burned = tryAction(state);
+    expect(burned.player.healthUnits).toBe(0);
+    expect(burned.phase).toBe("playing");
+    expect(burned.toast).toContain("Burn");
+    expect(burned.lastEvents.at(-1)).toBe("bin-burn");
+    expect(tickPlaying(burned, 5_000).phase).toBe("playing");
+
+    const lost = declareLost(burned);
+    expect(lost.phase).toBe("lost");
+    expect(lost.lastEvents.at(-1)).toBe("lost");
   });
 });

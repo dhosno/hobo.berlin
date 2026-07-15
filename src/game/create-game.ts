@@ -23,6 +23,7 @@ import {
   beginDaySequence,
   continueToNextDay,
   createInitialState,
+  declareLost,
   endDayEarly,
   focusOrActOnItem,
   restartRun,
@@ -62,12 +63,32 @@ export function createGame(
   let last = performance.now();
   let lastActionAt = 0;
   let lastEvents: string[] = [...state.lastEvents];
+  let lossRevealTimer: number | null = null;
+
+  const LOSS_REVEAL_MS = 1800;
 
   const clearTransition = (): void => {
     if (transitionTimer !== null) {
       window.clearTimeout(transitionTimer);
       transitionTimer = null;
     }
+  };
+
+  const clearLossReveal = (): void => {
+    if (lossRevealTimer !== null) {
+      window.clearTimeout(lossRevealTimer);
+      lossRevealTimer = null;
+    }
+  };
+
+  const scheduleLossReveal = (): void => {
+    if (lossRevealTimer !== null) return;
+    lossRevealTimer = window.setTimeout(() => {
+      lossRevealTimer = null;
+      if (state.phase === "playing" && state.player.healthUnits <= 0) {
+        apply(declareLost(state));
+      }
+    }, LOSS_REVEAL_MS);
   };
 
   const jumpToPlaying = (from: GameState): GameState => ({
@@ -123,6 +144,11 @@ export function createGame(
     if (phaseChanged) {
       syncPhaseAudio(state.phase);
       manageTransitions();
+    }
+    if (state.phase === "playing" && state.player.healthUnits <= 0) {
+      scheduleLossReveal();
+    } else {
+      clearLossReveal();
     }
   };
 
@@ -256,6 +282,7 @@ export function createGame(
     },
     restart: () => {
       clearTransition();
+      clearLossReveal();
       countdownLeft = COUNTDOWN_SECONDS;
       lastEvents = [];
       apply(restartRun(map));
@@ -265,6 +292,7 @@ export function createGame(
     destroy: () => {
       cancelAnimationFrame(raf);
       clearTransition();
+      clearLossReveal();
       game.destroy(true);
     },
   };
