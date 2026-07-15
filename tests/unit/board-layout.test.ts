@@ -11,8 +11,8 @@ import { worldFromParsedMap } from "../../src/game/mechanics/world";
 const TREE_POSITIONS = [
   { column: 6, row: 5 },
   { column: 11, row: 5 },
-  { column: 7, row: 13 },
-  { column: 12, row: 15 },
+  { column: 9, row: 18 },
+  { column: 12, row: 17 },
   { column: 5, row: 24 },
   { column: 16, row: 18 },
 ] as const;
@@ -42,13 +42,18 @@ describe("portrait board layout", () => {
     const gate = map.interactables.find(
       (item) => item.assetKey === "brandenburg-gate",
     );
+    const bench = map.interactables.find((item) => item.assetKey === "bench");
     const trees = map.interactables
       .filter((item) => item.assetKey === "tree")
       .map((item) => item.position);
 
     expect(gate).toMatchObject({
-      position: { column: 7, row: 1 },
+      position: { column: 7, row: 12 },
       size: { columns: 4, rows: 3 },
+    });
+    expect(bench).toMatchObject({
+      position: { column: 8, row: 24 },
+      size: { columns: 2, rows: 1 },
     });
     expect(trees).toEqual(TREE_POSITIONS);
     expect(new Set(trees.map(blockedCellKey))).toEqual(map.blockedCells);
@@ -60,6 +65,10 @@ describe("portrait board layout", () => {
       worldFromParsedMap(map).items
         .filter((item) => item.assetKey !== undefined)
         .map((item) => item.assetKey),
-    ).toEqual(["brandenburg-gate", ...TREE_POSITIONS.map(() => "tree")]);
+    ).toEqual([
+      "brandenburg-gate",
+      "bench",
+      ...TREE_POSITIONS.map(() => "tree"),
+    ]);
   });
 });
