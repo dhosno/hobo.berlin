@@ -72,6 +72,8 @@ const els = {
 
 const MOON_SRC = new URL("../assets/ui/moon.png", import.meta.url).href;
 const SUN_SRC = new URL("../assets/ui/sun.png", import.meta.url).href;
+const GAME_OVER_SRC = new URL("../assets/sprites/game-over.gif", import.meta.url).href;
+const WIN_SRC = new URL("../assets/sprites/win.gif", import.meta.url).href;
 
 let stageAssetsReady = false;
 
@@ -405,7 +407,7 @@ export function syncOverlay(
         </div>
       </div>
       <ol>
-        <li>Survive seven days until the Agentur für Arbeit approves your money.</li>
+        <li>Survive one day until the Agentur für Arbeit approves your money.</li>
         <li>Each day gives you about one minute.</li>
         <li>Move one grid square at a time with the D-pad, arrow keys, or WASD.</li>
         <li>Search garbage bins for returnable bottles.</li>
@@ -414,8 +416,8 @@ export function syncOverlay(
         <li>Collect enough bottles and redeem them at the supermarket for cash (≥${MINIMUM_BOTTLES_TO_REDEEM}).</li>
         <li>Supermarket queues take time while the day timer keeps running.</li>
         <li>Spend the cash at ${MEAL_VENDOR_NAME} and wait for the food.</li>
-        <li>Eat before time runs out or lose one heart.</li>
-        <li>Once fed, tap <strong>End day</strong> to start the next night early.</li>
+        <li>Eat before time runs out or the run ends.</li>
+        <li>Once fed, tap <strong>End day</strong> to win.</li>
       </ol>
     `;
     btn.textContent = "Start game";
@@ -447,7 +449,10 @@ export function syncOverlay(
   if (state.phase === "won") {
     show(true);
     title.textContent = "Benefits approved";
-    body.innerHTML = `<p>Seven days on Pfand and ${MEAL_VENDOR_NAME}. Touch grass? Later.</p>`;
+    body.innerHTML = `
+      <img class="end-state-art" src="${WIN_SRC}" alt="You win" />
+      <p>One day on Pfand and ${MEAL_VENDOR_NAME}. Touch grass? Later.</p>
+    `;
     btn.textContent = "Play again";
     btn.onclick = () => onAction("restart");
     return;
@@ -456,7 +461,10 @@ export function syncOverlay(
   if (state.phase === "lost") {
     show(true);
     title.textContent = "Run over";
-    body.innerHTML = `<p>Zero hearts. Loop engineering wins again.</p>`;
+    body.innerHTML = `
+      <img class="end-state-art" src="${GAME_OVER_SRC}" alt="Game over" />
+      <p>Time’s up or the hearts are gone. Loop engineering wins again.</p>
+    `;
     btn.textContent = "Restart";
     btn.onclick = () => onAction("restart");
     return;

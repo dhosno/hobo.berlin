@@ -8,11 +8,13 @@ import { describe, expect, it } from "vitest";
 import {
   BOARD_ASSETS,
   itemAssetKey,
+  itemDisplaySize,
 } from "../../src/game/assets/board-assets";
 import type { WorldItem } from "../../src/game/mechanics/types";
 
 const ASSET_FILES = [
   "asphalt.png",
+  "bench.png",
   "grass.png",
   "tree.png",
   "trash-can.png",
@@ -21,6 +23,7 @@ const ASSET_FILES = [
   "bottle.png",
   "Rewe.png",
   "Netto.png",
+  "donner.png",
 ] as const;
 
 function item(type: WorldItem["type"], assetKey?: string): WorldItem {
@@ -38,6 +41,7 @@ describe("board assets", () => {
   it("exposes every supplied sprite under a stable Phaser key", () => {
     expect(Object.keys(BOARD_ASSETS)).toEqual([
       "asphalt",
+      "bench",
       "grass",
       "tree",
       "trash-can",
@@ -46,23 +50,43 @@ describe("board assets", () => {
       "bottle",
       "rewe",
       "netto",
+      "donner",
     ]);
   });
 
-  it("selects sprites for supported world items and preserves the food fallback", () => {
+  it("selects sprites for every supported world item", () => {
     expect(itemAssetKey(item("bin"))).toBe("trash-can");
     expect(itemAssetKey(item("loose-bottle"))).toBe("bottle");
-    expect(itemAssetKey(item("bottle-return"), () => 0)).toBe("rewe");
-    expect(itemAssetKey(item("bottle-return"), () => 0.999)).toBe("netto");
-    expect(itemAssetKey(item("bottle-return", "netto"), () => 0)).toBe("netto");
-    expect(itemAssetKey(item("bottle-return", "rewe"), () => 0.999)).toBe(
-      "rewe",
-    );
+    expect(itemAssetKey(item("bottle-return"))).toBe("rewe");
     expect(itemAssetKey(item("scenery", "tree"))).toBe("tree");
+    expect(itemAssetKey(item("scenery", "bench"))).toBe("bench");
     expect(itemAssetKey(item("scenery", "brandenburg-gate"))).toBe(
       "brandenburg-gate",
     );
-    expect(itemAssetKey(item("food"))).toBeUndefined();
+    expect(itemAssetKey(item("food"))).toBe("donner");
+  });
+
+  it("enlarges landmarks without changing their source aspect ratios", () => {
+    expect(itemDisplaySize(item("food"), 84, 56, 512, 512)).toEqual({
+      width: 95.2,
+      height: 95.2,
+    });
+    const gateSize = itemDisplaySize(
+      item("scenery", "brandenburg-gate"),
+      112,
+      84,
+      128,
+      96,
+    );
+    expect(gateSize.width).toBeCloseTo(190.4);
+    expect(gateSize.height).toBeCloseTo(142.8);
+  });
+
+  it.each(["game-over.gif", "win.gif"])("uses a real GIF for %s", async (filename) => {
+    const bytes = await readFile(resolve("src/assets/sprites", filename));
+
+    expect(new TextDecoder().decode(bytes.subarray(0, 6))).toMatch(/^GIF8[79]a$/);
+    expect(bytes.byteLength).toBeGreaterThan(6);
   });
 
   it.each(ASSET_FILES)("uses a real PNG for %s", async (filename) => {

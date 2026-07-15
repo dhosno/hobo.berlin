@@ -128,7 +128,6 @@ export function spawnDailyCollectibles(
   mark(world.spawn);
   for (const key of world.blockedCells) reserved.add(key);
 
-  // Each day, bottle-return randomly presents as REWE or Netto (seeded).
   const fixed = world.items
     .filter(
       (item) =>
@@ -140,7 +139,7 @@ export function spawnDailyCollectibles(
       if (item.type !== "bottle-return") return item;
       return {
         ...item,
-        assetKey: rng.chance(0.5) ? "rewe" : "netto",
+        assetKey: "rewe",
       };
     });
   for (const item of fixed) {

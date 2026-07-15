@@ -98,7 +98,7 @@ describe("mechanics run", () => {
     expect(next.player.position).toEqual(state.player.position);
   });
 
-  it("resolves a hungry day with heart loss", () => {
+  it("loses immediately when the timer expires", () => {
     const map = parseTiledMap(miniMap);
     let state = createInitialState(map, "test-seed");
     state = {
@@ -107,9 +107,9 @@ describe("mechanics run", () => {
       fedToday: false,
       timeRemainingMs: 0,
     };
-    const resolved = resolveDay(state);
-    expect(resolved.player.healthUnits).toBe(4);
-    expect(resolved.phase).toBe("day-resolution");
+    const resolved = tickPlaying(state, 1);
+    expect(resolved.phase).toBe("lost");
+    expect(resolved.lastEvents.at(-1)).toBe("lost");
   });
 
   it("ends the day early only when fed and idle", () => {
@@ -125,8 +125,8 @@ describe("mechanics run", () => {
 
     state = { ...state, fedToday: true };
     const ended = endDayEarly(state);
-    expect(ended.phase).toBe("day-resolution");
-    expect(ended.lastEvents.at(-1)).toBe("day-survived");
+    expect(ended.phase).toBe("won");
+    expect(ended.lastEvents.at(-1)).toBe("won");
     expect(ended.timeRemainingMs).toBe(0);
 
     state = {
@@ -199,16 +199,8 @@ describe("mechanics run", () => {
     expect(next.lastEvents.at(-1)).toBe("cash-received");
   });
 
-  it("gets harder from day 1 to day 7", () => {
-    const easy = dayBalance(1);
-    const hard = dayBalance(7);
-
-    expect(easy.looseBottleCount).toBeGreaterThan(hard.looseBottleCount);
-    expect(easy.binYieldMax).toBeGreaterThan(hard.binYieldMax);
-    expect(easy.hazardChanceMax).toBeLessThanOrEqual(hard.hazardChanceMax);
-    expect(easy.mealMinCents).toBeLessThan(hard.mealMinCents);
-    expect(easy.surplusRatioMin).toBeGreaterThan(hard.surplusRatioMin);
-    expect(hard.hazardChanceMax).toBe(BIN_HAZARD_CHANCE_MAX);
+  it("keeps the only playable day at day-one balance", () => {
+    expect(dayBalance(7)).toEqual(dayBalance(1));
   });
 
   it("keeps each day solvable but not wildly oversupplied", () => {
@@ -251,10 +243,9 @@ describe("mechanics run", () => {
     }
   });
 
-  it("randomizes bottle-return as REWE or Netto per day", () => {
+  it("keeps the bottle-return venue branded as REWE", () => {
     const map = parseTiledMap(miniMap);
     const world = worldFromParsedMap(map);
-    const brands = new Set<string>();
     for (let i = 0; i < 24; i += 1) {
       const items = spawnDailyCollectibles(
         world,
@@ -262,13 +253,8 @@ describe("mechanics run", () => {
         dayBalance(1),
       );
       const venue = items.find((item) => item.type === "bottle-return");
-      expect(venue?.assetKey === "rewe" || venue?.assetKey === "netto").toBe(
-        true,
-      );
-      brands.add(venue!.assetKey!);
+      expect(venue?.assetKey).toBe("rewe");
     }
-    expect(brands.has("rewe")).toBe(true);
-    expect(brands.has("netto")).toBe(true);
   });
 
   it("burns half a heart and awards no bottles", () => {

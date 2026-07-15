@@ -3,7 +3,6 @@ import {
   CHARACTERS,
   COUNTDOWN_SECONDS,
   DAMAGE_BIN_HAZARD,
-  DAMAGE_MISSED_MEAL,
   DAY_DURATION_MS,
   DAYS_PER_RUN,
   DONER_WAIT_MAX_MS,
@@ -449,18 +448,12 @@ export function resolveDay(state: GameState): GameState {
   let next = cancelVenue(state);
 
   if (!next.fedToday) {
-    const healthUnits = Math.max(
-      0,
-      next.player.healthUnits - DAMAGE_MISSED_MEAL,
-    );
     next = emit(
-      { ...next, player: { ...next.player, healthUnits } },
+      next,
       "day-failed",
-      "Missed meal −1 ♥",
+      "Time's up",
     );
-    if (healthUnits <= 0) {
-      return emit({ ...next, phase: "lost" }, "lost", "Game over");
-    }
+    return emit({ ...next, phase: "lost" }, "lost", "Game over");
   } else {
     next = emit(next, "day-survived", "Survived the day");
   }
