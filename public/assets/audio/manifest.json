@@ -138,10 +138,11 @@
       "files": [
         "/assets/audio/sfx/base/step-1.wav",
         "/assets/audio/sfx/base/step-2.wav",
-        "/assets/audio/sfx/modern/step-modern.wav"
+        "/assets/audio/sfx/modern/step-modern.wav",
+        "/assets/audio/sfx/alt/step-drunk-alt.wav"
       ],
-      "variantStyles": ["retro-8bit", "retro-8bit", "modern-16bit"],
-      "intent": "quiet alternating lo-fi footsteps",
+      "variantStyles": ["retro-8bit", "retro-8bit", "modern-16bit", "drunk"],
+      "intent": "quiet alternating footsteps plus an optional uneven boot thud and scrape",
       "priority": "low",
       "volume": 0.18,
       "defaultEnabled": false
