@@ -29,6 +29,7 @@ export type WorldItem = {
   state?: "available" | "depleted";
   yieldBottles?: number;
   hazardChance?: number;
+  assetKey?: string;
 };
 
 export type PlayerState = {
