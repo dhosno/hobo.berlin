@@ -101,7 +101,7 @@ export function mapBottleValueCents(items: readonly WorldItem[]): number {
       continue;
     }
     if (item.type === "bin" && item.state !== "depleted") {
-      if ((item.hazardChance ?? 0) >= 1) continue;
+      // Count full yield for solvability; burns are risk on top of that.
       cents += (item.yieldBottles ?? 0) * BOTTLE_VALUE_CENTS;
     }
   }
@@ -150,19 +150,11 @@ export function spawnDailyCollectibles(
   const collectibles: WorldItem[] = [];
   let i = 0;
 
-  const burnBinCount = Math.min(
-    balance.binCount,
-    Math.floor(balance.binCount * balance.hazardFraction),
-  );
-  const burnSlots = new Set(
-    rng
-      .shuffle(Array.from({ length: balance.binCount }, (_, index) => index))
-      .slice(0, burnBinCount),
-  );
-
   for (let n = 0; n < balance.binCount && i < shuffled.length; n += 1, i += 1) {
     const pos = shuffled[i]!;
-    const isHazard = burnSlots.has(n);
+    const hazardChance =
+      balance.hazardChanceMin +
+      rng.next() * (balance.hazardChanceMax - balance.hazardChanceMin);
     collectibles.push({
       id: `bin-${n}`,
       type: "bin",
@@ -170,10 +162,8 @@ export function spawnDailyCollectibles(
       size: { columns: 1, rows: 1 },
       blocking: true,
       state: "available",
-      yieldBottles: isHazard
-        ? 0
-        : rng.int(balance.binYieldMin, balance.binYieldMax),
-      hazardChance: isHazard ? 1 : 0,
+      yieldBottles: rng.int(balance.binYieldMin, balance.binYieldMax),
+      hazardChance,
     });
   }
 
@@ -198,11 +188,7 @@ export function spawnDailyCollectibles(
 function boostSafeBinYields(items: WorldItem[], amount: number): WorldItem[] {
   let remaining = amount;
   return items.map((item) => {
-    if (
-      remaining <= 0 ||
-      item.type !== "bin" ||
-      (item.hazardChance ?? 0) >= 1
-    ) {
+    if (remaining <= 0 || item.type !== "bin") {
       return item;
     }
     const current = item.yieldBottles ?? 0;
@@ -216,14 +202,10 @@ function boostSafeBinYields(items: WorldItem[], amount: number): WorldItem[] {
 
 function trimSafeBinYields(items: WorldItem[], removeBottles: number): WorldItem[] {
   let remaining = removeBottles;
-  // Prefer trimming higher-yield bins first so the floor stays readable.
   const order = items
     .map((item, index) => ({ item, index }))
     .filter(
-      ({ item }) =>
-        item.type === "bin" &&
-        (item.hazardChance ?? 0) < 1 &&
-        (item.yieldBottles ?? 0) > 1,
+      ({ item }) => item.type === "bin" && (item.yieldBottles ?? 0) > 1,
     )
     .sort(
       (a, b) => (b.item.yieldBottles ?? 0) - (a.item.yieldBottles ?? 0),

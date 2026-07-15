@@ -1,6 +1,11 @@
 import Phaser from "phaser";
 
-import { playEventDelta, unlockAudio } from "./audio";
+import {
+  playEventDelta,
+  playFootstep,
+  syncPhaseAudio,
+  unlockAudio,
+} from "./audio";
 import {
   ACTION_DEBOUNCE_MS,
   COUNTDOWN_SECONDS,
@@ -113,11 +118,21 @@ export function createGame(
     if (worldDirty) scene?.syncState(state);
     else scene?.syncLight(state);
     onState(state);
-    if (phaseChanged) manageTransitions();
+    if (phaseChanged) {
+      syncPhaseAudio(state.phase);
+      manageTransitions();
+    }
   };
 
   const onMove = (direction: Direction): void => {
+    const before = state.player.position;
     apply(tryMove(state, direction));
+    if (
+      state.player.position.column !== before.column ||
+      state.player.position.row !== before.row
+    ) {
+      playFootstep();
+    }
   };
   const onAction = (): void => {
     const now = performance.now();
@@ -203,8 +218,9 @@ export function createGame(
     getState: () => state,
     beginGame: () => {
       if (state.phase !== "instructions") return;
-      void unlockAudio();
-      startDayFlow();
+      void unlockAudio().then(() => {
+        startDayFlow();
+      });
     },
     continueDay: () => {
       if (state.phase === "day-resolution") {
@@ -212,8 +228,9 @@ export function createGame(
         return;
       }
       if (state.phase === "day-ready") {
-        void unlockAudio();
-        startDayFlow();
+        void unlockAudio().then(() => {
+          startDayFlow();
+        });
       }
     },
     restart: () => {

@@ -138,6 +138,35 @@ body {
   transform: translateX(-50%) translateY(0.35rem);
 }
 
+#speech-bubble {
+  position: absolute;
+  left: 50%;
+  bottom: 9.25rem;
+  z-index: 7;
+  transform: translateX(-50%);
+  max-width: min(86%, 16rem);
+  padding: 0.55rem 0.75rem;
+  border-radius: 12px;
+  background: rgba(243, 240, 230, 0.96);
+  color: #1a1f18;
+  border: 1px solid rgba(18, 22, 15, 0.2);
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.35;
+  text-align: center;
+  pointer-events: none;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+#speech-bubble.hidden {
+  display: none;
+}
+
+#speech-bubble.fade {
+  opacity: 0;
+  transition: opacity 280ms ease;
+}
+
 #hud-need {
   color: var(--muted);
   font-size: 0.72rem;
@@ -195,7 +224,7 @@ body {
 #stage {
   position: absolute;
   inset: 0;
-  z-index: 4;
+  z-index: 7;
   display: grid;
   place-items: center;
   pointer-events: none;
@@ -208,13 +237,8 @@ body {
 #stage-veil {
   position: absolute;
   inset: 0;
-  opacity: 0;
-  transition: opacity 520ms ease;
-}
-
-#stage.stage-enter #stage-veil,
-#stage.reduced #stage-veil {
   opacity: 1;
+  transition: opacity 520ms ease;
 }
 
 #stage.reduced #stage-veil {
@@ -232,7 +256,7 @@ body {
 }
 
 #stage[data-phase="countdown"] #stage-veil {
-  background: rgba(18, 22, 15, 0.4);
+  background: rgba(12, 14, 10, 0.55);
 }
 
 #stage-content {
@@ -249,21 +273,20 @@ body {
   height: 96px;
   image-rendering: pixelated;
   filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.35));
-  opacity: 0;
-  transform: translateY(8px) scale(0.92);
+  opacity: 1;
+  transform: translateY(0) scale(1);
   transition:
     opacity 420ms ease 80ms,
     transform 420ms ease 80ms;
 }
 
-#stage.stage-enter #stage-asset,
-#stage.reduced #stage-asset {
-  opacity: 1;
-  transform: translateY(0) scale(1);
+#stage.stage-enter #stage-asset {
+  animation: stage-pop 420ms ease;
 }
 
 #stage.reduced #stage-asset {
   transition: none;
+  animation: none;
 }
 
 #stage-asset.hidden {
@@ -288,17 +311,7 @@ body {
   letter-spacing: 0.04em;
   color: var(--ink);
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.45);
-  opacity: 0;
-  transition: opacity 360ms ease 160ms;
-}
-
-#stage.stage-enter #stage-text,
-#stage.reduced #stage-text {
   opacity: 1;
-}
-
-#stage.reduced #stage-text {
-  transition: none;
 }
 
 #stage[data-phase="dawn"] #stage-text {
@@ -325,6 +338,17 @@ body {
   animation: none;
 }
 
+@keyframes stage-pop {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 @keyframes countdown-pop {
   from {
     transform: scale(0.7);
@@ -345,6 +369,7 @@ body {
   #stage-asset,
   #stage-text {
     transition: none;
+    animation: none;
   }
 }
 

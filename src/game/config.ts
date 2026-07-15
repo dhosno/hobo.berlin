@@ -14,8 +14,8 @@ export const ACTION_DEBOUNCE_MS = 280;
 /** Economy / run balance (from mechanics sketch + game-mechanics.md). */
 export const DAYS_PER_RUN = 7;
 export const DAY_DURATION_MS = 60_000;
-export const PRE_DAY_NIGHT_MS = 1_100;
-export const PRE_DAY_DAWN_MS = 1_100;
+export const PRE_DAY_NIGHT_MS = 1_400;
+export const PRE_DAY_DAWN_MS = 1_400;
 export const COUNTDOWN_SECONDS = 3;
 
 export const MAX_HEALTH_UNITS = 6;
@@ -30,8 +30,9 @@ export const BIN_COUNT = 12;
 export const LOOSE_BOTTLE_COUNT = 10;
 export const BIN_YIELD_MIN = 1;
 export const BIN_YIELD_MAX = 5;
-/** Max share of bins that are burn hazards on the hardest day. */
-export const BIN_HAZARD_FRACTION = 0.1;
+/** Spec: each bin rolls a hidden burn chance in this band (day curve interpolates). */
+export const BIN_HAZARD_CHANCE_MIN = 0.05;
+export const BIN_HAZARD_CHANCE_MAX = 0.15;
 
 /** Absolute meal price rails used by day scaling. */
 export const MEAL_PRICE_MIN_CENTS = 400;

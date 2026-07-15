@@ -212,7 +212,7 @@ function collectLooseBottle(state: GameState, item: WorldItem): GameState {
         items: state.world.items.filter((i) => i.id !== item.id),
       },
     },
-    "bottle-collected",
+    "loose-bottle-collected",
     "+1 bottle",
   );
 }
@@ -248,7 +248,7 @@ function searchBin(state: GameState, item: WorldItem): GameState {
   }
 
   const rng = createRng(`${state.daySeed}:bin:${item.id}:resolve`);
-  const burns = (item.hazardChance ?? 0) >= 1 || rng.chance(item.hazardChance ?? 0);
+  const burns = rng.chance(item.hazardChance ?? 0.1);
   const items = state.world.items.map((i) =>
     i.id === item.id ? { ...i, state: "depleted" as const } : i,
   );
@@ -265,7 +265,7 @@ function searchBin(state: GameState, item: WorldItem): GameState {
         world: { ...state.world, items },
         focusedItemId: null,
       },
-      "got-burned",
+      "bin-burn",
       "Burn! −½ ♥",
     );
     if (healthUnits <= 0) {
@@ -285,7 +285,7 @@ function searchBin(state: GameState, item: WorldItem): GameState {
       world: { ...state.world, items },
       focusedItemId: null,
     },
-    "bottle-collected",
+    "bin-bottles",
     gained === 1 ? "+1 bottle" : `+${gained} bottles`,
   );
 }

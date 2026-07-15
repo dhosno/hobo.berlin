@@ -48,6 +48,7 @@ app.innerHTML = `
       </div>
     </div>
     <div id="bottom-toast" class="hidden" aria-live="polite"></div>
+    <div id="speech-bubble" class="hidden" aria-live="polite"></div>
     <output id="player-position" aria-live="polite" data-column="0" data-row="0">Player: 0,0</output>
     <div id="overlay">
       <div id="overlay-card">

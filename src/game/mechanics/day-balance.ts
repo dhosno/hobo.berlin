@@ -1,5 +1,6 @@
 import {
-  BIN_HAZARD_FRACTION,
+  BIN_HAZARD_CHANCE_MAX,
+  BIN_HAZARD_CHANCE_MIN,
   DAYS_PER_RUN,
   MEAL_PRICE_STEP_CENTS,
 } from "../config";
@@ -12,8 +13,9 @@ export type DayBalance = {
   binCount: number;
   binYieldMin: number;
   binYieldMax: number;
-  /** Share of bins that are secret burn hazards (≤ BIN_HAZARD_FRACTION). */
-  hazardFraction: number;
+  /** Per-bin hidden burn probability range (spec: ~5–15%). */
+  hazardChanceMin: number;
+  hazardChanceMax: number;
   mealMinCents: number;
   mealMaxCents: number;
   /**
@@ -45,6 +47,10 @@ export function dayBalance(day: number): DayBalance {
     Math.round(lerp(5, 3, progress)),
   );
 
+  // Day 1 sits near the safer end of the 5–15% band; day 7 near the hotter end.
+  const hazardChanceMin = lerp(BIN_HAZARD_CHANCE_MIN, 0.1, progress);
+  const hazardChanceMax = lerp(0.1, BIN_HAZARD_CHANCE_MAX, progress);
+
   return {
     day: clamped,
     progress,
@@ -52,8 +58,8 @@ export function dayBalance(day: number): DayBalance {
     binCount: Math.round(lerp(13, 10, progress)),
     binYieldMin,
     binYieldMax,
-    // Day 1: almost no burns; day 7: up to the configured cap (~10%).
-    hazardFraction: lerp(0, BIN_HAZARD_FRACTION, progress),
+    hazardChanceMin,
+    hazardChanceMax: Math.max(hazardChanceMin, hazardChanceMax),
     mealMinCents: roundToStep(lerp(400, 700, progress), MEAL_PRICE_STEP_CENTS),
     mealMaxCents: roundToStep(lerp(500, 800, progress), MEAL_PRICE_STEP_CENTS),
     surplusRatioMin: lerp(1.35, 1.08, progress),

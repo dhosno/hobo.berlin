@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 
-import { CELL_SIZE, DESIGN_HEIGHT, DESIGN_WIDTH } from "../config";
+import { CELL_SIZE, DESIGN_HEIGHT, DESIGN_WIDTH, MEAL_VENDOR_NAME } from "../config";
 import type { Direction } from "../grid/movement";
 import { ArrowRepeatController } from "../input/repeat";
 import type { GameState } from "../mechanics/types";
@@ -190,11 +190,18 @@ export class MapScene extends Phaser.Scene {
       }
     });
 
+    const label = shortLabel(item);
+    const fontSize =
+      item.type === "food"
+        ? Math.max(9, Math.floor(CELL_SIZE * 0.42))
+        : Math.max(8, Math.floor(CELL_SIZE * 0.55));
     const text = this.add
-      .text(px + w / 2, py + h / 2, shortLabel(item), {
-        fontSize: `${Math.max(8, Math.floor(CELL_SIZE * 0.55))}px`,
+      .text(px + w / 2, py + h / 2, label, {
+        fontSize: `${fontSize}px`,
         color: "#111111",
         fontFamily: "sans-serif",
+        align: "center",
+        wordWrap: item.type === "food" ? { width: w * 0.82 } : undefined,
       })
       .setOrigin(0.5)
       .setDepth(6);
@@ -242,7 +249,7 @@ function shortLabel(item: WorldItem): string {
     case "bottle-return":
       return "REWE";
     case "food":
-      return "MK";
+      return MEAL_VENDOR_NAME;
     case "scenery":
       return item.id.startsWith("gate") ? "GATE" : "";
     default:
