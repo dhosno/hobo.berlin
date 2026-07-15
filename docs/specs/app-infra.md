@@ -14,6 +14,14 @@ Ship a runnable TypeScript browser app the whole team can clone: portrait game f
 
 This workstream owns **structure and presentation chrome**, not bottle math or day resolution (see [`game-mechanics.md`](./game-mechanics.md)).
 
+## Runtime decision
+
+**Phaser is the required game runtime.** WP-0 should use Phaser Scenes, Loader,
+Input, Scale, Canvas/WebGL rendering, and the global Sound Manager rather than
+building parallel browser subsystems. Keep mechanics as plain testable modules
+behind the Scene layer. The audio workstream provides a Phaser-native adapter in
+[`../09-sound-pack.md`](../09-sound-pack.md).
+
 ---
 
 ## WP-0 — Foundation (land first, then share)
@@ -22,7 +30,7 @@ This workstream owns **structure and presentation chrome**, not bottle math or d
 
 | Area | Requirement |
 | --- | --- |
-| Tooling | TypeScript + Vite (or equivalent); `npm install` / `npm run dev` documented in root README |
+| Tooling | TypeScript + Vite + Phaser; `npm install` / `npm run dev` documented in root README |
 | Portrait shell | Centered mobile frame on desktop; usable at ~360×640 CSS px; no horizontal page scroll |
 | Canvas board | HTML Canvas 2D world renderer |
 | Grid | Configurable `width` × `height`; start compact (e.g. 24×32 or 32×40); cells are source of truth |

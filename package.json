@@ -1,0 +1,11 @@
+{
+  "name": "hobo-berlin",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "audio:generate": "node scripts/generate-sfx.mjs && node scripts/generate-modern-sfx.mjs",
+    "test": "node --test",
+    "verify": "npm run audio:generate && npm test"
+  }
+}
