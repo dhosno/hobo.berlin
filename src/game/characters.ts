@@ -1,13 +1,10 @@
 import { CHARACTERS } from "./config";
 
 const PORTRAITS: Record<string, string> = {
-  prompt: new URL("../../assets/characters/prompt-placeholder.svg", import.meta.url)
+  prompt: new URL("../../assets/characters/prompt.png", import.meta.url).href,
+  marketing: new URL("../../assets/characters/marketing.png", import.meta.url)
     .href,
-  marketing: new URL(
-    "../../assets/characters/marketing-placeholder.svg",
-    import.meta.url,
-  ).href,
-  qa: new URL("../../assets/characters/qa-placeholder.svg", import.meta.url).href,
+  qa: new URL("../../assets/characters/qa.png", import.meta.url).href,
 };
 
 export function characterPortraitUrl(characterId: string): string {
