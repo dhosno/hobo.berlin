@@ -6,7 +6,9 @@ export function createAudio(options?: {
   unlock(): Promise<boolean>;
   play(eventId: string, options?: { volume?: number }): Promise<boolean>;
   playAmbience(trackId: string, options?: { volume?: number }): Promise<boolean>;
+  playMusic(trackId: string, options?: { volume?: number }): Promise<boolean>;
   stopAmbience(): boolean;
+  stopMusic(): boolean;
   setMuted(muted: boolean): boolean;
   isMuted(): boolean;
   setEventEnabled(eventId: string, enabled: boolean): void;

@@ -3,6 +3,10 @@ import {
   MEAL_VENDOR_NAME,
   MINIMUM_BOTTLES_TO_REDEEM,
 } from "../game/config";
+import {
+  characterDialogueId,
+  dialogueEventFor,
+} from "../game/audio";
 import { DEV_FREEZE_TIMER, prefersReducedMotion } from "../game/env";
 import {
   bottlesNeededForMeal,
@@ -12,16 +16,18 @@ import {
   formatHearts,
   phaseLabel,
 } from "../game/mechanics/run";
-import type { GameState } from "../game/mechanics/types";
+import type { GameEvent, GameState } from "../game/mechanics/types";
+import { createDialogue } from "../dialogue.js";
 
 export type OverlayAction = "start-game" | "start-day" | "restart";
 
 const PICKUP_EVENTS = new Set([
-  "bottle-collected",
+  "loose-bottle-collected",
+  "bin-bottles",
   "bottles-depositing",
   "cash-received",
   "food-bought",
-  "got-burned",
+  "bin-burn",
 ]);
 
 const els = {
@@ -36,6 +42,7 @@ const els = {
   fed: () => document.getElementById("hud-fed"),
   toast: () => document.getElementById("hud-toast"),
   bottomToast: () => document.getElementById("bottom-toast"),
+  speechBubble: () => document.getElementById("speech-bubble"),
   queue: () => document.getElementById("queue-bar"),
   queueFill: () => document.getElementById("queue-fill"),
   queueLabel: () => document.getElementById("queue-label"),
@@ -75,6 +82,52 @@ let displayCash = 0;
 let animFrame = 0;
 let lastPickupKey = "";
 let bottomToastTimer = 0;
+let lastDialogueKey = "";
+let speechTimer = 0;
+const dialogue = createDialogue();
+
+function showSpeechBubble(text: string, key: string): void {
+  const el = els.speechBubble();
+  if (!el || !text) return;
+  el.textContent = text;
+  el.classList.remove("hidden", "fade");
+  window.clearTimeout(speechTimer);
+  speechTimer = window.setTimeout(() => {
+    el.classList.add("fade");
+    speechTimer = window.setTimeout(() => {
+      el.classList.add("hidden");
+      el.classList.remove("fade");
+    }, 280);
+  }, 2200);
+  void key;
+}
+
+function maybeShowDialogue(state: GameState): void {
+  const last = state.lastEvents.at(-1) as GameEvent | undefined;
+  if (!last) return;
+
+  let eventId = dialogueEventFor(last);
+  if (
+    !eventId &&
+    last === "night-started" &&
+    state.day === 1
+  ) {
+    eventId = "character-intro";
+  }
+  if (!eventId) return;
+
+  const key = `${state.lastEvents.join("|")}|${eventId}`;
+  if (key === lastDialogueKey) return;
+  lastDialogueKey = key;
+
+  void dialogue
+    .pick(eventId, {
+      characterId: characterDialogueId(state.player.characterId),
+    })
+    .then((line) => {
+      if (line?.text) showSpeechBubble(line.text, key);
+    });
+}
 
 function setText(el: HTMLElement | null, value: string): void {
   if (el) el.textContent = value;
@@ -233,6 +286,8 @@ export function renderHud(state: GameState): void {
     const key = `${state.lastEvents.join("|")}|${pickup}`;
     showBottomToast(pickup, key);
   }
+
+  maybeShowDialogue(state);
 
   const need = bottlesNeededForMeal(state);
   setText(

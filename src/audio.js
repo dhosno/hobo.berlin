@@ -52,6 +52,8 @@ export function createAudio({
   let preferredVariantStyle;
   let activeAmbience;
   let ambienceRequest = 0;
+  let activeMusic;
+  let musicRequest = 0;
   const buffers = new Map();
   const enabledOverrides = new Map();
   const variantIndexes = new Map();
@@ -124,6 +126,18 @@ export function createAudio({
       // A source may already have ended or been stopped.
     }
     activeAmbience = undefined;
+    return true;
+  }
+
+  function stopMusic() {
+    musicRequest += 1;
+    if (!activeMusic) return false;
+    try {
+      activeMusic.source.stop();
+    } catch {
+      // Already ended.
+    }
+    activeMusic = undefined;
     return true;
   }
 
@@ -216,11 +230,50 @@ export function createAudio({
       }
     },
 
+    /** Plays one non-looping music sting from the manifest. */
+    async playMusic(trackId, { volume = 1 } = {}) {
+      if (!trackId || destroyed || muted || !unlocked || !context) return false;
+      if (activeMusic?.trackId === trackId) return true;
+      const request = ++musicRequest;
+
+      try {
+        const manifest = await loadManifest();
+        const entry = manifest.music?.[trackId];
+        if (!entry?.file) return false;
+        const buffer = await loadBuffer(entry.file);
+        if (request !== musicRequest || destroyed || muted || !unlocked) return false;
+        if (context.state === 'suspended') await context.resume();
+
+        stopMusic();
+        const source = context.createBufferSource();
+        const gain = context.createGain();
+        source.buffer = buffer;
+        source.loop = entry.loop === true;
+        gain.gain.value = Math.max(0, Math.min(1,
+          Number(entry.volume ?? manifest.defaults?.musicVolume ?? 0.28) * Number(volume)
+        ));
+        source.connect(gain).connect(context.destination);
+        source.onended = () => {
+          if (activeMusic?.source === source) activeMusic = undefined;
+        };
+        source.start();
+        activeMusic = { source, gain, trackId };
+        return true;
+      } catch (error) {
+        warnOnce(`music failed for "${trackId}"`, error);
+        return false;
+      }
+    },
+
     stopAmbience,
+    stopMusic,
 
     setMuted(nextMuted) {
       muted = Boolean(nextMuted);
-      if (muted) stopAmbience();
+      if (muted) {
+        stopAmbience();
+        stopMusic();
+      }
       storeMuted(storage, storageKey, muted);
       return muted;
     },
@@ -244,6 +297,7 @@ export function createAudio({
       destroyed = true;
       unlocked = false;
       stopAmbience();
+      stopMusic();
       buffers.clear();
       if (context?.close) await context.close().catch(() => {});
     }

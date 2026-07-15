@@ -250,7 +250,7 @@ describe("mechanics run", () => {
     const next = tryAction(state);
     expect(next.player.healthUnits).toBe(5);
     expect(next.player.bottles).toBe(0);
-    expect(next.lastEvents).toContain("got-burned");
+    expect(next.lastEvents).toContain("bin-burn");
     expect(next.toast).toContain("Burn");
   });
 });
