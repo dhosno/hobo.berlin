@@ -1,52 +1,109 @@
 import "./styles.css";
 
-import { createGame } from "./game/create-game";
+import { ACTIVE_MAP_URL } from "./game/config";
+import { createGame, type GameController } from "./game/create-game";
 import { parseTiledMap } from "./game/map/tiled-contract";
+import { renderHud, syncOverlay, type OverlayAction } from "./ui/hud";
 
 const app = document.querySelector<HTMLElement>("#app");
-
 if (app === null) {
   throw new Error("Missing #app root element");
 }
 
-app.outerHTML = `
-  <main id="app">
-    <div id="game" aria-label="Phase 0 Berlin grid"></div>
-    <output id="player-position" aria-live="polite" data-column="2" data-row="2">Player: 2,2</output>
-  </main>
+app.innerHTML = `
+  <div id="frame">
+    <div id="hud">
+      <div class="hud-row">
+        <span id="hud-day">Day 1 / 7</span>
+        <span id="hud-phase">Ready</span>
+        <span id="hud-timer">—</span>
+      </div>
+      <div class="hud-row">
+        <span id="hud-hearts">♥♥♥</span>
+        <span id="hud-bottles">🍾 0</span>
+        <span id="hud-cash">€0.00</span>
+        <span id="hud-meal">Döner €—</span>
+        <span id="hud-fed">Hungry</span>
+      </div>
+      <div id="hud-toast"></div>
+    </div>
+    <div id="game" aria-label="hobo.berlin grid"></div>
+    <output id="player-position" aria-live="polite" data-column="0" data-row="0">Player: 0,0</output>
+    <div id="overlay">
+      <div id="overlay-card">
+        <h1 id="overlay-title">hobo.berlin</h1>
+        <div id="overlay-body"></div>
+        <button id="overlay-btn" type="button">Start game</button>
+      </div>
+    </div>
+    <div id="touch">
+      <div id="dpad" aria-label="D-pad">
+        <button type="button" data-dir="up">▲</button>
+        <div class="mid">
+          <button type="button" data-dir="left">◀</button>
+          <button type="button" data-dir="right">▶</button>
+        </div>
+        <button type="button" data-dir="down">▼</button>
+      </div>
+      <button id="action-btn" type="button">ACT</button>
+    </div>
+  </div>
 `;
 
 const gameParentElement = document.querySelector<HTMLElement>("#game");
-const positionOutputElement = document.querySelector<HTMLOutputElement>("#player-position");
+if (gameParentElement === null) {
+  throw new Error("Unable to create game shell");
+}
+const gameParent = gameParentElement;
 
-if (gameParentElement === null || positionOutputElement === null) {
-  throw new Error("Unable to create the Phase 0 shell");
+let controller: GameController | undefined;
+
+function handleOverlay(action: OverlayAction): void {
+  document.getElementById("overlay-btn")?.blur();
+  if (!controller) return;
+  if (action === "restart") controller.restart();
+  if (action === "start-game") controller.beginGame();
+  if (action === "start-day") controller.continueDay();
 }
 
-const gameParent = gameParentElement;
-const positionOutput = positionOutputElement;
+function bindTouch(): void {
+  const actionBtn = document.getElementById("action-btn");
+  actionBtn?.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    controller?.performAction();
+  });
 
-let game: ReturnType<typeof createGame> | undefined;
+  document.querySelectorAll<HTMLButtonElement>("#dpad button[data-dir]").forEach((btn) => {
+    const dir = btn.dataset.dir as "up" | "down" | "left" | "right";
+    btn.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      controller?.move(dir);
+    });
+  });
+}
 
 async function bootstrap(): Promise<void> {
   try {
-    const mapUrl = new URL("./assets/maps/phase-0.json", import.meta.url);
-    const response = await fetch(mapUrl);
+    const response = await fetch(ACTIVE_MAP_URL);
     if (!response.ok) {
       throw new Error(`Map request failed with status ${response.status}`);
     }
-
     const map = parseTiledMap(await response.json());
-    game = createGame(gameParent, map);
+    controller = createGame(gameParent, map, (state) => {
+      renderHud(state);
+      syncOverlay(state, handleOverlay);
+    });
+    bindTouch();
   } catch (error) {
-    game?.destroy(true);
-    game = undefined;
+    controller?.destroy();
+    controller = undefined;
     gameParent.replaceChildren();
-    positionOutput.remove();
+    document.getElementById("player-position")?.remove();
+    document.getElementById("overlay")?.classList.add("hidden");
 
     const alert = document.createElement("p");
     alert.setAttribute("role", "alert");
-    alert.textContent = `Unable to start Phase 0: ${error instanceof Error ? error.message : String(error)}`;
+    alert.textContent = `Unable to start: ${error instanceof Error ? error.message : String(error)}`;
     gameParent.append(alert);
   }
 }

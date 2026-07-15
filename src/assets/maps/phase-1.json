@@ -1,0 +1,100 @@
+{
+  "compressionlevel": -1,
+  "height": 28,
+  "infinite": false,
+  "layers": [
+    {
+      "id": 1,
+      "name": "Spawn",
+      "objects": [
+        {
+          "id": 1,
+          "name": "player",
+          "point": true,
+          "visible": true,
+          "x": 56,
+          "y": 700
+        }
+      ],
+      "type": "objectgroup",
+      "visible": true
+    },
+    {
+      "id": 2,
+      "name": "Collision",
+      "objects": [
+        {
+          "height": 28,
+          "id": 2,
+          "visible": true,
+          "width": 28,
+          "x": 140,
+          "y": 700
+        },
+        {
+          "height": 56,
+          "id": 3,
+          "visible": true,
+          "width": 56,
+          "x": 224,
+          "y": 392
+        }
+      ],
+      "type": "objectgroup",
+      "visible": true
+    },
+    {
+      "id": 3,
+      "name": "Interactables",
+      "objects": [
+        {
+          "height": 56,
+          "id": 10,
+          "name": "gate",
+          "visible": true,
+          "width": 168,
+          "x": 168,
+          "y": 28
+        },
+        {
+          "height": 56,
+          "id": 11,
+          "name": "rewe",
+          "visible": true,
+          "width": 84,
+          "x": 28,
+          "y": 224
+        },
+        {
+          "height": 56,
+          "id": 12,
+          "name": "food",
+          "visible": true,
+          "width": 84,
+          "x": 392,
+          "y": 224
+        },
+        {
+          "height": 28,
+          "id": 13,
+          "name": "bench",
+          "visible": true,
+          "width": 56,
+          "x": 112,
+          "y": 504
+        }
+      ],
+      "type": "objectgroup",
+      "visible": true
+    }
+  ],
+  "nextlayerid": 4,
+  "nextobjectid": 14,
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "tileheight": 28,
+  "tilewidth": 28,
+  "type": "map",
+  "version": "1.11",
+  "width": 18
+}

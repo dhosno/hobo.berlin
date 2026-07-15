@@ -1,6 +1,6 @@
 {
   "compressionlevel": -1,
-  "height": 16,
+  "height": 28,
   "infinite": false,
   "layers": [
     {
@@ -12,8 +12,8 @@
           "name": "player",
           "point": true,
           "visible": true,
-          "x": 64,
-          "y": 64
+          "x": 56,
+          "y": 56
         }
       ],
       "type": "objectgroup",
@@ -24,20 +24,20 @@
       "name": "Collision",
       "objects": [
         {
-          "height": 32,
+          "height": 28,
           "id": 2,
           "visible": true,
-          "width": 32,
-          "x": 160,
-          "y": 64
+          "width": 28,
+          "x": 140,
+          "y": 56
         },
         {
-          "height": 64,
+          "height": 56,
           "id": 3,
           "visible": true,
-          "width": 64,
-          "x": 320,
-          "y": 320
+          "width": 56,
+          "x": 280,
+          "y": 280
         }
       ],
       "type": "objectgroup",
@@ -48,9 +48,9 @@
   "nextobjectid": 4,
   "orientation": "orthogonal",
   "renderorder": "right-down",
-  "tileheight": 32,
-  "tilewidth": 32,
+  "tileheight": 28,
+  "tilewidth": 28,
   "type": "map",
   "version": "1.11",
-  "width": 24
+  "width": 18
 }
