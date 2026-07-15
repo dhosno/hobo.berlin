@@ -54,13 +54,15 @@ src/game/input/repeat.ts                deterministic arrow repeat
 src/game/map/tiled-contract.ts          validation and grid conversion
 src/game/scenes/map-scene.ts            Stage A/Stage B rendering and input
 src/assets/maps/phase-0.json            checked-in Tiled contract fixture
-src/assets/placeholders/*.png           Stage B-only local raster textures
-src/game/assets/placeholder-assets.ts   Stage B texture manifest
+src/assets/sprites/*.png                User-supplied Stage B raster textures
+src/game/assets/phase-b-assets.ts       Stage B texture manifest
+src/game/map/phase-b-layout.ts          Fixed terrain and prop placement
 tests/unit/config.test.ts               constants and version-facing contract
 tests/unit/tiled-contract.test.ts       parser acceptance/rejection
 tests/unit/movement.test.ts             movement behavior
 tests/unit/repeat.test.ts               input timing and priority
-tests/unit/placeholder-assets.test.ts   Stage B texture manifest/files
+tests/unit/phase-b-assets.test.ts       Stage B texture manifest/files
+tests/unit/phase-b-layout.test.ts       Terrain, prop, and collision alignment
 tests/e2e/phase-0.spec.ts               complete Stage A/Stage B user flow
 ```
 
@@ -500,79 +502,89 @@ Give the user the local URL, screenshot path, command results, and a short manua
 
 ---
 
-### Task 7: Stage B Local Berlin Placeholder Textures
+### Task 7: Stage B Berlin Park Grid
 
 **Precondition:** The user explicitly approved Task 6. If not, stop.
 
+**Execution:** Implement inline in the primary session as explicitly requested; do not dispatch subagents.
+
 **Files:**
 
-- Create: `tests/unit/placeholder-assets.test.ts`
-- Create: `src/game/assets/placeholder-assets.ts`
-- Create: `src/assets/placeholders/terrain.png`
-- Create: `src/assets/placeholders/brandenburg-gate.png`
-- Create: `src/assets/placeholders/character.png`
+- Create: `tests/unit/phase-b-assets.test.ts`
+- Create: `tests/unit/phase-b-layout.test.ts`
+- Create: `src/game/assets/phase-b-assets.ts`
+- Create: `src/game/map/phase-b-layout.ts`
+- Add: `src/assets/sprites/asphalt.png`
+- Add: `src/assets/sprites/grass.png`
+- Add: `src/assets/sprites/tree.png`
+- Add: `src/assets/sprites/trash-can.png`
+- Add: `src/assets/sprites/Brandenburg-Gate.png`
+- Add: `src/assets/sprites/hobo.png`
+- Modify: `src/assets/maps/phase-0.json`
+- Modify: `src/game/create-game.ts`
 - Modify: `src/game/scenes/map-scene.ts`
+- Modify: `src/main.ts`
+- Modify: `src/styles.css`
+- Modify: `tests/unit/tiled-contract.test.ts`
 - Modify: `tests/e2e/phase-0.spec.ts`
 
 **Interfaces:**
 
 ```ts
-export const PLACEHOLDER_ASSETS = {
-  terrain: { key: "terrain", url: terrainUrl },
+export const PHASE_B_ASSETS = {
+  asphalt: { key: "asphalt", url: asphaltUrl },
+  grass: { key: "grass", url: grassUrl },
+  tree: { key: "tree", url: treeUrl },
+  trashCan: { key: "trash-can", url: trashCanUrl },
   gate: { key: "brandenburg-gate", url: gateUrl },
   character: { key: "character", url: characterUrl },
 } as const;
+
+export type TerrainKind = "asphalt" | "grass";
+export function terrainAt(column: number, row: number): TerrainKind;
 ```
 
-- [ ] **Step 1: Write the failing file-existence/signature test**
+- [ ] **Step 1: Write the failing asset-manifest and layout tests**
 
-Without importing the not-yet-created manifest, assert each of the three exact source paths exists. For files that exist, read them and assert their first eight bytes equal the PNG signature `89 50 4e 47 0d 0a 1a 0a` and their size is greater than the signature alone.
+Assert the six exact supplied PNG paths exist and carry the PNG signature. Specify the `PHASE_B_ASSETS` keys above. Specify asphalt on rows 2–4 and 11–13 plus columns 3–5 and 16–18, with grass elsewhere. Specify trees on grass at `(1,9)`, `(8,7)`, `(8,9)`, `(11,7)`, `(13,8)`, `(21,6)`; trash cans on asphalt at `(7,3)`, `(17,7)`, `(15,12)`; Gate origin `(20,0)` and footprint 4×3; spawn `(2,2)` on asphalt; and every prop position in the checked-in blocked-cell set.
 
 - [ ] **Step 2: Verify RED**
 
-Run: `pnpm test tests/unit/placeholder-assets.test.ts`
+Run: `pnpm test tests/unit/phase-b-assets.test.ts tests/unit/phase-b-layout.test.ts`
 
-Expected RED: the test executes and FAILS its existence assertions for the three missing textures.
+Expected RED: test collection fails because the manifest and layout modules do not exist. Add empty typed seams, re-run, and confirm behavioral failures for the missing keys and layout values.
 
-- [ ] **Step 3: Create only the three approved temporary textures**
+- [ ] **Step 3: Implement the manifest, layout, and prop-aligned Tiled collision**
 
-Use the `imagegen` skill for raster generation. Produce a seamless simple terrain tile, a transparent Brandenburg Gate landmark, and a transparent top-down character sprite. Keep them locally stored at the exact paths, visually temporary, and free of external downloaded assets. Do not add variants, animation frames, attribution systems, or an asset pipeline.
+Reference only the six supplied textures. Implement the fixed Option A layout without a generic map editor or asset pipeline. Replace the Stage A Collision rectangles with nine 32×32 rectangles at the six tree and three trash-can cells, and update the checked-in map test from blocker `"5,2"` to the exact nine-key set.
 
-- [ ] **Step 4: Establish the manifest seam and verify behavioral RED**
+- [ ] **Step 4: Verify layout GREEN**
 
-After the file test is GREEN, add a focused manifest-shape test. Confirm its initial missing-module collection error, then create `placeholder-assets.ts` exporting `PLACEHOLDER_ASSETS = {} as const` as a compilation seam. Re-run the focused test.
+Run: `pnpm test tests/unit/phase-b-assets.test.ts tests/unit/phase-b-layout.test.ts tests/unit/tiled-contract.test.ts`
 
-Expected RED: the test executes and FAILS because the manifest has no asset keys.
+Expected: asset, layout, and parser tests pass with exact visual/collision alignment.
 
-- [ ] **Step 5: Implement the manifest and verify GREEN**
+- [ ] **Step 5: Write the failing Stage B browser and asset-failure assertions**
 
-Import the three PNG URLs and implement the exact manifest interface.
-
-Run: `pnpm test tests/unit/placeholder-assets.test.ts`
-
-Expected: manifest/file tests pass.
-
-- [ ] **Step 6: Write the failing Stage B browser assertion**
-
-Extend the real browser flow to assert the canvas still boots at `(2,2)` and the scene reports `data-presentation="berlin-placeholders"` on `#game`. Verify RED before changing the scene.
+Assert the real canvas boots at `(2,2)`, `#game` reports `data-presentation="berlin-placeholders"`, movement is rejected by trash can `(7,3)` and tree `(8,7)`, and a failed real texture request produces the readable boot alert with no canvas or status output.
 
 Run: `pnpm exec playwright test tests/e2e/phase-0.spec.ts`
 
-Expected: FAIL because the Stage A scene does not set the Stage B presentation marker.
+Expected RED: the presentation marker and new obstacle flow fail before scene changes; the texture-failure case does not yet reach the bootstrap cleanup path.
 
-- [ ] **Step 7: Replace presentation without changing behavior**
+- [ ] **Step 6: Render the approved layout and route load failures**
 
-Preload exactly the three manifest textures. Tile terrain across all 24×16 cells, place the Gate at a fixed grid-aligned non-blocking location, and use the character texture for the player visual. Preserve collision graphics sufficiently to see blockers, preserve status attributes, and set `data-presentation="berlin-placeholders"` only after all three textures render. Do not change the parser, movement, repeat controller, map JSON, or scale config.
+Preload all six manifest textures. Render 384 terrain images at exact 32×32 design cells, then the Gate at native 128×96, tree/bin props, a subtle grid, and the character at the authoritative player cell. Preserve texture aspect ratios and pixel-snap coordinates. Set the presentation marker only after successful rendering. Thread a Phaser loader-failure callback through `createGame` into the existing idempotent bootstrap cleanup. Add `image-rendering: pixelated` to the canvas; keep `Phaser.Scale.FIT` and the complete-map 3:2 layout.
 
-- [ ] **Step 8: Verify GREEN**
+- [ ] **Step 7: Verify focused GREEN**
 
 Run: `pnpm exec playwright test tests/e2e/phase-0.spec.ts && pnpm test && pnpm build`
 
 Expected: Stage B browser flow, all unit tests, and build pass.
 
-- [ ] **Step 9: Commit and review**
+- [ ] **Step 8: Commit and review**
 
-Commit message: `feat: add berlin placeholder presentation`
+Commit message: `feat: add berlin park grid`
 
 ---
 
@@ -594,9 +606,9 @@ Repeat the Stage A movement/collision/input checks and all three viewport checks
 
 Run `git status --short`, inspect `git diff origin/main...HEAD --stat`, and re-read the approved spec acceptance criteria. Confirm no deferred capabilities, external assets, merge, push, or PR were introduced.
 
-- [ ] **Step 4: Run broad whole-branch review**
+- [ ] **Step 4: Run broad whole-branch review inline**
 
-Generate a review package from the implementation merge base through `HEAD`. Dispatch one fresh high-judgment reviewer, forbid child agents, and ask for specification coverage, architecture, test quality, browser evidence, and scope discipline. Fix Critical/Important findings in one bounded fix wave with covering red/green evidence, then re-review.
+Review the complete implementation range in the primary session for specification coverage, architecture, test quality, browser evidence, and scope discipline. Fix Critical/Important findings through focused red/green cycles, then repeat the review. Do not dispatch subagents.
 
 - [ ] **Step 5: Hand off without landing**
 

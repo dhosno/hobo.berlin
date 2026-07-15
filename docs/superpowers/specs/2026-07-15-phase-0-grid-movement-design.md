@@ -130,13 +130,16 @@ The user must run and manually approve Stage A after the automated suite passes 
 
 After Stage A approval, replace only the debug presentation with locally owned, intentionally temporary placeholders:
 
-- a Brandenburg Gate landmark;
-- simple terrain tiles; and
+- grass and asphalt terrain;
+- blocking trees on grass and blocking trash cans on asphalt;
+- one Brandenburg Gate landmark; and
 - a character sprite.
 
-Store those three raster textures as `src/assets/placeholders/terrain.png`, `brandenburg-gate.png`, and `character.png`. Phaser loads them directly: terrain repeats across cells, the Gate is decorative at a fixed non-blocking grid-aligned location, and the character texture replaces the debug player marker. They do not add a Tiled tileset or tile layer and do not alter gameplay state or collision.
+Use the supplied PNG files in `src/assets/sprites/`: `grass.png`, `asphalt.png`, `tree.png`, `trash-can.png`, `Brandenburg-Gate.png`, and `hobo.png`. Do not use the opaque alternate Gate or the bench. Phaser loads these textures directly; no Tiled tileset, external asset search, generated art, or reusable asset pipeline belongs in Phase 0.
 
-Stage B must preserve the same map contract, spawn, blockers, movement, input cadence, whole-map scaling, and status readout. No external asset search or final-art pipeline belongs in Phase 0.
+The approved Option A layout uses asphalt on rows 2–4 and 11–13 plus columns 3–5 and 16–18; every other terrain cell is grass. Trees occupy `(1,9)`, `(8,7)`, `(8,9)`, `(11,7)`, `(13,8)`, and `(21,6)`. Trash cans occupy `(7,3)`, `(17,7)`, and `(15,12)`. Those nine prop cells are the checked-in Collision cells. Grass remains walkable. The Gate starts at `(20,0)`, uses its native 128×96 four-by-three-cell footprint, renders once, and is decorative rather than blocking.
+
+Stage B preserves the map geometry contract, spawn `(2,2)`, movement rules, input cadence, whole-map scaling, status readout, and visible failure behavior. It intentionally replaces the Stage A blocker fixture with the prop-aligned Collision cells. All assets are sized once in the fixed 768×512 design space with preserved aspect ratios; Phaser scales the complete canvas uniformly for desktop and mobile without camera following.
 
 ## Failure Behavior
 
@@ -183,7 +186,7 @@ Stage A is ready for the manual checkpoint only when all of the following are tr
 6. The entire 24×16 map is visible and centered at all three required viewport sizes without horizontal or vertical document overflow.
 7. A human verifies Stage A in the browser and explicitly approves beginning Stage B.
 
-Phase 0 is complete only after that approval, the three Stage B placeholders are present, all Stage A behavior remains unchanged, the full automated suite passes again, and the final app is verified in a real browser at the required viewport sizes.
+Phase 0 is complete only after that approval, all six Stage B textures render in the approved layout, the prop-aligned collision flow passes, all unchanged Stage A behavior remains green, and the final app is verified in a real browser at the required viewport sizes.
 
 ## Delivery Gates
 
