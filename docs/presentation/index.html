@@ -432,9 +432,9 @@
 
       .codex-grid {
         display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 0.65rem;
-        width: min(100%, 44rem);
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.55rem;
+        width: min(100%, 58rem);
         text-align: left;
       }
 
@@ -442,7 +442,7 @@
         background: rgba(44, 52, 40, 0.75);
         border: 1px solid var(--line);
         border-radius: 14px;
-        padding: 0.85rem 1rem;
+        padding: 0.7rem 0.85rem;
       }
 
       .codex-card h3 {
@@ -454,8 +454,20 @@
 
       .codex-card p {
         color: var(--muted);
-        font-size: 0.86rem;
-        line-height: 1.4;
+        font-size: 0.82rem;
+        line-height: 1.32;
+      }
+
+      .codex-card.sound-card {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: 13rem 1fr;
+        gap: 0.8rem;
+        align-items: center;
+      }
+
+      .codex-card.sound-card h3 {
+        margin-bottom: 0;
       }
 
       .codex-tools {
@@ -463,7 +475,7 @@
         flex-wrap: wrap;
         justify-content: center;
         gap: 0.55rem;
-        width: min(100%, 44rem);
+        width: min(100%, 58rem);
         margin-top: 1rem;
       }
 
@@ -480,6 +492,33 @@
 
       .codex-tools a:hover {
         background: rgba(110, 207, 122, 0.18);
+      }
+
+      .codex-slide {
+        padding-top: 1.5rem;
+      }
+
+      .codex-slide .slide-sub {
+        margin-bottom: 1rem;
+      }
+
+      .codex-slide .codex-tools {
+        margin-top: 0.7rem;
+      }
+
+      @media (max-width: 900px) {
+        .codex-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          width: min(100%, 44rem);
+        }
+
+        .codex-card.sound-card {
+          display: block;
+        }
+
+        .codex-tools {
+          width: min(100%, 44rem);
+        }
       }
 
       @media (max-width: 640px) {
@@ -720,12 +759,12 @@
       </section>
 
       <!-- 6. Codex workflow -->
-      <section class="slide slide-wide" data-slide="5">
+      <section class="slide slide-wide codex-slide" data-slide="5">
         <p class="eyebrow">Our AI co-pilot</p>
         <h2>How we used Codex</h2>
         <p class="slide-sub">
           From a messy idea to a playable Berlin survival loop — one shared
-          workflow for thinking, building, and checking the work.
+          workflow for thinking, building, scoring, and checking the work.
         </p>
         <div class="codex-grid">
           <article class="codex-card">
@@ -768,6 +807,14 @@
             <p>
               Used tests, browser flows, and final checks to prove each feature
               worked before calling it done.
+            </p>
+          </article>
+          <article class="codex-card sound-card">
+            <h3>Soundboard &amp; sound set</h3>
+            <p>
+              Codex mapped events into a Phaser manifest, synthesized 43
+              retro/modern WAV SFX plus three themes, curated four licensed CC0
+              loops, and tested unlock and mute-safe playback.
             </p>
           </article>
         </div>
