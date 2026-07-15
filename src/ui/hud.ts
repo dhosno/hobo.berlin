@@ -115,13 +115,13 @@ function showSpeechBubble(
   el.classList.toggle("speech-bubble--hero", Boolean(options.hero));
   el.classList.remove("hidden", "fade");
   window.clearTimeout(speechTimer);
-  const holdMs = options.hero ? 4200 : 2800;
+  const holdMs = options.hero ? 2000 : 1300;
   speechTimer = window.setTimeout(() => {
     el.classList.add("fade");
     speechTimer = window.setTimeout(() => {
       el.classList.add("hidden");
       el.classList.remove("fade", "speech-bubble--hero");
-    }, 280);
+    }, 200);
   }, holdMs);
   void key;
 }
