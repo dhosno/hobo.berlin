@@ -32,6 +32,6 @@ describe("Phase 1 layout constants", () => {
     expect(MINIMUM_BOTTLES_TO_REDEEM).toBe(20);
     expect([REWE_WAIT_MIN_MS, REWE_WAIT_MAX_MS]).toEqual([2_000, 12_000]);
     expect(MEAL_VENDOR_NAME).toBe("Mustafa Kebap");
-    expect([BIN_HAZARD_CHANCE_MIN, BIN_HAZARD_CHANCE_MAX]).toEqual([0.05, 0.15]);
+    expect([BIN_HAZARD_CHANCE_MIN, BIN_HAZARD_CHANCE_MAX]).toEqual([0.2, 0.35]);
   });
 });

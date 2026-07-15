@@ -149,7 +149,7 @@ At the start of each day, before the ready state is shown:
 
 - Bin bottle yield is a random one to five bottles by default.
 - Each bin receives a hidden hazard probability when the day is generated.
-- The provisional probability range is 5% to 15%, centered around the earlier 10% baseline.
+- The provisional probability range is 20% to 35% (higher later in the week via day balance).
 - A bin interaction resolves to bottles **or** a burn, never both.
 - A burn removes one health unit, equal to half a heart, and awards no bottles.
 - A depleted bin ignores further interaction until the next daily reset.
@@ -227,13 +227,14 @@ Price generation supports future per-location ranges, but only one location is r
 - Use elapsed wall-clock time rather than frame counts.
 - The visible timer never displays a negative value.
 - When it reaches zero, stop movement, cancel any incomplete venue transaction, and resolve the day exactly once.
+- While `fedToday` is true and the player is not in a venue wait, they may end the day early; resolution matches timer expiry, then the next night/dawn cycle begins immediately.
 
 ### Day resolution
 
 - If `fedToday` is false, remove two health units, equal to one full heart.
 - If health reaches zero, enter `lost` immediately.
 - If day seven resolves with health remaining, enter `won`.
-- Otherwise show a day summary and an explicit **Start day N** action.
+- Otherwise show a day summary and an explicit **Start day N** action (skipped when the player ended the day early after eating).
 - The next day keeps `healthUnits`, `cashCents`, and unredeemed bottles.
 - The next day resets `fedToday`, the timer, bins, loose bottles, per-bin risk/yield data, venue waits, and the Döner price.
 

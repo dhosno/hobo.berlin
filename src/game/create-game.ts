@@ -23,6 +23,7 @@ import {
   beginDaySequence,
   continueToNextDay,
   createInitialState,
+  endDayEarly,
   focusOrActOnItem,
   restartRun,
   tickCountdown,
@@ -37,6 +38,7 @@ export type GameController = {
   getState: () => GameState;
   beginGame: () => void;
   continueDay: () => void;
+  endDayEarly: () => void;
   restart: () => void;
   performAction: () => void;
   move: (direction: Direction) => void;
@@ -228,6 +230,25 @@ export function createGame(
         return;
       }
       if (state.phase === "day-ready") {
+        void unlockAudio().then(() => {
+          startDayFlow();
+        });
+      }
+    },
+    endDayEarly: () => {
+      if (
+        state.phase !== "playing" ||
+        !state.fedToday ||
+        state.venue.kind !== "none"
+      ) {
+        return;
+      }
+      clearTransition();
+      const resolved = endDayEarly(state);
+      apply(resolved);
+      // Fed early-end: jump straight into the next night/dawn cycle.
+      if (resolved.phase === "day-resolution") {
+        apply(continueToNextDay(state));
         void unlockAudio().then(() => {
           startDayFlow();
         });
