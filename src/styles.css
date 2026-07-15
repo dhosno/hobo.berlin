@@ -30,9 +30,10 @@ body {
 
 #frame {
   position: relative;
-  width: min(100vw, calc(100vh * 18 / 26));
-  height: min(100vh, calc(100vw * 26 / 18));
-  aspect-ratio: 18 / 26;
+  /* Full phone chrome stays 18×28; the board is 18×26 inset by one row top+bottom. */
+  width: min(100vw, calc(100vh * 18 / 28));
+  height: min(100vh, calc(100vw * 28 / 18));
+  aspect-ratio: 18 / 28;
   background: var(--frame);
   overflow: hidden;
   box-shadow: 0 0 0 1px rgba(243, 240, 230, 0.08);
@@ -40,7 +41,10 @@ body {
 
 #game {
   position: absolute;
-  inset: 0;
+  top: calc(100% / 28);
+  right: 0;
+  bottom: calc(100% / 28);
+  left: 0;
   z-index: 1;
 }
 

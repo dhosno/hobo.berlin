@@ -50,7 +50,7 @@ for (const viewport of [
     const frame = page.locator("#frame");
     const box = await frame.boundingBox();
     expect(box).not.toBeNull();
-    expect(Math.abs(box!.width / box!.height - 18 / 26)).toBeLessThanOrEqual(0.03);
+    expect(Math.abs(box!.width / box!.height - 18 / 28)).toBeLessThanOrEqual(0.03);
     expect(box!.x).toBeGreaterThanOrEqual(0);
     expect(box!.y).toBeGreaterThanOrEqual(0);
     expect(box!.x + box!.width).toBeLessThanOrEqual(viewport.width + 1);

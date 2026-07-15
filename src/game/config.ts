@@ -1,4 +1,4 @@
-/** Phase 1 layout: vertical sketch grid (cropped to clear HUD + controls). */
+/** Phase 1 board: 18×26 playable cells inside an 18×28 phone frame (1-row inset top+bottom). */
 
 export const GRID_COLUMNS = 18;
 export const GRID_ROWS = 26;

@@ -18,7 +18,7 @@ import {
 } from "../../src/game/config";
 
 describe("Phase 1 layout constants", () => {
-  it("uses the vertical sketch grid (18×26 @ 28px)", () => {
+  it("uses the vertical playable grid (18×26 @ 28px)", () => {
     expect([GRID_COLUMNS, GRID_ROWS, CELL_SIZE]).toEqual([18, 26, 28]);
     expect([DESIGN_WIDTH, DESIGN_HEIGHT]).toEqual([504, 728]);
     expect(DESIGN_HEIGHT).toBeGreaterThan(DESIGN_WIDTH);
