@@ -13,7 +13,7 @@ if (app === null) {
 
 app.innerHTML = `
   <div id="frame">
-    <div id="hud">
+    <header id="hud">
       <div class="hud-grid">
         <div class="hud-cell hud-cell-day">
           <span class="hud-label">Day</span>
@@ -53,48 +53,50 @@ app.innerHTML = `
         <div id="queue-track"><div id="queue-fill"></div></div>
         <span id="queue-label"></span>
       </div>
-    </div>
-    <div id="dev-badge" class="hidden">DEV · timer frozen</div>
-    <div id="game" aria-label="hobo.berlin grid"></div>
-    <div id="stage" class="hidden" aria-live="polite">
-      <div id="stage-veil"></div>
-      <div id="stage-content">
-        <div id="stage-asset" class="hidden" aria-hidden="true">
-          <img id="stage-moon" alt="" width="128" height="128" decoding="async" />
-          <img id="stage-sun" alt="" width="128" height="128" decoding="async" />
+    </header>
+    <div id="playfield">
+      <div id="dev-badge" class="hidden">DEV · timer frozen</div>
+      <div id="game" aria-label="hobo.berlin grid"></div>
+      <div id="stage" class="hidden" aria-live="polite">
+        <div id="stage-veil"></div>
+        <div id="stage-content">
+          <div id="stage-asset" class="hidden" aria-hidden="true">
+            <img id="stage-moon" alt="" width="128" height="128" decoding="async" />
+            <img id="stage-sun" alt="" width="128" height="128" decoding="async" />
+          </div>
+          <span id="stage-text"></span>
         </div>
-        <span id="stage-text"></span>
+      </div>
+      <div id="bottom-toast" class="hidden" aria-live="polite"></div>
+      <button id="end-day-btn" class="hidden" type="button">End day</button>
+      <div id="speech-bubble" class="hidden" aria-live="polite">
+        <div class="speech-portrait" aria-hidden="true">
+          <img id="speech-portrait-img" alt="" width="72" height="72" decoding="async" />
+        </div>
+        <div class="speech-copy">
+          <div id="speech-name"></div>
+          <div id="speech-text"></div>
+        </div>
+      </div>
+      <output id="player-position" aria-live="polite" data-column="0" data-row="0">Player: 0,0</output>
+      <div id="touch">
+        <div id="dpad" aria-label="D-pad">
+          <button type="button" data-dir="up">▲</button>
+          <div class="mid">
+            <button type="button" data-dir="left">◀</button>
+            <button type="button" data-dir="right">▶</button>
+          </div>
+          <button type="button" data-dir="down">▼</button>
+        </div>
+        <button id="action-btn" type="button">ACT</button>
       </div>
     </div>
-    <div id="bottom-toast" class="hidden" aria-live="polite"></div>
-    <button id="end-day-btn" class="hidden" type="button">End day</button>
-    <div id="speech-bubble" class="hidden" aria-live="polite">
-      <div class="speech-portrait" aria-hidden="true">
-        <img id="speech-portrait-img" alt="" width="72" height="72" decoding="async" />
-      </div>
-      <div class="speech-copy">
-        <div id="speech-name"></div>
-        <div id="speech-text"></div>
-      </div>
-    </div>
-    <output id="player-position" aria-live="polite" data-column="0" data-row="0">Player: 0,0</output>
     <div id="overlay">
       <div id="overlay-card">
         <h1 id="overlay-title">hobo.berlin</h1>
         <div id="overlay-body"></div>
         <button id="overlay-btn" type="button">Start game</button>
       </div>
-    </div>
-    <div id="touch">
-      <div id="dpad" aria-label="D-pad">
-        <button type="button" data-dir="up">▲</button>
-        <div class="mid">
-          <button type="button" data-dir="left">◀</button>
-          <button type="button" data-dir="right">▶</button>
-        </div>
-        <button type="button" data-dir="down">▼</button>
-      </div>
-      <button id="action-btn" type="button">ACT</button>
     </div>
   </div>
 `;

@@ -1,4 +1,4 @@
-/** Phase 1 board: 18×26 playable cells inside an 18×28 phone frame (1-row inset top+bottom). */
+/** Phase 1 board: 18×26 playable cells; HUD is a layout row above the playfield in the 18×28 frame. */
 
 export const GRID_COLUMNS = 18;
 export const GRID_ROWS = 26;

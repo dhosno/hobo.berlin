@@ -30,7 +30,8 @@ body {
 
 #frame {
   position: relative;
-  /* Full phone chrome stays 18×28; the board is 18×26 inset by one row top+bottom. */
+  display: flex;
+  flex-direction: column;
   width: min(100vw, calc(100vh * 18 / 28));
   height: min(100vh, calc(100vw * 28 / 18));
   aspect-ratio: 18 / 28;
@@ -39,12 +40,27 @@ body {
   box-shadow: 0 0 0 1px rgba(243, 240, 230, 0.08);
 }
 
+#hud {
+  position: relative;
+  z-index: 5;
+  flex: 0 0 auto;
+  padding: 0.45rem 0.55rem 0.4rem;
+  background: #141a12;
+  border-bottom: 1px solid rgba(243, 240, 230, 0.1);
+  pointer-events: none;
+  font-size: 0.78rem;
+}
+
+#playfield {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+}
+
 #game {
   position: absolute;
-  top: calc(100% / 28);
-  right: 0;
-  bottom: calc(100% / 28);
-  left: 0;
+  inset: 0;
   z-index: 1;
 }
 
@@ -52,21 +68,6 @@ body {
   display: block;
   width: 100% !important;
   height: 100% !important;
-}
-
-#hud {
-  position: absolute;
-  inset: 0 0 auto 0;
-  z-index: 5;
-  padding: 0.45rem 0.55rem 0.35rem;
-  background: linear-gradient(
-    to bottom,
-    rgba(18, 22, 15, 0.94) 0%,
-    rgba(18, 22, 15, 0.78) 70%,
-    transparent 100%
-  );
-  pointer-events: none;
-  font-size: 0.78rem;
 }
 
 .hud-grid {
