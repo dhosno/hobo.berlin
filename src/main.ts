@@ -14,19 +14,38 @@ if (app === null) {
 app.innerHTML = `
   <div id="frame">
     <div id="hud">
-      <div class="hud-row hud-row-primary">
-        <span id="hud-day">Day 1 / 7</span>
-        <span id="hud-timer">—</span>
+      <div class="hud-grid">
+        <div class="hud-cell hud-cell-day">
+          <span class="hud-label">Day</span>
+          <span id="hud-day">1 / 7</span>
+        </div>
+        <div class="hud-cell hud-cell-timer">
+          <span class="hud-label">Time</span>
+          <span id="hud-timer">—</span>
+        </div>
+        <div class="hud-cell hud-cell-hearts">
+          <span class="hud-label">Hearts</span>
+          <span id="hud-hearts">♥♥♥</span>
+        </div>
+        <div class="hud-cell hud-cell-bottles">
+          <span class="hud-label">Bottles</span>
+          <span id="hud-bottles">0</span>
+        </div>
+        <div class="hud-cell hud-cell-cash">
+          <span class="hud-label">Cash</span>
+          <span id="hud-cash">€0.00</span>
+        </div>
+        <div class="hud-cell hud-cell-meal">
+          <span class="hud-label">Meal</span>
+          <span id="hud-meal">Mustafa Kebap €—</span>
+        </div>
+        <div class="hud-cell hud-cell-fed">
+          <span class="hud-label">Status</span>
+          <span id="hud-fed">Hungry</span>
+        </div>
       </div>
-      <div class="hud-row">
+      <div class="hud-meta">
         <span id="hud-phase">Ready</span>
-        <span id="hud-hearts">♥♥♥</span>
-        <span id="hud-bottles">🍾 0</span>
-        <span id="hud-cash">€0.00</span>
-        <span id="hud-meal">Mustafa Kebap €—</span>
-        <span id="hud-fed">Hungry</span>
-      </div>
-      <div class="hud-row">
         <span id="hud-need"></span>
       </div>
       <div id="hud-toast"></div>

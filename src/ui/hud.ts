@@ -3,6 +3,7 @@ import {
   MEAL_VENDOR_NAME,
   MINIMUM_BOTTLES_TO_REDEEM,
 } from "../game/config";
+import { bottleReturnLabel } from "../game/assets/board-assets";
 import {
   characterDialogueId,
   dialogueEventFor,
@@ -22,6 +23,11 @@ import {
 } from "../game/mechanics/run";
 import type { GameEvent, GameState } from "../game/mechanics/types";
 import { createDialogue } from "../dialogue.js";
+
+function bottleReturnName(state: GameState): string {
+  const venue = state.world.items.find((item) => item.type === "bottle-return");
+  return venue ? bottleReturnLabel(venue) : "REWE";
+}
 
 export type OverlayAction = "start-game" | "start-day" | "restart";
 
@@ -163,7 +169,7 @@ function setText(el: HTMLElement | null, value: string): void {
 }
 
 function paintCounters(): void {
-  setText(els.bottles(), `🍾 ${displayBottles}`);
+  setText(els.bottles(), String(displayBottles));
   setText(els.cash(), formatCash(displayCash));
 }
 
@@ -300,7 +306,7 @@ export function renderHud(state: GameState): void {
         ? state.toast || "…"
         : "—";
 
-  setText(els.day(), `Day ${state.day} / ${DAYS_PER_RUN}`);
+  setText(els.day(), `${state.day} / ${DAYS_PER_RUN}`);
   setText(els.phase(), phaseLabel(state));
   setText(els.timer(), timerText);
   setText(els.hearts(), formatHearts(state.player.healthUnits));
@@ -352,7 +358,7 @@ export function renderHud(state: GameState): void {
       fill.style.width = `${Math.min(100, Math.max(0, pct))}%`;
       qLabel.textContent =
         state.venue.kind === "rewe-wait"
-          ? `REWE queue · ${Math.ceil(state.venue.remainingMs / 1000)}s`
+          ? `${bottleReturnName(state)} queue · ${Math.ceil(state.venue.remainingMs / 1000)}s`
           : `${MEAL_VENDOR_NAME} · ${Math.ceil(state.venue.remainingMs / 1000)}s`;
     } else {
       queue.classList.add("hidden");
@@ -411,8 +417,8 @@ export function syncOverlay(
         <li>Search garbage bins for returnable bottles.</li>
         <li>A bin contains bottles or a burn hazard; the result is hidden.</li>
         <li>A burn costs half a heart.</li>
-        <li>Collect enough bottles and redeem them at REWE for cash (≥${MINIMUM_BOTTLES_TO_REDEEM}).</li>
-        <li>REWE queues take time while the day timer keeps running.</li>
+        <li>Collect enough bottles and redeem them at REWE or Netto for cash (≥${MINIMUM_BOTTLES_TO_REDEEM}).</li>
+        <li>Pfand queues take time while the day timer keeps running.</li>
         <li>Spend the cash at ${MEAL_VENDOR_NAME} and wait for the food.</li>
         <li>Eat before time runs out or lose one heart.</li>
         <li>Once fed, tap <strong>End day</strong> to start the next night early.</li>

@@ -15,6 +15,7 @@ import {
   REWE_WAIT_MIN_MS,
   STARTING_CASH_CENTS,
 } from "../config";
+import { bottleReturnLabel } from "../assets/board-assets";
 import type { Direction } from "../grid/movement";
 import { moveGridPosition } from "../grid/movement";
 import type { ParsedMapContract } from "../map/tiled-contract";
@@ -70,8 +71,15 @@ export function formatCash(cents: number): string {
   return `€${(cents / 100).toFixed(2)}`;
 }
 
+function bottleReturnName(state: GameState): string {
+  const venue = state.world.items.find((item) => item.type === "bottle-return");
+  return venue ? bottleReturnLabel(venue) : "REWE";
+}
+
 export function phaseLabel(state: GameState): string {
-  if (state.venue.kind === "rewe-wait") return "Waiting · REWE";
+  if (state.venue.kind === "rewe-wait") {
+    return `Waiting · ${bottleReturnName(state)}`;
+  }
   if (state.venue.kind === "food-wait") return `Waiting · ${MEAL_VENDOR_NAME}`;
   switch (state.phase) {
     case "instructions":
@@ -317,7 +325,7 @@ function startRewe(state: GameState): GameState {
       focusedItemId: null,
     },
     "rewe-wait-started",
-    "Queue at REWE…",
+    `Queue at ${bottleReturnName(state)}…`,
   );
 }
 

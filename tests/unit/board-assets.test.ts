@@ -54,6 +54,10 @@ describe("board assets", () => {
     expect(itemAssetKey(item("loose-bottle"))).toBe("bottle");
     expect(itemAssetKey(item("bottle-return"), () => 0)).toBe("rewe");
     expect(itemAssetKey(item("bottle-return"), () => 0.999)).toBe("netto");
+    expect(itemAssetKey(item("bottle-return", "netto"), () => 0)).toBe("netto");
+    expect(itemAssetKey(item("bottle-return", "rewe"), () => 0.999)).toBe(
+      "rewe",
+    );
     expect(itemAssetKey(item("scenery", "tree"))).toBe("tree");
     expect(itemAssetKey(item("scenery", "brandenburg-gate"))).toBe(
       "brandenburg-gate",
