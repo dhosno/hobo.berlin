@@ -71,12 +71,13 @@ function fakeScene() {
   };
 }
 
-test('Phaser preload queues all SFX and ambience with stable cache keys', () => {
+test('Phaser preload queues all SFX, theme music, and ambience with stable cache keys', () => {
   const scene = fakeScene();
   const keys = queuePhaserAudio(scene, manifest);
-  assert.equal(keys.length, 43);
+  assert.equal(keys.length, 45);
   assert.equal(new Set(keys).size, keys.length);
   assert.ok(keys.includes('hobo:ambience:berlin-outside'));
+  assert.ok(keys.includes('hobo:music:intro-pfand-und-circumstance'));
   assert.ok(keys.includes('hobo:sfx:step:0'));
   assert.ok(keys.includes('hobo:ambience:city-night'));
 });
@@ -107,15 +108,22 @@ test('Phaser facade uses Sound Manager for unlock, events, ambience, mute, and t
   assert.equal(await audio.play('step'), true);
   assert.equal(scene.played.at(-1).key, 'hobo:sfx:step:2');
 
+  assert.equal(await audio.playMusic('intro-pfand-und-circumstance'), true);
+  assert.equal(scene.added[0].key, 'hobo:music:intro-pfand-und-circumstance');
+  assert.equal(scene.added[0].config.loop, false);
+  assert.equal(scene.added[0].config.volume, 0.28);
+
   assert.equal(await audio.playAmbience('berlin-outside'), true);
-  assert.equal(scene.added[0].key, 'hobo:ambience:berlin-outside');
-  assert.equal(scene.added[0].config.loop, true);
-  assert.equal(scene.added[0].config.volume, 0.14);
+  assert.equal(scene.added[1].key, 'hobo:ambience:berlin-outside');
+  assert.equal(scene.added[1].config.loop, true);
+  assert.equal(scene.added[1].config.volume, 0.14);
 
   assert.equal(audio.setMuted(true), true);
   assert.equal(scene.sound.mute, true);
   assert.equal(scene.added[0].stopped, true);
   assert.equal(scene.added[0].destroyed, true);
+  assert.equal(scene.added[1].stopped, true);
+  assert.equal(scene.added[1].destroyed, true);
   assert.equal(storageValues.get('hobo.audio.muted'), 'true');
   await audio.destroy();
 });

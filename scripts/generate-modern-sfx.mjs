@@ -2,7 +2,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 const SAMPLE_RATE = 44100;
-const OUTPUT_DIR = new URL('../public/assets/audio/sfx/', import.meta.url);
+const OUTPUT_DIR = new URL('../public/assets/audio/sfx/modern/', import.meta.url);
 const TAU = Math.PI * 2;
 
 const sampleCount = (seconds) => Math.max(1, Math.round(seconds * SAMPLE_RATE));

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import { readFile, readdir } from 'node:fs/promises';
 
 const projectFile = (path) => new URL(`../${path.replace(/^\//, '')}`, import.meta.url);
 
@@ -12,9 +12,32 @@ test('every manifest audio file exists', async () => {
     if (entry.file) paths.push(entry.file);
     if (entry.files) paths.push(...entry.files);
   }
+  for (const entry of Object.values(manifest.music)) paths.push(entry.file);
   for (const entry of Object.values(manifest.ambience)) paths.push(entry.file);
 
   await Promise.all(paths.map((path) => readFile(projectFile(`public${path}`))));
+});
+
+test('SFX files are organized into base, alt, and modern folders', async () => {
+  const sfxDirectory = projectFile('public/assets/audio/sfx/');
+  const rootEntries = await readdir(sfxDirectory, { withFileTypes: true });
+  assert.equal(rootEntries.filter((entry) => entry.isFile() && entry.name.endsWith('.wav')).length, 0);
+
+  const expectedCounts = { base: 14, alt: 12, modern: 13 };
+  for (const [folder, expected] of Object.entries(expectedCounts)) {
+    const files = (await readdir(new URL(`${folder}/`, sfxDirectory))).filter((file) => file.endsWith('.wav'));
+    assert.equal(files.length, expected, `${folder} WAV count`);
+  }
+
+  const manifest = JSON.parse(await readFile(projectFile('public/assets/audio/manifest.json'), 'utf8'));
+  for (const entry of Object.values(manifest.events)) {
+    entry.files.forEach((path, index) => {
+      const expectedFolder = entry.variantStyles[index] === 'modern-16bit'
+        ? '/modern/'
+        : path.endsWith('-alt.wav') ? '/alt/' : '/base/';
+      assert.ok(path.includes(expectedFolder), `${path} must live in ${expectedFolder}`);
+    });
+  }
 });
 
 test('four CC0 ambience alternatives are valid Ogg loops', async () => {
@@ -74,6 +97,24 @@ test('every event has a modern signed 16-bit mono WAV at 44.1 kHz', async () => 
   }
 });
 
+test('intro and outro are original signed 16-bit mono music WAVs at 44.1 kHz', async () => {
+  const manifest = JSON.parse(await readFile(projectFile('public/assets/audio/manifest.json'), 'utf8'));
+  assert.deepEqual(Object.keys(manifest.music).sort(), [
+    'intro-pfand-und-circumstance', 'outro-formular-finale'
+  ]);
+  for (const [trackId, entry] of Object.entries(manifest.music)) {
+    const data = await readFile(projectFile(`public${entry.file}`));
+    assert.equal(data.toString('ascii', 0, 4), 'RIFF', trackId);
+    assert.equal(data.toString('ascii', 8, 12), 'WAVE', trackId);
+    assert.equal(data.readUInt16LE(20), 1, `${trackId} must use PCM`);
+    assert.equal(data.readUInt16LE(22), 1, `${trackId} must be mono`);
+    assert.equal(data.readUInt32LE(24), 44100, `${trackId} sample rate`);
+    assert.equal(data.readUInt16LE(34), 16, `${trackId} bit depth`);
+    assert.equal(entry.loop, false);
+    assert.equal(entry.license, 'Original project asset');
+  }
+});
+
 test('manifest covers the complete MVP event contract and stays hackathon-small', async () => {
   const manifest = JSON.parse(await readFile(projectFile('public/assets/audio/manifest.json'), 'utf8'));
   const requiredEvents = [
@@ -97,9 +138,12 @@ test('manifest covers the complete MVP event contract and stays hackathon-small'
   const ambienceBytes = (await Promise.all(
     Object.values(manifest.ambience).map((entry) => readFile(projectFile(`public${entry.file}`)))
   )).reduce((sum, data) => sum + data.length, 0);
+  const musicBytes = (await Promise.all(
+    Object.values(manifest.music).map((entry) => readFile(projectFile(`public${entry.file}`)))
+  )).reduce((sum, data) => sum + data.length, 0);
 
   assert.ok(sfxBytes < 1_400_000, `SFX pack is unexpectedly large: ${sfxBytes} bytes`);
-  assert.ok(sfxBytes + ambienceBytes < 3_000_000, 'all audio must remain under 3 MB');
+  assert.ok(sfxBytes + ambienceBytes + musicBytes < 4_000_000, 'all audio must remain under 4 MB');
 });
 
 test('license ledger records the shipped ambience and non-shipped reference pack', async () => {
@@ -111,6 +155,8 @@ test('license ledger records the shipped ambience and non-shipped reference pack
   assert.match(ledger, /not\s+redistributed/i);
   assert.match(ledger, /generate-modern-sfx\.mjs/);
   assert.match(ledger, /signed 16-bit PCM/);
+  assert.match(ledger, /generate-theme-music\.mjs/);
+  assert.match(ledger, /Pfand and pomp/);
   assert.match(ledger, /AMB Outside 1/);
   assert.match(ledger, /wind whoosh loop/);
   assert.match(ledger, /Two Simple Game Music Loops/);
