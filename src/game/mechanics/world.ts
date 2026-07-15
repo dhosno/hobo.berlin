@@ -82,6 +82,7 @@ export function worldFromParsedMap(map: ParsedMapContract): WorldState {
     size: { ...entry.size },
     blocking: true,
     state: "available" as const,
+    ...(entry.assetKey ? { assetKey: entry.assetKey } : {}),
   }));
 
   return {

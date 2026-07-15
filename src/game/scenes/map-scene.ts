@@ -1,16 +1,19 @@
 import Phaser from "phaser";
 
+import {
+  BOARD_ASSETS,
+  itemAssetKey,
+  type BoardAssetKey,
+} from "../assets/board-assets";
 import { CELL_SIZE, DESIGN_HEIGHT, DESIGN_WIDTH, MEAL_VENDOR_NAME } from "../config";
 import type { Direction } from "../grid/movement";
 import { ArrowRepeatController } from "../input/repeat";
+import { terrainAt } from "../map/board-layout";
 import type { GameState } from "../mechanics/types";
 import type { WorldItem } from "../mechanics/types";
 
 const COLORS = {
-  background: 0x1a2118,
-  blocker: 0xa4495f,
   grid: 0x3a4534,
-  player: 0xf0d33c,
   bin: 0x6b7280,
   binDepleted: 0x3f4450,
   loose: 0x6ecf7a,
@@ -30,11 +33,16 @@ export class MapScene extends Phaser.Scene {
   private state!: GameState;
   private handlers!: Handlers;
   private readonly repeatController = new ArrowRepeatController();
-  private player!: Phaser.GameObjects.Rectangle;
+  private player!: Phaser.GameObjects.Image;
   private itemGfx = new Map<
     string,
-    { rect: Phaser.GameObjects.Rectangle; text: Phaser.GameObjects.Text }
+    {
+      hitArea: Phaser.GameObjects.Rectangle;
+      sprite?: Phaser.GameObjects.Image;
+      text?: Phaser.GameObjects.Text;
+    }
   >();
+  private readonly itemAssetKeys = new Map<string, BoardAssetKey>();
   private mapGfx?: Phaser.GameObjects.Graphics;
 
   constructor() {
@@ -46,11 +54,18 @@ export class MapScene extends Phaser.Scene {
     this.handlers = data.handlers;
   }
 
+  preload(): void {
+    for (const asset of Object.values(BOARD_ASSETS)) {
+      this.load.image(asset.key, asset.url);
+    }
+  }
+
   create(): void {
     this.drawStaticMap();
     this.rebuildItems();
     this.player = this.add
-      .rectangle(0, 0, CELL_SIZE * 0.7, CELL_SIZE * 0.7, COLORS.player)
+      .image(0, 0, BOARD_ASSETS.hobo.key)
+      .setDisplaySize(CELL_SIZE * 1.5, CELL_SIZE * 1.5)
       .setDepth(20);
     this.syncPlayer();
 
@@ -115,21 +130,21 @@ export class MapScene extends Phaser.Scene {
 
   private drawStaticMap(): void {
     this.mapGfx?.destroy();
-    const graphics = this.add.graphics().setDepth(0);
-    graphics.fillStyle(COLORS.background);
-    graphics.fillRect(0, 0, DESIGN_WIDTH, DESIGN_HEIGHT);
-
-    graphics.fillStyle(COLORS.blocker);
-    for (const blockedCell of this.state.world.blockedCells) {
-      const [column, row] = blockedCell.split(",").map(Number);
-      graphics.fillRect(
-        column * CELL_SIZE,
-        row * CELL_SIZE,
-        CELL_SIZE,
-        CELL_SIZE,
-      );
+    for (let row = 0; row < this.state.world.rows; row += 1) {
+      for (let column = 0; column < this.state.world.columns; column += 1) {
+        const terrain = BOARD_ASSETS[terrainAt(column, row)];
+        this.add
+          .image(
+            column * CELL_SIZE + CELL_SIZE / 2,
+            row * CELL_SIZE + CELL_SIZE / 2,
+            terrain.key,
+          )
+          .setDisplaySize(CELL_SIZE, CELL_SIZE)
+          .setDepth(0);
+      }
     }
 
+    const graphics = this.add.graphics().setDepth(0);
     graphics.lineStyle(1, COLORS.grid, 0.45);
     for (let column = 0; column <= this.state.world.columns; column += 1) {
       const x = column * CELL_SIZE;
@@ -152,8 +167,9 @@ export class MapScene extends Phaser.Scene {
 
   private rebuildItems(): void {
     for (const gfx of this.itemGfx.values()) {
-      gfx.rect.destroy();
-      gfx.text.destroy();
+      gfx.hitArea.destroy();
+      gfx.sprite?.destroy();
+      gfx.text?.destroy();
     }
     this.itemGfx.clear();
 
@@ -163,24 +179,38 @@ export class MapScene extends Phaser.Scene {
   }
 
   private makeItem(item: WorldItem): {
-    rect: Phaser.GameObjects.Rectangle;
-    text: Phaser.GameObjects.Text;
+    hitArea: Phaser.GameObjects.Rectangle;
+    sprite?: Phaser.GameObjects.Image;
+    text?: Phaser.GameObjects.Text;
   } {
     const w = item.size.columns * CELL_SIZE;
     const h = item.size.rows * CELL_SIZE;
     const px = item.position.column * CELL_SIZE;
     const py = item.position.row * CELL_SIZE;
 
-    const rect = this.add
-      .rectangle(px + w / 2, py + h / 2, w * 0.88, h * 0.88, colorFor(item))
+    let assetKey = this.itemAssetKeys.get(item.id);
+    if (assetKey === undefined) {
+      assetKey = itemAssetKey(item);
+      if (assetKey !== undefined) this.itemAssetKeys.set(item.id, assetKey);
+    }
+
+    const hitArea = this.add
+      .rectangle(
+        px + w / 2,
+        py + h / 2,
+        w * 0.92,
+        h * 0.92,
+        assetKey === undefined ? colorFor(item) : 0xffffff,
+        assetKey === undefined ? 1 : 0,
+      )
       .setDepth(5)
       .setInteractive({ useHandCursor: true });
 
     if (this.state.focusedItemId === item.id) {
-      rect.setStrokeStyle(2, COLORS.focus, 1);
+      hitArea.setStrokeStyle(2, COLORS.focus, 1);
     }
 
-    rect.on("pointerdown", () => {
+    hitArea.on("pointerdown", () => {
       if (
         item.type === "bin" ||
         item.type === "bottle-return" ||
@@ -189,6 +219,17 @@ export class MapScene extends Phaser.Scene {
         this.handlers.onItemTap(item.id);
       }
     });
+
+    if (assetKey !== undefined) {
+      const sprite = this.add
+        .image(px + w / 2, py + h / 2, BOARD_ASSETS[assetKey].key)
+        .setDisplaySize(w * 0.92, h * 0.92)
+        .setDepth(6);
+      if (item.type === "bin" && item.state === "depleted") {
+        sprite.setAlpha(0.38);
+      }
+      return { hitArea, sprite };
+    }
 
     const label = shortLabel(item);
     const fontSize =
@@ -206,7 +247,7 @@ export class MapScene extends Phaser.Scene {
       .setOrigin(0.5)
       .setDepth(6);
 
-    return { rect, text };
+    return { hitArea, text };
   }
 }
 
