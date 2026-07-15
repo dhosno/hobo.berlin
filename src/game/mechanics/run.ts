@@ -9,9 +9,7 @@ import {
   DONER_WAIT_MAX_MS,
   DONER_WAIT_MIN_MS,
   MAX_HEALTH_UNITS,
-  MEAL_PRICE_MAX_CENTS,
-  MEAL_PRICE_MIN_CENTS,
-  MEAL_PRICE_STEP_CENTS,
+  MEAL_VENDOR_NAME,
   MINIMUM_BOTTLES_TO_REDEEM,
   REWE_WAIT_MAX_MS,
   REWE_WAIT_MIN_MS,
@@ -20,6 +18,7 @@ import {
 import type { Direction } from "../grid/movement";
 import { moveGridPosition } from "../grid/movement";
 import type { ParsedMapContract } from "../map/tiled-contract";
+import { dayBalance, rollMealPriceCents } from "./day-balance";
 import { createRng, randomSeed } from "./rng";
 import type {
   GameEvent,
@@ -29,7 +28,7 @@ import type {
   WorldItem,
 } from "./types";
 import {
-  ensureAffordableDay,
+  balanceDayEconomy,
   isAdjacentToItem,
   itemAt,
   movementBlockedSet,
@@ -73,7 +72,7 @@ export function formatCash(cents: number): string {
 
 export function phaseLabel(state: GameState): string {
   if (state.venue.kind === "rewe-wait") return "Waiting · REWE";
-  if (state.venue.kind === "food-wait") return "Waiting · Döner";
+  if (state.venue.kind === "food-wait") return `Waiting · ${MEAL_VENDOR_NAME}`;
   switch (state.phase) {
     case "instructions":
       return "Instructions";
@@ -103,17 +102,16 @@ function canControl(state: GameState): boolean {
 function prepareDay(state: GameState, day: number): GameState {
   const daySeed = `${state.runSeed}:day-${day}`;
   const rng = createRng(daySeed);
-  const mealSteps =
-    (MEAL_PRICE_MAX_CENTS - MEAL_PRICE_MIN_CENTS) / MEAL_PRICE_STEP_CENTS + 1;
-  const mealPriceCents =
-    MEAL_PRICE_MIN_CENTS + rng.int(0, mealSteps - 1) * MEAL_PRICE_STEP_CENTS;
+  const balance = dayBalance(day);
+  const mealPriceCents = rollMealPriceCents(balance, rng);
 
-  let items = spawnDailyCollectibles(state.world, rng);
-  items = ensureAffordableDay(
+  let items = spawnDailyCollectibles(state.world, rng, balance);
+  items = balanceDayEconomy(
     items,
     mealPriceCents,
     state.player.cashCents,
     state.player.bottles,
+    balance,
   );
 
   return {
@@ -147,7 +145,7 @@ export function createInitialState(
     day: 1,
     timeRemainingMs: DAY_DURATION_MS,
     fedToday: false,
-    mealPriceCents: MEAL_PRICE_MIN_CENTS,
+    mealPriceCents: dayBalance(1).mealMinCents,
     player: {
       characterId: character.id,
       position: { ...world.spawn },
@@ -250,7 +248,7 @@ function searchBin(state: GameState, item: WorldItem): GameState {
   }
 
   const rng = createRng(`${state.daySeed}:bin:${item.id}:resolve`);
-  const burns = rng.chance(item.hazardChance ?? 0.1);
+  const burns = (item.hazardChance ?? 0) >= 1 || rng.chance(item.hazardChance ?? 0);
   const items = state.world.items.map((i) =>
     i.id === item.id ? { ...i, state: "depleted" as const } : i,
   );
@@ -288,7 +286,7 @@ function searchBin(state: GameState, item: WorldItem): GameState {
       focusedItemId: null,
     },
     "bottle-collected",
-    `+${gained} bottles`,
+    gained === 1 ? "+1 bottle" : `+${gained} bottles`,
   );
 }
 
@@ -345,13 +343,14 @@ function startFood(state: GameState): GameState {
       focusedItemId: null,
     },
     "food-wait-started",
-    "Waiting for Döner…",
+    `Waiting for ${MEAL_VENDOR_NAME}…`,
   );
 }
 
 function completeRewe(state: GameState): GameState {
   const bottles = state.venue.bottlesBefore;
-  const cash = state.venue.cashBefore + bottles * BOTTLE_VALUE_CENTS;
+  const gainedCents = bottles * BOTTLE_VALUE_CENTS;
+  const cash = state.venue.cashBefore + gainedCents;
   let next = emit(
     {
       ...state,
@@ -359,9 +358,12 @@ function completeRewe(state: GameState): GameState {
       venue: idleVenue(),
     },
     "bottles-depositing",
-    `Redeemed ${bottles}`,
   );
-  return emit(next, "cash-received", formatCash(cash));
+  return emit(
+    next,
+    "cash-received",
+    `−${bottles} bottles · +${formatCash(gainedCents)}`,
+  );
 }
 
 function completeFood(state: GameState): GameState {
@@ -376,7 +378,7 @@ function completeFood(state: GameState): GameState {
       venue: idleVenue(),
     },
     "food-bought",
-    "Fed!",
+    `−${formatCash(state.mealPriceCents)} · ${MEAL_VENDOR_NAME}`,
   );
 }
 
@@ -477,11 +479,17 @@ export function continueToNextDay(state: GameState): GameState {
   };
 }
 
-export function tickPlaying(state: GameState, dtMs: number): GameState {
+export function tickPlaying(
+  state: GameState,
+  dtMs: number,
+  options: { freezeDayTimer?: boolean } = {},
+): GameState {
   if (state.phase !== "playing") return state;
 
   let next = state;
-  const remaining = state.timeRemainingMs - dtMs;
+  const remaining = options.freezeDayTimer
+    ? state.timeRemainingMs
+    : state.timeRemainingMs - dtMs;
 
   if (state.venue.kind !== "none") {
     const venueLeft = state.venue.remainingMs - dtMs;
@@ -498,11 +506,18 @@ export function tickPlaying(state: GameState, dtMs: number): GameState {
     }
   }
 
-  if (remaining <= 0) {
+  if (!options.freezeDayTimer && remaining <= 0) {
     return resolveDay({ ...next, timeRemainingMs: 0 });
   }
 
-  return { ...next, timeRemainingMs: remaining };
+  return { ...next, timeRemainingMs: Math.max(0, remaining) };
+}
+
+/** Bottles still needed to afford today's meal after current cash. */
+export function bottlesNeededForMeal(state: GameState): number {
+  const shortfall = Math.max(0, state.mealPriceCents - state.player.cashCents);
+  if (shortfall === 0) return 0;
+  return Math.ceil(shortfall / BOTTLE_VALUE_CENTS);
 }
 
 export function characterName(characterId: string): string {

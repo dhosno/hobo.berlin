@@ -1,7 +1,8 @@
 import "./styles.css";
 
-import { ACTIVE_MAP_URL } from "./game/config";
+import { ACTIVE_MAP_URL, INITIAL_REPEAT_DELAY_MS, REPEAT_INTERVAL_MS } from "./game/config";
 import { createGame, type GameController } from "./game/create-game";
+import type { Direction } from "./game/grid/movement";
 import { parseTiledMap } from "./game/map/tiled-contract";
 import { renderHud, syncOverlay, type OverlayAction } from "./ui/hud";
 
@@ -13,21 +14,40 @@ if (app === null) {
 app.innerHTML = `
   <div id="frame">
     <div id="hud">
-      <div class="hud-row">
+      <div class="hud-row hud-row-primary">
         <span id="hud-day">Day 1 / 7</span>
-        <span id="hud-phase">Ready</span>
         <span id="hud-timer">—</span>
       </div>
       <div class="hud-row">
+        <span id="hud-phase">Ready</span>
         <span id="hud-hearts">♥♥♥</span>
         <span id="hud-bottles">🍾 0</span>
         <span id="hud-cash">€0.00</span>
-        <span id="hud-meal">Döner €—</span>
+        <span id="hud-meal">Mustafa Kebap €—</span>
         <span id="hud-fed">Hungry</span>
       </div>
+      <div class="hud-row">
+        <span id="hud-need"></span>
+      </div>
       <div id="hud-toast"></div>
+      <div id="queue-bar" class="hidden" aria-hidden="true">
+        <div id="queue-track"><div id="queue-fill"></div></div>
+        <span id="queue-label"></span>
+      </div>
     </div>
+    <div id="dev-badge" class="hidden">DEV · timer frozen</div>
     <div id="game" aria-label="hobo.berlin grid"></div>
+    <div id="stage" class="hidden" aria-live="polite">
+      <div id="stage-veil"></div>
+      <div id="stage-content">
+        <div id="stage-asset" class="hidden" aria-hidden="true">
+          <img id="stage-moon" alt="" width="96" height="96" decoding="async" />
+          <img id="stage-sun" alt="" width="96" height="96" decoding="async" />
+        </div>
+        <span id="stage-text"></span>
+      </div>
+    </div>
+    <div id="bottom-toast" class="hidden" aria-live="polite"></div>
     <output id="player-position" aria-live="polite" data-column="0" data-row="0">Player: 0,0</output>
     <div id="overlay">
       <div id="overlay-card">
@@ -73,12 +93,39 @@ function bindTouch(): void {
     controller?.performAction();
   });
 
+  let held: Direction | null = null;
+  let nextRepeatAt = 0;
+  let holdRaf = 0;
+
+  const stopHold = (): void => {
+    held = null;
+    cancelAnimationFrame(holdRaf);
+    holdRaf = 0;
+  };
+
+  const tickHold = (now: number): void => {
+    if (!held) return;
+    if (now >= nextRepeatAt) {
+      controller?.move(held);
+      nextRepeatAt = now + REPEAT_INTERVAL_MS;
+    }
+    holdRaf = requestAnimationFrame(tickHold);
+  };
+
   document.querySelectorAll<HTMLButtonElement>("#dpad button[data-dir]").forEach((btn) => {
-    const dir = btn.dataset.dir as "up" | "down" | "left" | "right";
+    const dir = btn.dataset.dir as Direction;
     btn.addEventListener("pointerdown", (e) => {
       e.preventDefault();
+      btn.setPointerCapture(e.pointerId);
+      stopHold();
+      held = dir;
       controller?.move(dir);
+      nextRepeatAt = performance.now() + INITIAL_REPEAT_DELAY_MS;
+      holdRaf = requestAnimationFrame(tickHold);
     });
+    btn.addEventListener("pointerup", stopHold);
+    btn.addEventListener("pointercancel", stopHold);
+    btn.addEventListener("lostpointercapture", stopHold);
   });
 }
 

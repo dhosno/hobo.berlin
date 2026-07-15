@@ -67,6 +67,36 @@ body {
   margin-bottom: 0.2rem;
 }
 
+.hud-row-primary {
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  margin-bottom: 0.35rem;
+}
+
+#hud-day {
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+}
+
+#hud-timer {
+  font-size: 1.55rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.45);
+}
+
+#hud-phase {
+  color: var(--muted);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
 #hud-hearts {
   color: #ff6b4a;
   letter-spacing: 0.05em;
@@ -77,6 +107,245 @@ body {
   min-height: 1.1rem;
   color: var(--accent);
   font-weight: 600;
+}
+
+#bottom-toast {
+  position: absolute;
+  left: 50%;
+  bottom: 6.75rem;
+  z-index: 7;
+  transform: translateX(-50%);
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  background: rgba(18, 22, 15, 0.92);
+  border: 1px solid rgba(240, 211, 60, 0.45);
+  color: var(--accent);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 280ms ease, transform 280ms ease;
+}
+
+#bottom-toast.hidden {
+  display: none;
+}
+
+#bottom-toast.fade {
+  opacity: 0;
+  transform: translateX(-50%) translateY(0.35rem);
+}
+
+#hud-need {
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+#queue-bar {
+  margin-top: 0.35rem;
+  max-width: 14rem;
+}
+
+#queue-bar.hidden {
+  display: none;
+}
+
+#queue-track {
+  height: 0.35rem;
+  border-radius: 999px;
+  background: rgba(243, 240, 230, 0.15);
+  overflow: hidden;
+}
+
+#queue-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width 80ms linear;
+}
+
+#queue-label {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.68rem;
+  color: var(--muted);
+}
+
+#dev-badge {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.5rem;
+  z-index: 7;
+  padding: 0.2rem 0.45rem;
+  border-radius: 6px;
+  background: #c45c26;
+  color: #fff8ef;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  pointer-events: none;
+}
+
+#dev-badge.hidden {
+  display: none;
+}
+
+#stage {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+#stage.hidden {
+  display: none;
+}
+
+#stage-veil {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 520ms ease;
+}
+
+#stage.stage-enter #stage-veil,
+#stage.reduced #stage-veil {
+  opacity: 1;
+}
+
+#stage.reduced #stage-veil {
+  transition: none;
+}
+
+/* Barely transparent black — map still faintly readable underneath. */
+#stage[data-phase="night"] #stage-veil {
+  background: rgba(4, 6, 12, 0.82);
+}
+
+/* Barely transparent yellow day wash. */
+#stage[data-phase="dawn"] #stage-veil {
+  background: rgba(240, 211, 60, 0.72);
+}
+
+#stage[data-phase="countdown"] #stage-veil {
+  background: rgba(18, 22, 15, 0.4);
+}
+
+#stage-content {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  gap: 0.65rem;
+  padding: 0.5rem;
+}
+
+#stage-asset {
+  width: 96px;
+  height: 96px;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.35));
+  opacity: 0;
+  transform: translateY(8px) scale(0.92);
+  transition:
+    opacity 420ms ease 80ms,
+    transform 420ms ease 80ms;
+}
+
+#stage.stage-enter #stage-asset,
+#stage.reduced #stage-asset {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+#stage.reduced #stage-asset {
+  transition: none;
+}
+
+#stage-asset.hidden {
+  display: none;
+}
+
+#stage-moon,
+#stage-sun {
+  display: block;
+  width: 96px;
+  height: 96px;
+}
+
+#stage-moon.hidden,
+#stage-sun.hidden {
+  display: none;
+}
+
+#stage-text {
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  transition: opacity 360ms ease 160ms;
+}
+
+#stage.stage-enter #stage-text,
+#stage.reduced #stage-text {
+  opacity: 1;
+}
+
+#stage.reduced #stage-text {
+  transition: none;
+}
+
+#stage[data-phase="dawn"] #stage-text {
+  color: #1a1f18;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+#stage-text.day-number {
+  font-size: clamp(2rem, 10vw, 2.75rem);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+#stage-text.countdown {
+  font-size: clamp(4.5rem, 22vw, 6.5rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--accent);
+  text-shadow: 0 3px 0 rgba(0, 0, 0, 0.55);
+  animation: countdown-pop 280ms ease-out;
+}
+
+#stage.reduced #stage-text.countdown {
+  animation: none;
+}
+
+@keyframes countdown-pop {
+  from {
+    transform: scale(0.7);
+    opacity: 0.4;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #queue-fill {
+    transition: none;
+  }
+
+  #stage-veil,
+  #stage-asset,
+  #stage-text {
+    transition: none;
+  }
 }
 
 #player-position {

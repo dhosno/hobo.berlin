@@ -242,7 +242,7 @@ function shortLabel(item: WorldItem): string {
     case "bottle-return":
       return "REWE";
     case "food":
-      return "FOOD";
+      return "MK";
     case "scenery":
       return item.id.startsWith("gate") ? "GATE" : "";
     default:
