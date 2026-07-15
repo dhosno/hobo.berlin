@@ -1,7 +1,16 @@
 import { describe, expect, it } from "vitest";
 
-import { createInitialState, tryMove, resolveDay } from "../../src/game/mechanics/run";
+import { BOTTLE_VALUE_CENTS, DAY_DURATION_MS } from "../../src/game/config";
+import {
+  bottlesNeededForMeal,
+  createInitialState,
+  formatCash,
+  resolveDay,
+  tickPlaying,
+  tryMove,
+} from "../../src/game/mechanics/run";
 import { parseTiledMap } from "../../src/game/map/tiled-contract";
+import type { GameState } from "../../src/game/mechanics/types";
 
 const miniMap = {
   orientation: "orthogonal",
@@ -83,5 +92,61 @@ describe("mechanics run", () => {
     const resolved = resolveDay(state);
     expect(resolved.player.healthUnits).toBe(4);
     expect(resolved.phase).toBe("day-resolution");
+  });
+
+  it("freezes the day timer when requested", () => {
+    const map = parseTiledMap(miniMap);
+    let state = createInitialState(map, "test-seed");
+    state = {
+      ...state,
+      phase: "playing",
+      timeRemainingMs: DAY_DURATION_MS,
+    };
+    const next = tickPlaying(state, 5_000, { freezeDayTimer: true });
+    expect(next.timeRemainingMs).toBe(DAY_DURATION_MS);
+    expect(next.phase).toBe("playing");
+  });
+
+  it("reports bottles needed for the meal", () => {
+    const map = parseTiledMap(miniMap);
+    let state = createInitialState(map, "test-seed");
+    state = {
+      ...state,
+      mealPriceCents: 500,
+      player: { ...state.player, cashCents: 0, bottles: 0 },
+    };
+    expect(bottlesNeededForMeal(state)).toBe(20);
+    state = {
+      ...state,
+      player: { ...state.player, cashCents: 500 },
+    };
+    expect(bottlesNeededForMeal(state)).toBe(0);
+  });
+
+  it("redeems bottles into cash with delta toast", () => {
+    const map = parseTiledMap(miniMap);
+    let state = createInitialState(map, "test-seed");
+    const bottles = 20;
+    const gained = bottles * BOTTLE_VALUE_CENTS;
+    state = {
+      ...state,
+      phase: "playing",
+      timeRemainingMs: DAY_DURATION_MS,
+      player: { ...state.player, bottles, cashCents: 100 },
+      venue: {
+        kind: "rewe-wait",
+        remainingMs: 1,
+        totalMs: 1000,
+        bottlesBefore: bottles,
+        cashBefore: 100,
+        fedBefore: false,
+      },
+    } satisfies GameState;
+
+    const next = tickPlaying(state, 50);
+    expect(next.player.bottles).toBe(0);
+    expect(next.player.cashCents).toBe(100 + gained);
+    expect(next.toast).toBe(`−${bottles} bottles · +${formatCash(gained)}`);
+    expect(next.lastEvents.at(-1)).toBe("cash-received");
   });
 });
