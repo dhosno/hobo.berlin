@@ -248,7 +248,7 @@ function searchBin(state: GameState, item: WorldItem): GameState {
   }
 
   const rng = createRng(`${state.daySeed}:bin:${item.id}:resolve`);
-  const burns = (item.hazardChance ?? 0) >= 1 || rng.chance(item.hazardChance ?? 0);
+  const burns = rng.chance(item.hazardChance ?? 0.1);
   const items = state.world.items.map((i) =>
     i.id === item.id ? { ...i, state: "depleted" as const } : i,
   );

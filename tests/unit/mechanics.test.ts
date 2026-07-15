@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  BIN_HAZARD_FRACTION,
+  BIN_HAZARD_CHANCE_MAX,
+  BIN_HAZARD_CHANCE_MIN,
   BOTTLE_VALUE_CENTS,
   DAY_DURATION_MS,
 } from "../../src/game/config";
@@ -171,10 +172,10 @@ describe("mechanics run", () => {
 
     expect(easy.looseBottleCount).toBeGreaterThan(hard.looseBottleCount);
     expect(easy.binYieldMax).toBeGreaterThan(hard.binYieldMax);
-    expect(easy.hazardFraction).toBeLessThan(hard.hazardFraction);
+    expect(easy.hazardChanceMax).toBeLessThanOrEqual(hard.hazardChanceMax);
     expect(easy.mealMinCents).toBeLessThan(hard.mealMinCents);
     expect(easy.surplusRatioMin).toBeGreaterThan(hard.surplusRatioMin);
-    expect(hard.hazardFraction).toBeLessThanOrEqual(BIN_HAZARD_FRACTION);
+    expect(hard.hazardChanceMax).toBe(BIN_HAZARD_CHANCE_MAX);
   });
 
   it("keeps each day solvable but not wildly oversupplied", () => {
@@ -197,7 +198,7 @@ describe("mechanics run", () => {
     }
   });
 
-  it("marks at most 10% of day-7 bins as burn hazards", () => {
+  it("assigns each bin a hidden 5–15% burn chance", () => {
     const map = parseTiledMap(miniMap);
     const world = worldFromParsedMap(map);
     const balance = dayBalance(7);
@@ -207,12 +208,13 @@ describe("mechanics run", () => {
       balance,
     );
     const bins = items.filter((item) => item.type === "bin");
-    const burners = bins.filter((item) => (item.hazardChance ?? 0) >= 1);
-    const maxBurners = Math.floor(balance.binCount * balance.hazardFraction);
 
     expect(bins.length).toBe(balance.binCount);
-    expect(burners.length).toBe(maxBurners);
-    expect(burners.length / bins.length).toBeLessThanOrEqual(0.1 + 1e-9);
+    for (const bin of bins) {
+      expect(bin.hazardChance).toBeGreaterThanOrEqual(BIN_HAZARD_CHANCE_MIN);
+      expect(bin.hazardChance).toBeLessThanOrEqual(BIN_HAZARD_CHANCE_MAX);
+      expect(bin.yieldBottles).toBeGreaterThan(0);
+    }
   });
 
   it("burns half a heart and awards no bottles", () => {
@@ -225,7 +227,7 @@ describe("mechanics run", () => {
       size: { columns: 1, rows: 1 },
       blocking: true,
       state: "available" as const,
-      yieldBottles: 0,
+      yieldBottles: 4,
       hazardChance: 1,
     };
     const neighbor = { column: 4, row: 3 };

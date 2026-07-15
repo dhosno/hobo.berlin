@@ -30,8 +30,9 @@ export const BIN_COUNT = 12;
 export const LOOSE_BOTTLE_COUNT = 10;
 export const BIN_YIELD_MIN = 1;
 export const BIN_YIELD_MAX = 5;
-/** Max share of bins that are burn hazards on the hardest day. */
-export const BIN_HAZARD_FRACTION = 0.1;
+/** Spec: each bin rolls a hidden burn chance in this band (day curve interpolates). */
+export const BIN_HAZARD_CHANCE_MIN = 0.05;
+export const BIN_HAZARD_CHANCE_MAX = 0.15;
 
 /** Absolute meal price rails used by day scaling. */
 export const MEAL_PRICE_MIN_CENTS = 400;
