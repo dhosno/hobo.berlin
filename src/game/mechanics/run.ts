@@ -71,7 +71,9 @@ export function formatCash(cents: number): string {
 }
 
 export function phaseLabel(state: GameState): string {
-  if (state.venue.kind === "rewe-wait") return "Waiting · REWE";
+  if (state.venue.kind === "rewe-wait") {
+    return "Waiting · supermarket";
+  }
   if (state.venue.kind === "food-wait") return `Waiting · ${MEAL_VENDOR_NAME}`;
   switch (state.phase) {
     case "instructions":
@@ -317,7 +319,7 @@ function startRewe(state: GameState): GameState {
       focusedItemId: null,
     },
     "rewe-wait-started",
-    "Queue at REWE…",
+    "Queue at the supermarket…",
   );
 }
 

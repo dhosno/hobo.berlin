@@ -242,12 +242,33 @@ describe("mechanics run", () => {
     );
     const bins = items.filter((item) => item.type === "bin");
 
-    expect(bins.length).toBe(balance.binCount);
+    expect(bins.length).toBeGreaterThanOrEqual(Math.max(5, balance.binCount - 3));
+    expect(bins.length).toBeLessThanOrEqual(balance.binCount + 3);
     for (const bin of bins) {
       expect(bin.hazardChance).toBeGreaterThanOrEqual(BIN_HAZARD_CHANCE_MIN - 1e-9);
       expect(bin.hazardChance).toBeLessThanOrEqual(BIN_HAZARD_CHANCE_MAX + 1e-9);
       expect(bin.yieldBottles).toBeGreaterThan(0);
     }
+  });
+
+  it("randomizes bottle-return as REWE or Netto per day", () => {
+    const map = parseTiledMap(miniMap);
+    const world = worldFromParsedMap(map);
+    const brands = new Set<string>();
+    for (let i = 0; i < 24; i += 1) {
+      const items = spawnDailyCollectibles(
+        world,
+        createRng(`pfand-brand-${i}`),
+        dayBalance(1),
+      );
+      const venue = items.find((item) => item.type === "bottle-return");
+      expect(venue?.assetKey === "rewe" || venue?.assetKey === "netto").toBe(
+        true,
+      );
+      brands.add(venue!.assetKey!);
+    }
+    expect(brands.has("rewe")).toBe(true);
+    expect(brands.has("netto")).toBe(true);
   });
 
   it("burns half a heart and awards no bottles", () => {

@@ -2,6 +2,7 @@ import Phaser from "phaser";
 
 import {
   BOARD_ASSETS,
+  bottleReturnLabel,
   itemAssetKey,
   type BoardAssetKey,
 } from "../assets/board-assets";
@@ -172,6 +173,7 @@ export class MapScene extends Phaser.Scene {
       gfx.text?.destroy();
     }
     this.itemGfx.clear();
+    this.itemAssetKeys.clear();
 
     for (const item of this.state.world.items) {
       this.itemGfx.set(item.id, this.makeItem(item));
@@ -221,10 +223,11 @@ export class MapScene extends Phaser.Scene {
     });
 
     if (assetKey !== undefined) {
+      const scale = assetKey === "brandenburg-gate" ? 1.38 : 0.92;
       const sprite = this.add
         .image(px + w / 2, py + h / 2, BOARD_ASSETS[assetKey].key)
-        .setDisplaySize(w * 0.92, h * 0.92)
-        .setDepth(6);
+        .setDisplaySize(w * scale, h * scale)
+        .setDepth(assetKey === "brandenburg-gate" ? 7 : 6);
       if (item.type === "bin" && item.state === "depleted") {
         sprite.setAlpha(0.38);
       }
@@ -288,7 +291,7 @@ function shortLabel(item: WorldItem): string {
     case "loose-bottle":
       return "B";
     case "bottle-return":
-      return "REWE";
+      return bottleReturnLabel(item);
     case "food":
       return MEAL_VENDOR_NAME;
     case "scenery":
