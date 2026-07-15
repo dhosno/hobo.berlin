@@ -30,16 +30,18 @@ export const BIN_COUNT = 12;
 export const LOOSE_BOTTLE_COUNT = 10;
 export const BIN_YIELD_MIN = 1;
 export const BIN_YIELD_MAX = 5;
-export const BIN_HAZARD_CHANCE_MIN = 0.05;
-export const BIN_HAZARD_CHANCE_MAX = 0.15;
+/** Max share of bins that are burn hazards on the hardest day. */
+export const BIN_HAZARD_FRACTION = 0.1;
+
+/** Absolute meal price rails used by day scaling. */
+export const MEAL_PRICE_MIN_CENTS = 400;
+export const MEAL_PRICE_MAX_CENTS = 800;
+export const MEAL_PRICE_STEP_CENTS = 100;
 
 export const REWE_WAIT_MIN_MS = 2_000;
 export const REWE_WAIT_MAX_MS = 12_000;
 export const DONER_WAIT_MIN_MS = 2_000;
 export const DONER_WAIT_MAX_MS = 5_000;
-export const MEAL_PRICE_MIN_CENTS = 400;
-export const MEAL_PRICE_MAX_CENTS = 800;
-export const MEAL_PRICE_STEP_CENTS = 100;
 /** Player-facing name for the food stand. */
 export const MEAL_VENDOR_NAME = "Mustafa Kebap";
 

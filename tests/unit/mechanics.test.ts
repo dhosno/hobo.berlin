@@ -1,14 +1,29 @@
 import { describe, expect, it } from "vitest";
 
-import { BOTTLE_VALUE_CENTS, DAY_DURATION_MS } from "../../src/game/config";
+import {
+  BIN_HAZARD_FRACTION,
+  BOTTLE_VALUE_CENTS,
+  DAY_DURATION_MS,
+} from "../../src/game/config";
+import { dayBalance } from "../../src/game/mechanics/day-balance";
 import {
   bottlesNeededForMeal,
   createInitialState,
   formatCash,
   resolveDay,
   tickPlaying,
+  tryAction,
   tryMove,
 } from "../../src/game/mechanics/run";
+import { createRng } from "../../src/game/mechanics/rng";
+import {
+  balanceDayEconomy,
+  dayPotentialCents,
+  isAdjacentToItem,
+  mapBottleValueCents,
+  spawnDailyCollectibles,
+  worldFromParsedMap,
+} from "../../src/game/mechanics/world";
 import { parseTiledMap } from "../../src/game/map/tiled-contract";
 import type { GameState } from "../../src/game/mechanics/types";
 
@@ -148,5 +163,94 @@ describe("mechanics run", () => {
     expect(next.player.cashCents).toBe(100 + gained);
     expect(next.toast).toBe(`−${bottles} bottles · +${formatCash(gained)}`);
     expect(next.lastEvents.at(-1)).toBe("cash-received");
+  });
+
+  it("gets harder from day 1 to day 7", () => {
+    const easy = dayBalance(1);
+    const hard = dayBalance(7);
+
+    expect(easy.looseBottleCount).toBeGreaterThan(hard.looseBottleCount);
+    expect(easy.binYieldMax).toBeGreaterThan(hard.binYieldMax);
+    expect(easy.hazardFraction).toBeLessThan(hard.hazardFraction);
+    expect(easy.mealMinCents).toBeLessThan(hard.mealMinCents);
+    expect(easy.surplusRatioMin).toBeGreaterThan(hard.surplusRatioMin);
+    expect(hard.hazardFraction).toBeLessThanOrEqual(BIN_HAZARD_FRACTION);
+  });
+
+  it("keeps each day solvable but not wildly oversupplied", () => {
+    const map = parseTiledMap(miniMap);
+    const world = worldFromParsedMap(map);
+
+    for (const day of [1, 4, 7] as const) {
+      const balance = dayBalance(day);
+      const rng = createRng(`balance-day-${day}`);
+      const meal = balance.mealMaxCents;
+      let items = spawnDailyCollectibles(world, rng, balance);
+      items = balanceDayEconomy(items, meal, 0, 0, balance);
+      const potential = dayPotentialCents(items, 0, 0);
+
+      expect(potential).toBeGreaterThanOrEqual(meal);
+      expect(potential).toBeLessThanOrEqual(
+        Math.ceil(meal * balance.surplusRatioMax) + BOTTLE_VALUE_CENTS,
+      );
+      expect(mapBottleValueCents(items)).toBeGreaterThan(0);
+    }
+  });
+
+  it("marks at most 10% of day-7 bins as burn hazards", () => {
+    const map = parseTiledMap(miniMap);
+    const world = worldFromParsedMap(map);
+    const balance = dayBalance(7);
+    const items = spawnDailyCollectibles(
+      world,
+      createRng("hazard-day-7"),
+      balance,
+    );
+    const bins = items.filter((item) => item.type === "bin");
+    const burners = bins.filter((item) => (item.hazardChance ?? 0) >= 1);
+    const maxBurners = Math.floor(balance.binCount * balance.hazardFraction);
+
+    expect(bins.length).toBe(balance.binCount);
+    expect(burners.length).toBe(maxBurners);
+    expect(burners.length / bins.length).toBeLessThanOrEqual(0.1 + 1e-9);
+  });
+
+  it("burns half a heart and awards no bottles", () => {
+    const map = parseTiledMap(miniMap);
+    let state = createInitialState(map, "hazard-seed");
+    const burner = {
+      id: "bin-burn",
+      type: "bin" as const,
+      position: { column: 3, row: 3 },
+      size: { columns: 1, rows: 1 },
+      blocking: true,
+      state: "available" as const,
+      yieldBottles: 0,
+      hazardChance: 1,
+    };
+    const neighbor = { column: 4, row: 3 };
+    expect(isAdjacentToItem(neighbor, burner)).toBe(true);
+
+    state = {
+      ...state,
+      phase: "playing",
+      player: {
+        ...state.player,
+        position: neighbor,
+        healthUnits: 6,
+        bottles: 0,
+      },
+      focusedItemId: burner.id,
+      world: {
+        ...state.world,
+        items: [...state.world.items.filter((i) => i.type !== "bin"), burner],
+      },
+    };
+
+    const next = tryAction(state);
+    expect(next.player.healthUnits).toBe(5);
+    expect(next.player.bottles).toBe(0);
+    expect(next.lastEvents).toContain("got-burned");
+    expect(next.toast).toContain("Burn");
   });
 });

@@ -21,6 +21,7 @@ const PICKUP_EVENTS = new Set([
   "bottles-depositing",
   "cash-received",
   "food-bought",
+  "got-burned",
 ]);
 
 const els = {
@@ -187,15 +188,17 @@ function renderStage(state: GameState): void {
 
   if (state.phase === "night") {
     text.textContent = reduced ? "Night" : "Night falls…";
-    text.classList.remove("countdown");
+    text.classList.remove("countdown", "day-number");
   } else if (state.phase === "dawn") {
-    text.textContent = reduced ? "Dawn" : "Dawn over Berlin";
+    text.textContent = `Day ${state.day}`;
     text.classList.remove("countdown");
+    text.classList.add("day-number");
   } else if (state.phase === "countdown") {
     text.textContent = state.toast || "3";
     text.classList.add("countdown");
+    text.classList.remove("day-number");
   } else {
-    text.classList.remove("countdown");
+    text.classList.remove("countdown", "day-number");
   }
 }
 

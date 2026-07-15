@@ -9,9 +9,6 @@ import {
   DONER_WAIT_MAX_MS,
   DONER_WAIT_MIN_MS,
   MAX_HEALTH_UNITS,
-  MEAL_PRICE_MAX_CENTS,
-  MEAL_PRICE_MIN_CENTS,
-  MEAL_PRICE_STEP_CENTS,
   MEAL_VENDOR_NAME,
   MINIMUM_BOTTLES_TO_REDEEM,
   REWE_WAIT_MAX_MS,
@@ -21,6 +18,7 @@ import {
 import type { Direction } from "../grid/movement";
 import { moveGridPosition } from "../grid/movement";
 import type { ParsedMapContract } from "../map/tiled-contract";
+import { dayBalance, rollMealPriceCents } from "./day-balance";
 import { createRng, randomSeed } from "./rng";
 import type {
   GameEvent,
@@ -30,7 +28,7 @@ import type {
   WorldItem,
 } from "./types";
 import {
-  ensureAffordableDay,
+  balanceDayEconomy,
   isAdjacentToItem,
   itemAt,
   movementBlockedSet,
@@ -104,17 +102,16 @@ function canControl(state: GameState): boolean {
 function prepareDay(state: GameState, day: number): GameState {
   const daySeed = `${state.runSeed}:day-${day}`;
   const rng = createRng(daySeed);
-  const mealSteps =
-    (MEAL_PRICE_MAX_CENTS - MEAL_PRICE_MIN_CENTS) / MEAL_PRICE_STEP_CENTS + 1;
-  const mealPriceCents =
-    MEAL_PRICE_MIN_CENTS + rng.int(0, mealSteps - 1) * MEAL_PRICE_STEP_CENTS;
+  const balance = dayBalance(day);
+  const mealPriceCents = rollMealPriceCents(balance, rng);
 
-  let items = spawnDailyCollectibles(state.world, rng);
-  items = ensureAffordableDay(
+  let items = spawnDailyCollectibles(state.world, rng, balance);
+  items = balanceDayEconomy(
     items,
     mealPriceCents,
     state.player.cashCents,
     state.player.bottles,
+    balance,
   );
 
   return {
@@ -148,7 +145,7 @@ export function createInitialState(
     day: 1,
     timeRemainingMs: DAY_DURATION_MS,
     fedToday: false,
-    mealPriceCents: MEAL_PRICE_MIN_CENTS,
+    mealPriceCents: dayBalance(1).mealMinCents,
     player: {
       characterId: character.id,
       position: { ...world.spawn },
@@ -251,7 +248,7 @@ function searchBin(state: GameState, item: WorldItem): GameState {
   }
 
   const rng = createRng(`${state.daySeed}:bin:${item.id}:resolve`);
-  const burns = rng.chance(item.hazardChance ?? 0.1);
+  const burns = (item.hazardChance ?? 0) >= 1 || rng.chance(item.hazardChance ?? 0);
   const items = state.world.items.map((i) =>
     i.id === item.id ? { ...i, state: "depleted" as const } : i,
   );

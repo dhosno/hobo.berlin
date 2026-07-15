@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   ACTION_DEBOUNCE_MS,
+  BIN_COUNT,
+  BIN_HAZARD_FRACTION,
   CELL_SIZE,
   DESIGN_HEIGHT,
   DESIGN_WIDTH,
@@ -30,5 +32,7 @@ describe("Phase 1 layout constants", () => {
     expect(MINIMUM_BOTTLES_TO_REDEEM).toBe(20);
     expect([REWE_WAIT_MIN_MS, REWE_WAIT_MAX_MS]).toEqual([2_000, 12_000]);
     expect(MEAL_VENDOR_NAME).toBe("Mustafa Kebap");
+    expect(BIN_HAZARD_FRACTION).toBe(0.1);
+    expect(Math.floor(BIN_COUNT * BIN_HAZARD_FRACTION)).toBe(1);
   });
 });

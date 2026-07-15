@@ -1,12 +1,8 @@
 import {
-  BIN_COUNT,
-  BIN_HAZARD_CHANCE_MAX,
-  BIN_HAZARD_CHANCE_MIN,
   BIN_YIELD_MAX,
-  BIN_YIELD_MIN,
   BOTTLE_VALUE_CENTS,
-  LOOSE_BOTTLE_COUNT,
 } from "../config";
+import type { DayBalance } from "./day-balance";
 import {
   blockedCellKey,
   type GridPosition,
@@ -97,9 +93,33 @@ export function worldFromParsedMap(map: ParsedMapContract): WorldState {
   };
 }
 
+export function mapBottleValueCents(items: readonly WorldItem[]): number {
+  let cents = 0;
+  for (const item of items) {
+    if (item.type === "loose-bottle") {
+      cents += BOTTLE_VALUE_CENTS;
+      continue;
+    }
+    if (item.type === "bin" && item.state !== "depleted") {
+      if ((item.hazardChance ?? 0) >= 1) continue;
+      cents += (item.yieldBottles ?? 0) * BOTTLE_VALUE_CENTS;
+    }
+  }
+  return cents;
+}
+
+export function dayPotentialCents(
+  items: readonly WorldItem[],
+  cashCents: number,
+  bottles: number,
+): number {
+  return cashCents + bottles * BOTTLE_VALUE_CENTS + mapBottleValueCents(items);
+}
+
 export function spawnDailyCollectibles(
   world: WorldState,
   rng: Rng,
+  balance: DayBalance,
 ): WorldItem[] {
   const reserved = new Set<string>();
   const mark = (pos: GridPosition) => reserved.add(blockedCellKey(pos));
@@ -130,8 +150,19 @@ export function spawnDailyCollectibles(
   const collectibles: WorldItem[] = [];
   let i = 0;
 
-  for (let n = 0; n < BIN_COUNT && i < shuffled.length; n += 1, i += 1) {
+  const burnBinCount = Math.min(
+    balance.binCount,
+    Math.floor(balance.binCount * balance.hazardFraction),
+  );
+  const burnSlots = new Set(
+    rng
+      .shuffle(Array.from({ length: balance.binCount }, (_, index) => index))
+      .slice(0, burnBinCount),
+  );
+
+  for (let n = 0; n < balance.binCount && i < shuffled.length; n += 1, i += 1) {
     const pos = shuffled[i]!;
+    const isHazard = burnSlots.has(n);
     collectibles.push({
       id: `bin-${n}`,
       type: "bin",
@@ -139,16 +170,16 @@ export function spawnDailyCollectibles(
       size: { columns: 1, rows: 1 },
       blocking: true,
       state: "available",
-      yieldBottles: rng.int(BIN_YIELD_MIN, BIN_YIELD_MAX),
-      hazardChance:
-        BIN_HAZARD_CHANCE_MIN +
-        rng.next() * (BIN_HAZARD_CHANCE_MAX - BIN_HAZARD_CHANCE_MIN),
+      yieldBottles: isHazard
+        ? 0
+        : rng.int(balance.binYieldMin, balance.binYieldMax),
+      hazardChance: isHazard ? 1 : 0,
     });
   }
 
   for (
     let n = 0;
-    n < LOOSE_BOTTLE_COUNT && i < shuffled.length;
+    n < balance.looseBottleCount && i < shuffled.length;
     n += 1, i += 1
   ) {
     collectibles.push({
@@ -164,28 +195,123 @@ export function spawnDailyCollectibles(
   return [...fixed, ...collectibles];
 }
 
-export function ensureAffordableDay(
+function boostSafeBinYields(items: WorldItem[], amount: number): WorldItem[] {
+  let remaining = amount;
+  return items.map((item) => {
+    if (
+      remaining <= 0 ||
+      item.type !== "bin" ||
+      (item.hazardChance ?? 0) >= 1
+    ) {
+      return item;
+    }
+    const current = item.yieldBottles ?? 0;
+    const room = Math.max(0, BIN_YIELD_MAX + 2 - current);
+    const add = Math.min(room, remaining);
+    if (add <= 0) return item;
+    remaining -= add;
+    return { ...item, yieldBottles: current + add };
+  });
+}
+
+function trimSafeBinYields(items: WorldItem[], removeBottles: number): WorldItem[] {
+  let remaining = removeBottles;
+  // Prefer trimming higher-yield bins first so the floor stays readable.
+  const order = items
+    .map((item, index) => ({ item, index }))
+    .filter(
+      ({ item }) =>
+        item.type === "bin" &&
+        (item.hazardChance ?? 0) < 1 &&
+        (item.yieldBottles ?? 0) > 1,
+    )
+    .sort(
+      (a, b) => (b.item.yieldBottles ?? 0) - (a.item.yieldBottles ?? 0),
+    );
+
+  const next = [...items];
+  for (const { index, item } of order) {
+    if (remaining <= 0) break;
+    const current = item.yieldBottles ?? 0;
+    const cut = Math.min(current - 1, remaining);
+    if (cut <= 0) continue;
+    remaining -= cut;
+    next[index] = { ...item, yieldBottles: current - cut };
+  }
+  return next;
+}
+
+function dropLooseBottles(items: WorldItem[], count: number): WorldItem[] {
+  if (count <= 0) return items;
+  let left = count;
+  const out: WorldItem[] = [];
+  for (const item of items) {
+    if (left > 0 && item.type === "loose-bottle") {
+      left -= 1;
+      continue;
+    }
+    out.push(item);
+  }
+  return out;
+}
+
+/**
+ * Guarantee the day is winnable, then soft-cap surplus so early days stay
+ * generous without trivializing Mustafa Kebap.
+ */
+export function balanceDayEconomy(
   items: WorldItem[],
   mealPriceCents: number,
   cashCents: number,
   bottles: number,
+  balance: DayBalance,
 ): WorldItem[] {
-  const potential =
-    cashCents +
-    bottles * BOTTLE_VALUE_CENTS +
-    items
-      .filter((i) => i.type === "bin" && i.state === "available")
-      .reduce(
-        (sum, i) => sum + (i.yieldBottles ?? 0) * BOTTLE_VALUE_CENTS,
-        0,
-      ) +
-    items.filter((i) => i.type === "loose-bottle").length * BOTTLE_VALUE_CENTS;
+  const minNeed = Math.ceil(mealPriceCents * balance.surplusRatioMin);
+  const maxNeed = Math.ceil(mealPriceCents * balance.surplusRatioMax);
 
-  if (potential >= mealPriceCents) return items;
+  let next = items;
+  let potential = dayPotentialCents(next, cashCents, bottles);
 
-  return items.map((item) =>
-    item.type === "bin"
-      ? { ...item, yieldBottles: BIN_YIELD_MAX, hazardChance: 0.05 }
-      : item,
-  );
+  let guard = 0;
+  while (potential < minNeed && guard < 24) {
+    const shortfallBottles = Math.ceil((minNeed - potential) / BOTTLE_VALUE_CENTS);
+    next = boostSafeBinYields(next, shortfallBottles);
+    const after = dayPotentialCents(next, cashCents, bottles);
+    if (after <= potential) break;
+    potential = after;
+    guard += 1;
+  }
+
+  potential = dayPotentialCents(next, cashCents, bottles);
+  if (potential > maxNeed) {
+    const excessBottles = Math.floor(
+      (potential - maxNeed) / BOTTLE_VALUE_CENTS,
+    );
+    if (excessBottles > 0) {
+      const loose = next.filter((i) => i.type === "loose-bottle").length;
+      const dropLoose = Math.min(
+        Math.floor(excessBottles / 2),
+        Math.max(0, loose - 3),
+      );
+      next = dropLooseBottles(next, dropLoose);
+      const stillExcess = Math.floor(
+        (dayPotentialCents(next, cashCents, bottles) - maxNeed) /
+          BOTTLE_VALUE_CENTS,
+      );
+      if (stillExcess > 0) {
+        next = trimSafeBinYields(next, stillExcess);
+      }
+    }
+  }
+
+  // Final hard guarantee: never leave the day impossible.
+  potential = dayPotentialCents(next, cashCents, bottles);
+  if (potential < mealPriceCents) {
+    next = boostSafeBinYields(
+      next,
+      Math.ceil((mealPriceCents - potential) / BOTTLE_VALUE_CENTS),
+    );
+  }
+
+  return next;
 }

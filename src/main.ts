@@ -14,12 +14,12 @@ if (app === null) {
 app.innerHTML = `
   <div id="frame">
     <div id="hud">
-      <div class="hud-row">
+      <div class="hud-row hud-row-primary">
         <span id="hud-day">Day 1 / 7</span>
-        <span id="hud-phase">Ready</span>
         <span id="hud-timer">—</span>
       </div>
       <div class="hud-row">
+        <span id="hud-phase">Ready</span>
         <span id="hud-hearts">♥♥♥</span>
         <span id="hud-bottles">🍾 0</span>
         <span id="hud-cash">€0.00</span>
