@@ -197,30 +197,6 @@
         line-height: 1;
       }
 
-      .demo-box p {
-        color: var(--muted);
-        font-size: 1rem;
-        max-width: 16ch;
-      }
-
-      .demo-link {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-        margin-top: 0.25rem;
-        padding: 0.65rem 1.1rem;
-        border-radius: 999px;
-        background: var(--accent);
-        color: #1a1f18;
-        font-weight: 600;
-        text-decoration: none;
-        font-size: 0.95rem;
-      }
-
-      .demo-link:hover {
-        filter: brightness(1.05);
-      }
-
       .team-grid {
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -664,9 +640,6 @@
         <h2>The demo</h2>
         <div class="demo-box">
           <div class="big">DEMO</div>
-          <p>Placeholder — drop the live build here when it’s ready.</p>
-          <!-- Replace href when you have a deployed URL -->
-          <a class="demo-link" href="#" id="demo-link">Play placeholder →</a>
         </div>
       </section>
 
@@ -885,9 +858,6 @@
         if (e.target.closest("a, button, .nav")) return;
         show(index + 1);
       });
-
-      // Optional: set your live demo URL
-      // document.getElementById("demo-link").href = "https://your-demo-url";
     </script>
   </body>
 </html>
