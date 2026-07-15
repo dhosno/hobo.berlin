@@ -1,0 +1,197 @@
+:root {
+  --bg: #12160f;
+  --frame: #1a2118;
+  --ink: #f3f0e6;
+  --muted: #9aa88c;
+  --accent: #f0d33c;
+  --bottle: #6ecf7a;
+  --danger: #ff6b4a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Segoe UI", system-ui, sans-serif;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+}
+
+#app {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+    env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#frame {
+  position: relative;
+  width: min(100vw, calc(100vh * 9 / 16));
+  height: min(100vh, calc(100vw * 16 / 9));
+  background: var(--frame);
+  overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(243, 240, 230, 0.08);
+}
+
+#game-root {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+#game-root,
+#game-root canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: none;
+}
+
+#hud {
+  position: absolute;
+  inset: 0 0 auto 0;
+  z-index: 5;
+  padding: 0.55rem 0.7rem;
+  background: linear-gradient(to bottom, rgba(18, 22, 15, 0.88), transparent);
+  pointer-events: none;
+  font-size: 0.78rem;
+}
+
+.hud-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem 0.85rem;
+  margin-bottom: 0.25rem;
+}
+
+#hud-toast {
+  min-height: 1.1rem;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+#overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: grid;
+  place-items: center;
+  background: rgba(12, 16, 10, 0.82);
+  padding: 1rem;
+}
+
+#overlay.hidden {
+  display: none;
+}
+
+#overlay-card {
+  width: min(100%, 22rem);
+  background: #243022;
+  border: 1px solid rgba(243, 240, 230, 0.12);
+  border-radius: 16px;
+  padding: 1.15rem 1.2rem 1.25rem;
+}
+
+#overlay-card h1 {
+  margin: 0 0 0.75rem;
+  font-size: 1.45rem;
+  letter-spacing: -0.03em;
+}
+
+#overlay-card h1::after {
+  content: "";
+}
+
+#overlay-body {
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.4;
+  margin-bottom: 1rem;
+  max-height: 50vh;
+  overflow: auto;
+}
+
+#overlay-body ol {
+  margin: 0;
+  padding-left: 1.15rem;
+}
+
+#overlay-body li {
+  margin-bottom: 0.35rem;
+}
+
+#overlay-btn {
+  width: 100%;
+  border: none;
+  border-radius: 999px;
+  padding: 0.75rem 1rem;
+  background: var(--accent);
+  color: #1a1f18;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+#touch {
+  position: absolute;
+  inset: auto 0 0 0;
+  z-index: 6;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 0.75rem 0.9rem calc(0.75rem + env(safe-area-inset-bottom));
+  pointer-events: none;
+}
+
+#dpad,
+#action-btn {
+  pointer-events: auto;
+  opacity: 0.22;
+  transition: opacity 0.12s ease;
+}
+
+#dpad:active,
+#dpad:focus-within,
+#action-btn:active,
+#action-btn.pressed {
+  opacity: 0.7;
+}
+
+#dpad {
+  display: grid;
+  gap: 0.25rem;
+  justify-items: center;
+}
+
+#dpad .mid {
+  display: flex;
+  gap: 1.6rem;
+}
+
+#dpad button,
+#action-btn {
+  width: 48px;
+  height: 48px;
+  border: 1px solid rgba(243, 240, 230, 0.25);
+  border-radius: 12px;
+  background: rgba(36, 48, 34, 0.85);
+  color: var(--ink);
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+#action-btn {
+  width: 64px;
+  height: 64px;
+  border-radius: 999px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}

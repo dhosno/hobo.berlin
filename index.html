@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+    <title>hobo.berlin</title>
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <div id="frame">
+        <div id="hud">
+          <div class="hud-row">
+            <span id="hud-day">Day 1 / 7</span>
+            <span id="hud-phase">Ready</span>
+            <span id="hud-timer">—</span>
+          </div>
+          <div class="hud-row">
+            <span id="hud-hearts">♥♥♥</span>
+            <span id="hud-bottles">🍾 0</span>
+            <span id="hud-cash">€0.00</span>
+            <span id="hud-meal">Döner €—</span>
+            <span id="hud-fed">Hungry</span>
+          </div>
+          <div id="hud-toast"></div>
+        </div>
+        <div id="game-root"></div>
+        <div id="overlay" class="hidden">
+          <div id="overlay-card">
+            <h1 id="overlay-title">hobo.berlin</h1>
+            <div id="overlay-body"></div>
+            <button id="overlay-btn" type="button">Start game</button>
+          </div>
+        </div>
+        <div id="touch">
+          <div id="dpad">
+            <button type="button" data-dir="up">▲</button>
+            <div class="mid">
+              <button type="button" data-dir="left">◀</button>
+              <button type="button" data-dir="right">▶</button>
+            </div>
+            <button type="button" data-dir="down">▼</button>
+          </div>
+          <button id="action-btn" type="button">ACT</button>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
