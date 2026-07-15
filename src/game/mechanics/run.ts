@@ -469,6 +469,14 @@ export function resolveDay(state: GameState): GameState {
   return { ...next, phase: "day-resolution" };
 }
 
+/** End the day early once the player has eaten (same rules as timer expiry). */
+export function endDayEarly(state: GameState): GameState {
+  if (state.phase !== "playing") return state;
+  if (!state.fedToday) return state;
+  if (state.venue.kind !== "none") return state;
+  return resolveDay({ ...state, timeRemainingMs: 0 });
+}
+
 export function continueToNextDay(state: GameState): GameState {
   if (state.phase !== "day-resolution") return state;
   const prepared = prepareDay(state, state.day + 1);

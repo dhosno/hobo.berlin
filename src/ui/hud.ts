@@ -51,6 +51,8 @@ const els = {
     document.getElementById("speech-portrait-img") as HTMLImageElement | null,
   speechName: () => document.getElementById("speech-name"),
   speechText: () => document.getElementById("speech-text"),
+  endDayBtn: () =>
+    document.getElementById("end-day-btn") as HTMLButtonElement | null,
   queue: () => document.getElementById("queue-bar"),
   queueFill: () => document.getElementById("queue-fill"),
   queueLabel: () => document.getElementById("queue-label"),
@@ -305,6 +307,15 @@ export function renderHud(state: GameState): void {
   setText(els.meal(), `${MEAL_VENDOR_NAME} ${formatCash(state.mealPriceCents)}`);
   setText(els.fed(), state.fedToday ? "Fed" : "Hungry");
 
+  const endDayBtn = els.endDayBtn();
+  if (endDayBtn) {
+    const canEndEarly =
+      state.phase === "playing" &&
+      state.fedToday &&
+      state.venue.kind === "none";
+    endDayBtn.classList.toggle("hidden", !canEndEarly);
+  }
+
   const pickup = latestPickupToast(state);
   const topToast =
     pickup && state.toast === pickup
@@ -404,6 +415,7 @@ export function syncOverlay(
         <li>REWE queues take time while the day timer keeps running.</li>
         <li>Spend the cash at ${MEAL_VENDOR_NAME} and wait for the food.</li>
         <li>Eat before time runs out or lose one heart.</li>
+        <li>Once fed, tap <strong>End day</strong> to start the next night early.</li>
       </ol>
     `;
     btn.textContent = "Start game";

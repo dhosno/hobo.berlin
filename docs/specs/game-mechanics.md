@@ -227,13 +227,14 @@ Price generation supports future per-location ranges, but only one location is r
 - Use elapsed wall-clock time rather than frame counts.
 - The visible timer never displays a negative value.
 - When it reaches zero, stop movement, cancel any incomplete venue transaction, and resolve the day exactly once.
+- While `fedToday` is true and the player is not in a venue wait, they may end the day early; resolution matches timer expiry, then the next night/dawn cycle begins immediately.
 
 ### Day resolution
 
 - If `fedToday` is false, remove two health units, equal to one full heart.
 - If health reaches zero, enter `lost` immediately.
 - If day seven resolves with health remaining, enter `won`.
-- Otherwise show a day summary and an explicit **Start day N** action.
+- Otherwise show a day summary and an explicit **Start day N** action (skipped when the player ended the day early after eating).
 - The next day keeps `healthUnits`, `cashCents`, and unredeemed bottles.
 - The next day resets `fedToday`, the timer, bins, loose bottles, per-bin risk/yield data, venue waits, and the Döner price.
 

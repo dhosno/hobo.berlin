@@ -10,6 +10,7 @@ import { dayBalance } from "../../src/game/mechanics/day-balance";
 import {
   bottlesNeededForMeal,
   createInitialState,
+  endDayEarly,
   formatCash,
   resolveDay,
   tickPlaying,
@@ -108,6 +109,37 @@ describe("mechanics run", () => {
     const resolved = resolveDay(state);
     expect(resolved.player.healthUnits).toBe(4);
     expect(resolved.phase).toBe("day-resolution");
+  });
+
+  it("ends the day early only when fed and idle", () => {
+    const map = parseTiledMap(miniMap);
+    let state = createInitialState(map, "test-seed");
+    state = {
+      ...state,
+      phase: "playing",
+      fedToday: false,
+      timeRemainingMs: DAY_DURATION_MS,
+    };
+    expect(endDayEarly(state).phase).toBe("playing");
+
+    state = { ...state, fedToday: true };
+    const ended = endDayEarly(state);
+    expect(ended.phase).toBe("day-resolution");
+    expect(ended.lastEvents.at(-1)).toBe("day-survived");
+    expect(ended.timeRemainingMs).toBe(0);
+
+    state = {
+      ...state,
+      venue: {
+        kind: "rewe-wait",
+        remainingMs: 2000,
+        totalMs: 2000,
+        bottlesBefore: 8,
+        cashBefore: 0,
+        fedBefore: true,
+      },
+    };
+    expect(endDayEarly(state).phase).toBe("playing");
   });
 
   it("freezes the day timer when requested", () => {

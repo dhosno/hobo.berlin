@@ -48,6 +48,7 @@ app.innerHTML = `
       </div>
     </div>
     <div id="bottom-toast" class="hidden" aria-live="polite"></div>
+    <button id="end-day-btn" class="hidden" type="button">End day</button>
     <div id="speech-bubble" class="hidden" aria-live="polite">
       <div class="speech-portrait" aria-hidden="true">
         <img id="speech-portrait-img" alt="" width="72" height="72" decoding="async" />
@@ -96,6 +97,11 @@ function handleOverlay(action: OverlayAction): void {
 }
 
 function bindTouch(): void {
+  const endDayBtn = document.getElementById("end-day-btn");
+  endDayBtn?.addEventListener("click", () => {
+    controller?.endDayEarly();
+  });
+
   const actionBtn = document.getElementById("action-btn");
   actionBtn?.addEventListener("pointerdown", (e) => {
     e.preventDefault();
