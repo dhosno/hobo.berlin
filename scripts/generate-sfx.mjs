@@ -175,6 +175,12 @@ const sounds = {
     { at: 0.20, duration: 0.24, frequency: 261.63 },
     { at: 0.40, duration: 0.34, frequency: 196 }
   ], { type: 'triangle', volume: 0.30, release: 0.15, vibrato: 0.004 })),
+  'heart-lost-funny.wav': mix(0.82, [
+    { at: 0, samples: oscillator({ duration: 0.10, frequency: 105, endFrequency: 82, type: 'triangle', volume: 0.34, release: 0.07 }) },
+    { at: 0.13, samples: oscillator({ duration: 0.13, frequency: 92, endFrequency: 70, type: 'triangle', volume: 0.38, release: 0.09 }) },
+    { at: 0.27, samples: noise({ duration: 0.055, volume: 0.26, release: 0.04, seed: 241, crunch: 3 }) },
+    { at: 0.31, samples: oscillator({ duration: 0.46, frequency: 720, endFrequency: 128, type: 'square', volume: 0.25, release: 0.17, vibrato: 0.035 }) }
+  ]),
   'ui-start.wav': mix(0.24, notes([
     { at: 0, duration: 0.08, frequency: 440 },
     { at: 0.07, duration: 0.14, frequency: 880 }
@@ -267,6 +273,13 @@ Object.assign(sounds, {
       { at: 0.38, duration: 0.40, frequency: 164.81 }
     ], { type: 'square', volume: 0.22, release: 0.18, vibrato: 0.006 }),
     { at: 0.55, samples: noise({ duration: 0.16, volume: 0.07, release: 0.13, seed: 210, crunch: 16 }) }
+  ]),
+  'heart-lost-drunk-alt.wav': mix(1.02, [
+    { at: 0, samples: oscillator({ duration: 0.19, frequency: 118, endFrequency: 91, type: 'triangle', volume: 0.33, release: 0.11, vibrato: 0.025 }) },
+    { at: 0.23, samples: oscillator({ duration: 0.15, frequency: 101, endFrequency: 76, type: 'triangle', volume: 0.36, release: 0.10, vibrato: 0.04 }) },
+    { at: 0.40, samples: noise({ duration: 0.07, volume: 0.22, release: 0.05, seed: 242, crunch: 4 }) },
+    { at: 0.46, samples: oscillator({ duration: 0.50, frequency: 370, endFrequency: 116, type: 'saw', volume: 0.21, release: 0.22, vibrato: 0.065 }) },
+    { at: 0.69, samples: oscillator({ duration: 0.18, frequency: 540, endFrequency: 310, type: 'triangle', volume: 0.14, release: 0.11, vibrato: 0.08 }) }
   ]),
   'ui-start-alt.wav': mix(0.28, [
     { at: 0, samples: oscillator({ duration: 0.11, frequency: 523.25, type: 'triangle', volume: 0.34, release: 0.04 }) },

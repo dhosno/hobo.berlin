@@ -23,7 +23,7 @@ test('SFX files are organized into base, alt, and modern folders', async () => {
   const rootEntries = await readdir(sfxDirectory, { withFileTypes: true });
   assert.equal(rootEntries.filter((entry) => entry.isFile() && entry.name.endsWith('.wav')).length, 0);
 
-  const expectedCounts = { base: 14, alt: 12, modern: 13 };
+  const expectedCounts = { base: 15, alt: 13, modern: 14 };
   for (const [folder, expected] of Object.entries(expectedCounts)) {
     const files = (await readdir(new URL(`${folder}/`, sfxDirectory))).filter((file) => file.endsWith('.wav'));
     assert.equal(files.length, expected, `${folder} WAV count`);
@@ -32,10 +32,11 @@ test('SFX files are organized into base, alt, and modern folders', async () => {
   const manifest = JSON.parse(await readFile(projectFile('public/assets/audio/manifest.json'), 'utf8'));
   for (const entry of Object.values(manifest.events)) {
     entry.files.forEach((path, index) => {
-      const expectedFolder = entry.variantStyles[index] === 'modern-16bit'
-        ? '/modern/'
-        : path.endsWith('-alt.wav') ? '/alt/' : '/base/';
-      assert.ok(path.includes(expectedFolder), `${path} must live in ${expectedFolder}`);
+      if (index === 2) {
+        assert.ok(path.includes('/modern/'), `${path} must live in /modern/`);
+      } else {
+        assert.match(path, /\/sfx\/(base|alt)\//, `${path} must live in /base/ or /alt/`);
+      }
     });
   }
 });
@@ -61,7 +62,7 @@ test('four CC0 ambience alternatives are valid Ogg loops', async () => {
 test('generated SFX are unsigned 8-bit mono PCM at 22.05 kHz', async () => {
   const manifest = JSON.parse(await readFile(projectFile('public/assets/audio/manifest.json'), 'utf8'));
   const wavPaths = Object.values(manifest.events).flatMap((entry) => (
-    entry.files.filter((_, index) => entry.variantStyles[index] === 'retro-8bit')
+    entry.files.filter((path) => !path.includes('/modern/'))
   ));
 
   for (const path of wavPaths) {
@@ -78,13 +79,9 @@ test('generated SFX are unsigned 8-bit mono PCM at 22.05 kHz', async () => {
 
 test('every event has a modern signed 16-bit mono WAV at 44.1 kHz', async () => {
   const manifest = JSON.parse(await readFile(projectFile('public/assets/audio/manifest.json'), 'utf8'));
-  const modernPaths = Object.values(manifest.events).map((entry) => {
-    const index = entry.variantStyles.indexOf('modern-16bit');
-    assert.notEqual(index, -1);
-    return entry.files[index];
-  });
-  assert.equal(modernPaths.length, 13);
-  assert.equal(new Set(modernPaths).size, 13);
+  const modernPaths = Object.values(manifest.events).map((entry) => entry.files[2]);
+  assert.equal(modernPaths.length, 14);
+  assert.equal(new Set(modernPaths).size, 14);
 
   for (const path of modernPaths) {
     const data = await readFile(projectFile(`public${path}`));
@@ -97,10 +94,12 @@ test('every event has a modern signed 16-bit mono WAV at 44.1 kHz', async () => 
   }
 });
 
-test('intro and outro are original signed 16-bit mono music WAVs at 44.1 kHz', async () => {
+test('intro, win, and lose themes are original signed 16-bit mono WAVs at 44.1 kHz', async () => {
   const manifest = JSON.parse(await readFile(projectFile('public/assets/audio/manifest.json'), 'utf8'));
   assert.deepEqual(Object.keys(manifest.music).sort(), [
-    'intro-pfand-und-circumstance', 'outro-formular-finale'
+    'intro-pfand-und-circumstance',
+    'lose-wartenummer-requiem',
+    'win-benefits-approved-overture'
   ]);
   for (const [trackId, entry] of Object.entries(manifest.music)) {
     const data = await readFile(projectFile(`public${entry.file}`));
@@ -112,6 +111,10 @@ test('intro and outro are original signed 16-bit mono music WAVs at 44.1 kHz', a
     assert.equal(data.readUInt16LE(34), 16, `${trackId} bit depth`);
     assert.equal(entry.loop, false);
     assert.equal(entry.license, 'Original project asset');
+    if (entry.screen === 'won' || entry.screen === 'lost') {
+      const durationSeconds = (data.length - 44) / (44100 * 2);
+      assert.ok(durationSeconds >= 10, `${trackId} must run for at least ten seconds`);
+    }
   }
 });
 
@@ -119,7 +122,7 @@ test('manifest covers the complete MVP event contract and stays hackathon-small'
   const manifest = JSON.parse(await readFile(projectFile('public/assets/audio/manifest.json'), 'utf8'));
   const requiredEvents = [
     'loose-bottle-collected', 'bin-bottles', 'bin-burn', 'bottles-redeemed',
-    'food-bought', 'food-denied', 'day-failed', 'day-survived', 'won', 'lost',
+    'food-bought', 'food-denied', 'day-failed', 'day-survived', 'won', 'lost', 'heart-lost',
     'ui-start', 'step', 'day-night-sting'
   ];
   assert.deepEqual(Object.keys(manifest.events).sort(), requiredEvents.sort());
@@ -128,7 +131,10 @@ test('manifest covers the complete MVP event contract and stays hackathon-small'
   for (const [eventId, entry] of Object.entries(manifest.events)) {
     assert.equal(entry.files?.length, 3, `${eventId} must have three rotating WAV variants`);
     assert.equal(new Set(entry.files).size, 3, `${eventId} variants must be unique`);
-    assert.deepEqual(entry.variantStyles, ['retro-8bit', 'retro-8bit', 'modern-16bit']);
+    const expectedStyles = eventId === 'heart-lost'
+      ? ['funny', 'drunk', 'dark']
+      : ['retro-8bit', 'retro-8bit', 'modern-16bit'];
+    assert.deepEqual(entry.variantStyles, expectedStyles);
   }
 
   const sfxPaths = Object.values(manifest.events).flatMap((entry) => entry.files || [entry.file]);
@@ -143,7 +149,7 @@ test('manifest covers the complete MVP event contract and stays hackathon-small'
   )).reduce((sum, data) => sum + data.length, 0);
 
   assert.ok(sfxBytes < 1_400_000, `SFX pack is unexpectedly large: ${sfxBytes} bytes`);
-  assert.ok(sfxBytes + ambienceBytes + musicBytes < 4_000_000, 'all audio must remain under 4 MB');
+  assert.ok(sfxBytes + ambienceBytes + musicBytes < 5_500_000, 'all audio must remain under 5.5 MB');
 });
 
 test('license ledger records the shipped ambience and non-shipped reference pack', async () => {

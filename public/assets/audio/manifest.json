@@ -113,6 +113,17 @@
       "intent": "soft game-over descent",
       "priority": "high"
     },
+    "heart-lost": {
+      "files": [
+        "/assets/audio/sfx/base/heart-lost-funny.wav",
+        "/assets/audio/sfx/alt/heart-lost-drunk-alt.wav",
+        "/assets/audio/sfx/modern/heart-lost-dark-modern.wav"
+      ],
+      "variantStyles": ["funny", "drunk", "dark"],
+      "intent": "single-heart break with cartoon, wobbly, and cinematic personalities",
+      "priority": "high",
+      "volume": 0.68
+    },
     "ui-start": {
       "files": [
         "/assets/audio/sfx/base/ui-start.wav",
