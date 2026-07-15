@@ -454,6 +454,64 @@
         font-weight: 400;
       }
 
+      .codex-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.65rem;
+        width: min(100%, 44rem);
+        text-align: left;
+      }
+
+      .codex-card {
+        background: rgba(44, 52, 40, 0.75);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 0.85rem 1rem;
+      }
+
+      .codex-card h3 {
+        color: var(--accent);
+        font-family: "Bricolage Grotesque", sans-serif;
+        font-size: 1rem;
+        margin-bottom: 0.3rem;
+      }
+
+      .codex-card p {
+        color: var(--muted);
+        font-size: 0.86rem;
+        line-height: 1.4;
+      }
+
+      .codex-tools {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.55rem;
+        width: min(100%, 44rem);
+        margin-top: 1rem;
+      }
+
+      .codex-tools a {
+        color: var(--bottle);
+        background: rgba(110, 207, 122, 0.1);
+        border: 1px solid rgba(110, 207, 122, 0.35);
+        border-radius: 999px;
+        padding: 0.45rem 0.8rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-decoration: none;
+      }
+
+      .codex-tools a:hover {
+        background: rgba(110, 207, 122, 0.18);
+      }
+
+      @media (max-width: 640px) {
+        .codex-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
       .loop {
         display: flex;
         flex-wrap: wrap;
@@ -688,8 +746,69 @@
         </div>
       </section>
 
-      <!-- 6. Team -->
-      <section class="slide" data-slide="5">
+      <!-- 6. Codex workflow -->
+      <section class="slide slide-wide" data-slide="5">
+        <p class="eyebrow">Our AI co-pilot</p>
+        <h2>How we used Codex</h2>
+        <p class="slide-sub">
+          From a messy idea to a playable Berlin survival loop — one shared
+          workflow for thinking, building, and checking the work.
+        </p>
+        <div class="codex-grid">
+          <article class="codex-card">
+            <h3>Planning</h3>
+            <p>
+              Turned brainstorm transcripts into product docs, technical specs,
+              milestones, and parallel workstreams before coding began.
+            </p>
+          </article>
+          <article class="codex-card">
+            <h3>Brainstorming</h3>
+            <p>
+              Challenged the premise, narrowed the core loop, explored Berlin
+              jokes, and cut ideas that would not fit the hackathon.
+            </p>
+          </article>
+          <article class="codex-card">
+            <h3>Coding</h3>
+            <p>
+              Implemented Phaser mechanics, movement, HUD, economy, and polish
+              across coordinated tasks while keeping shared invariants intact.
+            </p>
+          </article>
+          <article class="codex-card">
+            <h3>Images &amp; GIFs</h3>
+            <p>
+              Generated and iterated pixel-art portraits, game visuals, and
+              GIF-ready animation assets that match the hobo.berlin style.
+            </p>
+          </article>
+          <article class="codex-card">
+            <h3>Grill with Docs</h3>
+            <p>
+              Interrogated plans and specs for missing decisions, vague rules,
+              hidden assumptions, and risks before they became code.
+            </p>
+          </article>
+          <article class="codex-card">
+            <h3>Verification</h3>
+            <p>
+              Used tests, browser flows, and final checks to prove each feature
+              worked before calling it done.
+            </p>
+          </article>
+        </div>
+        <div class="codex-tools" aria-label="Codex skills and plugins">
+          <a href="https://github.com/mattpocock/skills/blob/main/skills/engineering/grill-with-docs/SKILL.md">grill-with-docs ↗</a>
+          <a href="https://github.com/obra/superpowers">Superpowers plugin ↗</a>
+          <a href="https://github.com/obra/superpowers">brainstorming</a>
+          <a href="https://github.com/obra/superpowers">subagent-driven-development</a>
+          <a href="https://github.com/obra/superpowers">verification-before-completion</a>
+        </div>
+      </section>
+
+      <!-- 7. Team -->
+      <section class="slide" data-slide="6">
         <p class="eyebrow">The humans still employed</p>
         <h2>Team</h2>
         <div class="team-grid">
