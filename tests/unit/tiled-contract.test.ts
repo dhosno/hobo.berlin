@@ -13,20 +13,20 @@ function validMap(): unknown {
   return {
     orientation: "orthogonal",
     infinite: false,
-    width: 24,
-    height: 16,
-    tilewidth: 32,
-    tileheight: 32,
+    width: 18,
+    height: 28,
+    tilewidth: 28,
+    tileheight: 28,
     layers: [
       {
         type: "objectgroup",
         name: "Spawn",
-        objects: [{ id: 1, name: "player", point: true, x: 64, y: 64 }],
+        objects: [{ id: 1, name: "player", point: true, x: 56, y: 56 }],
       },
       {
         type: "objectgroup",
         name: "Collision",
-        objects: [{ id: 2, x: 160, y: 64, width: 32, height: 32 }],
+        objects: [{ id: 2, x: 140, y: 56, width: 28, height: 28 }],
       },
     ],
   };
@@ -51,15 +51,16 @@ describe("parseTiledMap", () => {
   it("parses a valid map", () => {
     const result = parseTiledMap(validMap());
 
-    expect(result.bounds).toEqual({ columns: 24, rows: 16 });
+    expect(result.bounds).toEqual({ columns: 18, rows: 28 });
     expect(result.spawn).toEqual({ column: 2, row: 2 });
     expect(result.blockedCells).toEqual(new Set([blockedCellKey({ column: 5, row: 2 })]));
+    expect(result.interactables).toEqual([]);
   });
 
   it("expands a multi-cell Collision rectangle", () => {
     const map = validMap() as { layers: Array<{ name: string; objects: unknown[] }> };
     map.layers.find((layer) => layer.name === "Collision")!.objects = [
-      { id: 2, x: 160, y: 64, width: 64, height: 64 },
+      { id: 2, x: 140, y: 56, width: 56, height: 56 },
     ];
 
     expect(parseTiledMap(map).blockedCells).toEqual(new Set(["5,2", "6,2", "5,3", "6,3"]));
@@ -110,8 +111,8 @@ describe("parseTiledMap", () => {
 
   it.each([
     ["non-point", { point: false }],
-    ["misaligned", { x: 65 }],
-    ["outside the map", { x: 768 }],
+    ["misaligned", { x: 57 }],
+    ["outside the map", { x: 504 }],
   ])("rejects a %s player", (_description, changes) => {
     const map = validMap();
     Object.assign(playerObject(map), changes);
@@ -155,7 +156,7 @@ describe("parseTiledMap", () => {
 
   it("rejects a spawn on a blocker", () => {
     const map = validMap();
-    Object.assign(playerObject(map), { x: 160, y: 64 });
+    Object.assign(playerObject(map), { x: 140, y: 56 });
 
     expect(() => parseTiledMap(map)).toThrow(/spawn/i);
   });
@@ -163,8 +164,8 @@ describe("parseTiledMap", () => {
   it.each([
     ["orientation", { orientation: "isometric" }],
     ["finite geometry", { infinite: true }],
-    ["dimensions", { width: 23 }],
-    ["dimensions", { height: 15 }],
+    ["dimensions", { width: 17 }],
+    ["dimensions", { height: 27 }],
     ["tile size", { tilewidth: 16 }],
     ["tile size", { tileheight: 16 }],
   ])("rejects unsupported map geometry: %s", (contract, changes) => {
@@ -184,14 +185,14 @@ describe("parseTiledMap", () => {
     ["hidden object", { visible: false }],
     ["zero width", { width: 0 }],
     ["zero height", { height: 0 }],
-    ["misaligned x", { x: 161 }],
-    ["misaligned y", { y: 65 }],
-    ["misaligned width", { width: 33 }],
-    ["misaligned height", { height: 33 }],
-    ["out-of-map x", { x: 768 }],
-    ["out-of-map y", { y: 512 }],
-    ["out-of-map width", { x: 736, width: 64 }],
-    ["out-of-map height", { y: 480, height: 64 }],
+    ["misaligned x", { x: 141 }],
+    ["misaligned y", { y: 57 }],
+    ["misaligned width", { width: 29 }],
+    ["misaligned height", { height: 29 }],
+    ["out-of-map x", { x: 504 }],
+    ["out-of-map y", { y: 784 }],
+    ["out-of-map width", { x: 476, width: 56 }],
+    ["out-of-map height", { y: 756, height: 56 }],
   ])("rejects invalid Collision object %s and names its ID", (_description, changes) => {
     const map = validMap();
     Object.assign(collisionObject(map), changes);

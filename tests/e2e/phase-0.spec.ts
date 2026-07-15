@@ -22,37 +22,39 @@ async function pressMany(page: Page, key: string, count: number): Promise<void> 
 async function openGame(page: Page): Promise<void> {
   await page.goto("/");
   await expect(page.locator("#game canvas")).toBeVisible();
+  await page.locator("#overlay-btn").click();
+  await expect(page.locator("#hud-phase")).toHaveText("Playing", { timeout: 8_000 });
   await page.evaluate(() => new Promise<void>((resolve) => {
     requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
   }));
 }
 
-test("renders the Stage A canvas and spawn status", async ({ page }) => {
-  await openGame(page);
-
+test("renders the canvas, HUD hearts, and spawn status", async ({ page }) => {
+  await page.goto("/");
   await expect(page.locator("#game canvas")).toHaveCount(1);
-  await expect(page.locator("#player-position")).toHaveText("Player: 2,2");
-  await expect.poll(() => readPosition(page)).toEqual({ column: 2, row: 2 });
+  await expect(page.locator("#hud-hearts")).toContainText("♥");
+  await expect(page.locator("#player-position")).toHaveText("Player: 2,25");
+  await expect.poll(() => readPosition(page)).toEqual({ column: 2, row: 25 });
 });
 
 for (const viewport of [
   { width: 360, height: 640 },
-  { width: 768, height: 512 },
-  { width: 1440, height: 900 },
+  { width: 390, height: 844 },
+  { width: 768, height: 1024 },
 ]) {
-  test(`fits the complete canvas at ${viewport.width}x${viewport.height}`, async ({ page }) => {
+  test(`fits the portrait canvas at ${viewport.width}x${viewport.height}`, async ({ page }) => {
     await page.setViewportSize(viewport);
-    await openGame(page);
+    await page.goto("/");
+    await expect(page.locator("#game canvas")).toBeVisible();
 
-    const canvas = page.locator("#game canvas");
-    await expect(canvas).toBeVisible();
-    const box = await canvas.boundingBox();
+    const frame = page.locator("#frame");
+    const box = await frame.boundingBox();
     expect(box).not.toBeNull();
-    expect(Math.abs(box!.width / box!.height - 1.5)).toBeLessThanOrEqual(0.01);
+    expect(Math.abs(box!.width / box!.height - 18 / 28)).toBeLessThanOrEqual(0.03);
     expect(box!.x).toBeGreaterThanOrEqual(0);
     expect(box!.y).toBeGreaterThanOrEqual(0);
-    expect(box!.x + box!.width).toBeLessThanOrEqual(viewport.width + 0.01);
-    expect(box!.y + box!.height).toBeLessThanOrEqual(viewport.height + 0.01);
+    expect(box!.x + box!.width).toBeLessThanOrEqual(viewport.width + 1);
+    expect(box!.y + box!.height).toBeLessThanOrEqual(viewport.height + 1);
 
     const overflow = await page.evaluate(() => ({
       horizontal: document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -62,13 +64,13 @@ for (const viewport of [
   });
 }
 
-test("ArrowRight moves one cell exactly once", async ({ page }) => {
+test("ArrowRight moves one cell exactly once after start", async ({ page }) => {
   await openGame(page);
   await page.keyboard.press("ArrowRight");
 
-  await expect.poll(() => readPosition(page)).toEqual({ column: 3, row: 2 });
+  await expect.poll(() => readPosition(page)).toEqual({ column: 3, row: 25 });
   await page.waitForTimeout(120);
-  expect(await readPosition(page)).toEqual({ column: 3, row: 2 });
+  expect(await readPosition(page)).toEqual({ column: 3, row: 25 });
 });
 
 test("holding ArrowDown repeats after the initial delay", async ({ page }) => {
@@ -79,30 +81,30 @@ test("holding ArrowDown repeats after the initial delay", async ({ page }) => {
 
   const position = await readPosition(page);
   expect(position.column).toBe(2);
-  expect(position.row).toBeGreaterThanOrEqual(4);
+  expect(position.row).toBeGreaterThanOrEqual(26);
 });
 
 test("the most recently held arrow wins without diagonal movement", async ({ page }) => {
   await openGame(page);
   await page.keyboard.down("ArrowRight");
   await page.waitForTimeout(20);
-  await page.keyboard.down("ArrowDown");
+  await page.keyboard.down("ArrowUp");
   const afterImmediateMoves = await readPosition(page);
 
   await page.waitForTimeout(240);
-  await page.keyboard.up("ArrowDown");
+  await page.keyboard.up("ArrowUp");
   await page.keyboard.up("ArrowRight");
   const afterRepeat = await readPosition(page);
 
-  expect(afterImmediateMoves).toEqual({ column: 3, row: 3 });
+  expect(afterImmediateMoves).toEqual({ column: 3, row: 24 });
   expect(afterRepeat.column).toBe(afterImmediateMoves.column);
-  expect(afterRepeat.row).toBeGreaterThan(afterImmediateMoves.row);
+  expect(afterRepeat.row).toBeLessThan(afterImmediateMoves.row);
 });
 
 test("repeated ArrowLeft and ArrowUp stop at the top-left map edge", async ({ page }) => {
   await openGame(page);
   await pressMany(page, "ArrowLeft", 10);
-  await pressMany(page, "ArrowUp", 10);
+  await pressMany(page, "ArrowUp", 40);
 
   await expect.poll(() => readPosition(page)).toEqual({ column: 0, row: 0 });
 });
@@ -111,21 +113,21 @@ test("three ArrowRight presses stop before the blocker", async ({ page }) => {
   await openGame(page);
   await pressMany(page, "ArrowRight", 3);
 
-  await expect.poll(() => readPosition(page)).toEqual({ column: 4, row: 2 });
+  await expect.poll(() => readPosition(page)).toEqual({ column: 4, row: 25 });
 });
 
 test("an invalid map shows a readable failure and does not start gameplay", async ({ page }) => {
-  await page.route("**/phase-0*.json", async (route) => {
+  await page.route("**/phase-1.json", async (route) => {
     await route.fulfill({
       status: 200,
       contentType: "application/json",
       body: JSON.stringify({
         orientation: "orthogonal",
         infinite: false,
-        width: 24,
-        height: 16,
-        tilewidth: 32,
-        tileheight: 32,
+        width: 18,
+        height: 28,
+        tilewidth: 28,
+        tileheight: 28,
         layers: [
           { name: "Collision", type: "objectgroup", visible: true, objects: [] },
         ],

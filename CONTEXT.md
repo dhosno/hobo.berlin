@@ -2,7 +2,11 @@
 
 ## Phase 0
 
-The smallest playable project slice: a single responsive grid scene with orthogonal player movement, map bounds, blockers, and temporary visual placeholders.
+The smallest playable project slice: a single responsive grid scene with orthogonal player movement, map bounds, blockers, and temporary visual placeholders. Superseded as the default product slice by Phase 1, but its movement/Tiled contracts remain the foundation.
+
+## Phase 1
+
+Portrait survival loop on the Phase 0 engine: smaller tiles, HUD (hearts, bottles, cash, day/timer), mystery bins, REWE/Döner economy, and a seven-day win/lose run.
 
 ## Scene
 
