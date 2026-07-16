@@ -416,7 +416,7 @@ export function syncOverlay(
         <li>Collect enough bottles and redeem them at the supermarket for cash (≥${MINIMUM_BOTTLES_TO_REDEEM}).</li>
         <li>Supermarket queues take time while the day timer keeps running.</li>
         <li>Spend the cash at ${MEAL_VENDOR_NAME} and wait for the food.</li>
-        <li>Eat before time runs out or lose one heart.</li>
+        <li>Eating restores one heart — and if you miss a meal, you lose the run.</li>
         <li>Once fed, tap <strong>End day</strong> to start the next night early.</li>
       </ol>
     `;
@@ -438,7 +438,7 @@ export function syncOverlay(
     show(true);
     title.textContent = state.fedToday ? "Day survived" : "Hungry night";
     body.innerHTML = `
-      <p>${state.fedToday ? "You ate. Hearts stay." : "No food — lost a heart."}</p>
+      <p>${state.fedToday ? "You ate and restored a heart." : "No food — run over."}</p>
       <p>${formatCash(state.player.cashCents)} · ${state.player.bottles} bottles · ${formatHearts(state.player.healthUnits)}</p>
     `;
     btn.textContent = "Continue";

@@ -344,4 +344,70 @@ describe("mechanics run", () => {
     expect(lost.phase).toBe("lost");
     expect(lost.lastEvents.at(-1)).toBe("lost");
   });
+
+  it("restores one heart when a meal purchase completes", () => {
+    const map = parseTiledMap(miniMap);
+    let state = createInitialState(map, "meal-heal");
+    const mealPriceCents = 500;
+    state = {
+      ...state,
+      phase: "playing",
+      timeRemainingMs: DAY_DURATION_MS,
+      mealPriceCents,
+      player: {
+        ...state.player,
+        healthUnits: 3,
+        cashCents: mealPriceCents,
+        bottles: 0,
+      },
+      fedToday: false,
+      venue: {
+        kind: "food-wait",
+        remainingMs: 1,
+        totalMs: 1000,
+        bottlesBefore: 0,
+        cashBefore: mealPriceCents,
+        fedBefore: false,
+      },
+    } satisfies GameState;
+
+    const next = tickPlaying(state, 50);
+    expect(next.fedToday).toBe(true);
+    expect(next.player.healthUnits).toBe(5);
+    expect(next.player.cashCents).toBe(0);
+    expect(next.lastEvents.at(-1)).toBe("food-bought");
+    expect(next.toast).toContain("+1 ♥");
+  });
+
+  it("does not heal past max hearts when already full", () => {
+    const map = parseTiledMap(miniMap);
+    let state = createInitialState(map, "meal-full");
+    const mealPriceCents = 400;
+    state = {
+      ...state,
+      phase: "playing",
+      timeRemainingMs: DAY_DURATION_MS,
+      mealPriceCents,
+      player: {
+        ...state.player,
+        healthUnits: 6,
+        cashCents: mealPriceCents,
+        bottles: 0,
+      },
+      fedToday: false,
+      venue: {
+        kind: "food-wait",
+        remainingMs: 1,
+        totalMs: 1000,
+        bottlesBefore: 0,
+        cashBefore: mealPriceCents,
+        fedBefore: false,
+      },
+    } satisfies GameState;
+
+    const next = tickPlaying(state, 50);
+    expect(next.player.healthUnits).toBe(6);
+    expect(next.fedToday).toBe(true);
+    expect(next.toast).not.toContain("+1 ♥");
+  });
 });

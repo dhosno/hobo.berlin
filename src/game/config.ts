@@ -21,6 +21,8 @@ export const COUNTDOWN_SECONDS = 3;
 export const MAX_HEALTH_UNITS = 6;
 export const DAMAGE_MISSED_MEAL = 2;
 export const DAMAGE_BIN_HAZARD = 1;
+/** One full heart restored when a meal purchase completes. */
+export const HEAL_MEAL = 2;
 
 export const STARTING_CASH_CENTS = 0;
 export const BOTTLE_VALUE_CENTS = 25;
