@@ -18,9 +18,9 @@ import {
 } from "../../src/game/config";
 
 describe("Phase 1 layout constants", () => {
-  it("uses the vertical sketch grid (18×28 @ 28px)", () => {
-    expect([GRID_COLUMNS, GRID_ROWS, CELL_SIZE]).toEqual([18, 28, 28]);
-    expect([DESIGN_WIDTH, DESIGN_HEIGHT]).toEqual([504, 784]);
+  it("uses the vertical playable grid (18×26 @ 28px)", () => {
+    expect([GRID_COLUMNS, GRID_ROWS, CELL_SIZE]).toEqual([18, 26, 28]);
+    expect([DESIGN_WIDTH, DESIGN_HEIGHT]).toEqual([504, 728]);
     expect(DESIGN_HEIGHT).toBeGreaterThan(DESIGN_WIDTH);
   });
 
@@ -30,8 +30,8 @@ describe("Phase 1 layout constants", () => {
   });
 
   it("keeps economy defaults aligned with the mechanics spec", () => {
-    expect(DAYS_PER_RUN).toBe(1);
-    expect(MINIMUM_BOTTLES_TO_REDEEM).toBe(20);
+    expect(DAYS_PER_RUN).toBe(7);
+    expect(MINIMUM_BOTTLES_TO_REDEEM).toBe(15);
     expect([REWE_WAIT_MIN_MS, REWE_WAIT_MAX_MS]).toEqual([2_000, 12_000]);
     expect(MEAL_VENDOR_NAME).toBe("kebap with Attitude");
     expect([BIN_HAZARD_CHANCE_MIN, BIN_HAZARD_CHANCE_MAX]).toEqual([0.2, 0.35]);

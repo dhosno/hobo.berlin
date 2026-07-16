@@ -19,7 +19,8 @@ All balance values live in configuration. Randomness must be seedable, and mecha
 - One complete **run** contains seven **days**. “Round” and “day” refer to the same unit; the interface uses **Day** consistently.
 - A day lasts 60 seconds by default.
 - The daily objective is to buy food before the timer expires.
-- Missing food costs one heart. A bin burn costs half a heart.
+- Buying food restores one heart (capped at three). Missing food ends the run.
+- A bin burn costs half a heart.
 - Health reaching zero ends the run immediately.
 - Completing day seven with health remaining wins the run.
 - The player starts with three hearts, zero bottles, and configured starting cash.
@@ -56,7 +57,7 @@ On first load, show the game, but keep it inactive behind or beneath a first-scr
 7. Collect enough bottles and redeem them at REWE for cash.
 8. REWE queues take time while the day timer keeps running.
 9. Spend the cash at the Döner stand and wait for the food.
-10. Eat before time runs out or lose one heart.
+10. Eating restores one heart; miss a meal and the run ends.
 
 The panel ends with a prominent **Start game** button. Pressing it unlocks browser audio and begins the day-one start sequence; it does not jump directly into the live timer.
 
@@ -171,7 +172,7 @@ All money is stored as integer cents. The configured bottle value defaults to �
 
 - The HUD may show how many more bottles are needed to afford the current meal after accounting for current cash.
 - REWE accepts a redemption only when the player has at least `minimumBottlesToRedeem` bottles.
-- The provisional minimum is 20 bottles and must be tuned with the food-price and day-duration ranges.
+- The provisional minimum is 15 bottles and must be tuned with the food-price and day-duration ranges.
 - An attempt below the minimum does not begin a queue and emits an immediate denial event.
 
 ### REWE bottle return
@@ -196,9 +197,9 @@ Every REWE visit samples a fresh wait, even within the same day. If the day ends
 - If cash is insufficient, deny immediately; do not start a wait or deduct cash.
 - If cash is sufficient, sample a new 2–5 second wait for that visit.
 - During `food-wait`, lock movement/actions and keep the day timer running.
-- If the wait completes before day end, deduct the exact price and set `fedToday = true`.
+- If the wait completes before day end, deduct the exact price, set `fedToday = true`, and restore one heart (`HEAL_MEAL` health units, capped at `maxHealthUnits`).
 - A second meal on the same day is a no-op because it has no additional MVP effect.
-- If the day ends during the wait, cancel the purchase and preserve the pre-transaction cash and `fedToday` state.
+- If the day ends during the wait, cancel the purchase and preserve the pre-transaction cash, health, and `fedToday` state.
 
 Price generation supports future per-location ranges, but only one location is required now.
 
@@ -208,7 +209,7 @@ Price generation supports future per-location ranges, but only one location is r
 - A valid REWE transaction has no floating-point drift and cannot double-spend bottles.
 - Counter animation values reconcile exactly to the authoritative post-transaction state.
 - The meal price is stable for one day and rerolls on the next day.
-- A successful food purchase deducts the displayed price and sets `fedToday`.
+- A successful food purchase deducts the displayed price, sets `fedToday`, and restores one heart up to the max.
 - Denied and interrupted transactions leave authoritative resources unchanged.
 
 ## WP-3 — Seven-day run loop
@@ -266,7 +267,7 @@ Mechanics emits semantic event IDs. The sound workstream supplies short 8-bit-st
 | `bottles-depositing` | `bottles-depositing.mp3` | Bottle counter transfer begins; 8-bit glass clink |
 | `cash-received` | `cash-received.mp3` | Cash has been credited; 8-bit cha-ching |
 | `food-wait-started` | `food-wait-started.mp3` | Döner wait begins |
-| `food-bought` | `food-bought.mp3` | Food transaction completes |
+| `food-bought` | `food-bought.mp3` | Food transaction completes; may restore one heart |
 | `food-denied` | `food-denied.mp3` | Insufficient cash or already fed |
 | `day-failed` | `day-failed.mp3` | End-of-day heart loss |
 | `day-survived` | `day-survived.mp3` | Day resolves without meal damage |
@@ -296,6 +297,7 @@ Mechanics emits semantic event IDs. The sound workstream supplies short 8-bit-st
 
   maxHealthUnits: 6,
   damage: { missedMeal: 2, binHazard: 1 },
+  heal: { meal: 2 },
 
   bottleValueCents: 25,
   minimumBottlesToRedeem: 20,
@@ -340,9 +342,9 @@ Randomness must be injectable or seedable for deterministic tests of bin placeme
 12. The live timer continues and movement is locked during venue waits.
 13. Completed redemption updates state exactly, then animates bottles down and euros up with bottle-clink and cash cues.
 14. The daily Döner price is visible, falls within €4–€8, and remains stable for that day.
-15. An affordable purchase samples a 2–5 second wait, deducts the exact price, and marks the player fed.
-16. Insufficient or interrupted transactions do not change bottles, cash, or fed state.
-17. Missing food at time zero costs one heart; eating avoids that damage.
+15. An affordable purchase samples a 2–5 second wait, deducts the exact price, marks the player fed, and restores one heart (capped).
+16. Insufficient or interrupted transactions do not change bottles, cash, health, or fed state.
+17. Missing food at time zero ends the run; eating restores a heart and avoids that failure.
 18. Zero health loses; surviving the end of day seven wins.
 19. Seeded tests reproduce all mechanics randomness.
 20. The entire loop remains understandable and functional with audio muted.

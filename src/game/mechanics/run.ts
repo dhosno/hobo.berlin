@@ -7,6 +7,7 @@ import {
   DAYS_PER_RUN,
   DONER_WAIT_MAX_MS,
   DONER_WAIT_MIN_MS,
+  HEAL_MEAL,
   MAX_HEALTH_UNITS,
   MEAL_VENDOR_NAME,
   MINIMUM_BOTTLES_TO_REDEEM,
@@ -369,18 +370,25 @@ function completeRewe(state: GameState): GameState {
 }
 
 function completeFood(state: GameState): GameState {
+  const healthBefore = state.player.healthUnits;
+  const healthUnits = Math.min(MAX_HEALTH_UNITS, healthBefore + HEAL_MEAL);
+  const healed = healthUnits > healthBefore;
+  const toast = healed
+    ? `−${formatCash(state.mealPriceCents)} · +1 ♥`
+    : `−${formatCash(state.mealPriceCents)} · ${MEAL_VENDOR_NAME}`;
   return emit(
     {
       ...state,
       player: {
         ...state.player,
         cashCents: state.venue.cashBefore - state.mealPriceCents,
+        healthUnits,
       },
       fedToday: true,
       venue: idleVenue(),
     },
     "food-bought",
-    `−${formatCash(state.mealPriceCents)} · ${MEAL_VENDOR_NAME}`,
+    toast,
   );
 }
 

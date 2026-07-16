@@ -125,7 +125,7 @@ test("an invalid map shows a readable failure and does not start gameplay", asyn
         orientation: "orthogonal",
         infinite: false,
         width: 18,
-        height: 28,
+        height: 26,
         tilewidth: 28,
         tileheight: 28,
         layers: [

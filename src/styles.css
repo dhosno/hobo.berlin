@@ -30,12 +30,32 @@ body {
 
 #frame {
   position: relative;
+  display: flex;
+  flex-direction: column;
   width: min(100vw, calc(100vh * 18 / 28));
   height: min(100vh, calc(100vw * 28 / 18));
   aspect-ratio: 18 / 28;
   background: var(--frame);
   overflow: hidden;
   box-shadow: 0 0 0 1px rgba(243, 240, 230, 0.08);
+}
+
+#hud {
+  position: relative;
+  z-index: 5;
+  flex: 0 0 auto;
+  padding: 0.45rem 0.55rem 0.4rem;
+  background: #141a12;
+  border-bottom: 1px solid rgba(243, 240, 230, 0.1);
+  pointer-events: none;
+  font-size: 0.78rem;
+}
+
+#playfield {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
 }
 
 #game {
@@ -48,21 +68,6 @@ body {
   display: block;
   width: 100% !important;
   height: 100% !important;
-}
-
-#hud {
-  position: absolute;
-  inset: 0 0 auto 0;
-  z-index: 5;
-  padding: 0.45rem 0.55rem 0.35rem;
-  background: linear-gradient(
-    to bottom,
-    rgba(18, 22, 15, 0.94) 0%,
-    rgba(18, 22, 15, 0.78) 70%,
-    transparent 100%
-  );
-  pointer-events: none;
-  font-size: 0.78rem;
 }
 
 .hud-grid {
@@ -374,8 +379,18 @@ body {
 }
 
 #queue-bar {
-  margin-top: 0.35rem;
-  max-width: 14rem;
+  position: absolute;
+  top: 0.45rem;
+  left: 50%;
+  z-index: 7;
+  transform: translateX(-50%);
+  width: min(86%, 14rem);
+  padding: 0.35rem 0.55rem;
+  border-radius: 10px;
+  background: rgba(18, 22, 15, 0.92);
+  border: 1px solid rgba(243, 240, 230, 0.12);
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.28);
 }
 
 #queue-bar.hidden {

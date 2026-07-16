@@ -1,10 +1,10 @@
-/** Phase 1 layout: vertical sketch grid (from mechanics branch). */
+/** Phase 1 board: 18×26 playable cells; HUD is a layout row above the playfield in the 18×28 frame. */
 
 export const GRID_COLUMNS = 18;
-export const GRID_ROWS = 28;
+export const GRID_ROWS = 26;
 export const CELL_SIZE = 28;
 export const DESIGN_WIDTH = GRID_COLUMNS * CELL_SIZE; // 504
-export const DESIGN_HEIGHT = GRID_ROWS * CELL_SIZE; // 784
+export const DESIGN_HEIGHT = GRID_ROWS * CELL_SIZE; // 728
 
 export const INITIAL_REPEAT_DELAY_MS = 180;
 export const REPEAT_INTERVAL_MS = 100;
@@ -12,7 +12,7 @@ export const REPEAT_INTERVAL_MS = 100;
 export const ACTION_DEBOUNCE_MS = 280;
 
 /** Economy / run balance (from mechanics sketch + game-mechanics.md). */
-export const DAYS_PER_RUN = 1;
+export const DAYS_PER_RUN = 7;
 export const DAY_DURATION_MS = 60_000;
 export const PRE_DAY_NIGHT_MS = 1_400;
 export const PRE_DAY_DAWN_MS = 1_400;
@@ -21,10 +21,12 @@ export const COUNTDOWN_SECONDS = 3;
 export const MAX_HEALTH_UNITS = 6;
 export const DAMAGE_MISSED_MEAL = 2;
 export const DAMAGE_BIN_HAZARD = 1;
+/** One full heart restored when a meal purchase completes. */
+export const HEAL_MEAL = 2;
 
 export const STARTING_CASH_CENTS = 0;
 export const BOTTLE_VALUE_CENTS = 25;
-export const MINIMUM_BOTTLES_TO_REDEEM = 20;
+export const MINIMUM_BOTTLES_TO_REDEEM = 15;
 
 export const BIN_COUNT = 12;
 export const LOOSE_BOTTLE_COUNT = 10;
